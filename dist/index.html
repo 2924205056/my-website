@@ -267,8 +267,8 @@
 
     /* 进入动画 */
     @keyframes cg-enter {
-      0% { opacity: 0; transform: translateX(80px); }
-      100% { opacity: 1; transform: translateX(0); }
+      0% { opacity: 0; transform: translateX(-80px) scaleX(-1); }
+      100% { opacity: 1; transform: translateX(0) scaleX(-1); }
     }
 
     @keyframes hero-cloud-drift {
@@ -389,6 +389,7 @@
       pointer-events: none;
       overflow: visible;
       animation: cg-enter 1s ease-out;
+      transform: scaleX(-1);
     }
 
     #cloud-glider.cg-home-glider {
