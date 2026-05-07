@@ -246,7 +246,7 @@ export default function App() {
           <div className="relative">
             {/* Using the user provided image as character */}
             <img 
-              src="https://storage.googleapis.com/mle-it-outputs/cqtj5ueg5e2jn5f5qgppju/SkateCloud.png" 
+              src="/images/0641f907-e976-44bd-b2dc-f08e14852cd9.png" 
               alt="SkateCloud"
               className="w-24 h-24 object-contain drop-shadow-2xl"
               referrerPolicy="no-referrer"
@@ -296,7 +296,7 @@ export default function App() {
             <motion.img 
               animate={{ y: [0, -20, 0] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              src="https://storage.googleapis.com/mle-it-outputs/cqtj5ueg5e2jn5f5qgppju/SkateCloud.png"
+              src="/images/0641f907-e976-44bd-b2dc-f08e14852cd9.png"
               className="w-40 h-40 mb-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.5)]"
             />
             <h1 className="text-6xl font-black text-white mb-2 drop-shadow-lg tracking-tighter">云端酷跑</h1>
