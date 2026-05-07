@@ -248,7 +248,7 @@ export default function App() {
             <img 
               src="/images/0641f907-e976-44bd-b2dc-f08e14852cd9.png" 
               alt="SkateCloud"
-              className="w-24 h-24 object-contain drop-shadow-2xl"
+              className="w-28 h-28 object-contain drop-shadow-2xl"
               referrerPolicy="no-referrer"
             />
             {/* Trail effect */}
