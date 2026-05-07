@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkateCloud Adventure - 云端酷跑</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    .animate-bounce-slow { animation: bounce 2s ease-in-out infinite; }
+    .animate-pulse-fast { animation: pulse 1s ease-in-out infinite; }
+    
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    #gameCanvas {
+      display: block;
+    }
+    
+    .cloud-bg {
+      position: absolute;
+      color: rgba(255,255,255,0.3);
+      animation: drift linear infinite;
+    }
+    
+    @keyframes drift {
+      from { transform: translateX(-200px); }
+      to { transform: translateX(calc(100vw + 200px)); }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-sky-400 to-sky-200 h-screen w-screen overflow-hidden">
+  <!-- Background Clouds -->
+  <div id="bgClouds" class="absolute inset-0 pointer-events-none"></div>
+  
+  <!-- Game Canvas -->
+  <canvas id="gameCanvas" class="absolute inset-0" style="background: linear-gradient(180deg, #38bdf8, #bae6fd);"></canvas>
+  
+  <!-- Score -->
+  <div class="absolute top-8 left-8 z-20">
+    <div class="flex items-center gap-2 bg-white/20 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/30 shadow-xl">
+      <span class="text-2xl">⚡</span>
+      <span id="scoreDisplay" class="text-2xl font-extrabold text-white tracking-widest">0</span>
+    </div>
+  </div>
+  
+  <!-- Start Screen -->
+  <div id="startScreen" class="absolute inset-0 z-30 flex flex-col items-center justify-center bg-sky-900/40 backdrop-blur-sm px-6 text-center">
+    <div class="animate-float mb-6 text-8xl">☁️</div>
+    <h1 class="text-6xl font-black text-white mb-2 drop-shadow-lg tracking-tighter">云端酷跑</h1>
+    <p class="text-xl text-sky-50 font-medium mb-8 max-w-sm">选择你的云端挑战难度</p>
+    
+    <div class="flex flex-col gap-4 w-full max-w-xs">
+      <button onclick="startGame('easy')" class="bg-green-400 hover:bg-green-500 text-white px-8 py-4 rounded-2xl text-xl font-bold shadow-lg transition-all transform hover:scale-105 flex items-center justify-between">
+        <span class="flex items-center gap-3">
+          <span>▶</span>
+          <span>休闲</span>
+        </span>
+        <span class="text-sm opacity-70 font-normal">放松心境</span>
+      </button>
+      
+      <button onclick="startGame('normal')" class="bg-blue-400 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl text-xl font-bold shadow-lg transition-all transform hover:scale-105 flex items-center justify-between">
+        <span class="flex items-center gap-3">
+          <span>▶</span>
+          <span>普通</span>
+        </span>
+        <span class="text-sm opacity-70 font-normal">平稳节奏</span>
+      </button>
+      
+      <button onclick="startGame('hard')" class="bg-rose-500 hover:bg-rose-600 text-white px-8 py-4 rounded-2xl text-xl font-bold shadow-lg transition-all transform hover:scale-105 flex items-center justify-between">
+        <span class="flex items-center gap-3">
+          <span>⚡</span>
+          <span>专家</span>
+        </span>
+        <span class="text-sm opacity-70 font-normal">极速瞬移</span>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Game Over Screen -->
+  <div id="gameOverScreen" class="hidden absolute inset-0 z-40 flex flex-col items-center justify-center bg-rose-500/90 backdrop-blur-md text-white p-8 text-center">
+    <div class="text-6xl mb-4 animate-bounce">🏆</div>
+    <h2 class="text-6xl font-black mb-1">出局啦!</h2>
+    <p id="difficultyText" class="text-xl opacity-90 mb-6 italic">你在 普通 模式中获得了：</p>
+    
+    <div class="bg-black/20 px-8 py-4 rounded-3xl mb-8">
+      <span id="finalScore" class="text-6xl font-black tabular-nums">0</span>
+    </div>
+    
+    <div class="flex flex-col gap-4 w-full max-w-xs">
+      <button onclick="restartGame()" class="flex items-center justify-center gap-3 bg-white text-rose-600 px-8 py-4 rounded-2xl text-xl font-bold shadow-xl transition-all transform hover:scale-105">
+        <span>↻</span>
+        <span>再试一次</span>
+      </button>
+      
+      <button onclick="backToMenu()" class="text-white/80 hover:text-white font-medium underline underline-offset-4">
+        返回难度选择
+      </button>
+    </div>
+  </div>
+  
+  <!-- Instructions -->
+  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/70 text-sm">
+    点击屏幕或按空格键跳跃
+  </div>
+
+  <script>
+    // Game Configuration
+    const DIFFICULTY = {
+      easy: { gravity: 0.4, jumpStrength: -10, gameSpeed: 4, spawnRate: 200 },
+      normal: { gravity: 0.5, jumpStrength: -11, gameSpeed: 5.5, spawnRate: 140 },
+      hard: { gravity: 0.65, jumpStrength: -13, gameSpeed: 8, spawnRate: 80 }
+    };
+    
+    // Game State
+    let canvas, ctx;
+    let gameState = 'menu'; // menu, playing, gameover
+    let currentDifficulty = 'normal';
+    let score = 0;
+    let frameCount = 0;
+    let animationId = null;
+    
+    // Player
+    let player = {
+      x: 60,
+      y: 200,
+      velocity: 0,
+      width: 60,
+      height: 60,
+      rotation: 0
+    };
+    
+    // Obstacles
+    let obstacles = [];
+    
+    // Background clouds
+    let bgClouds = [];
+    
+    // Initialize
+    function init() {
+      canvas = document.getElementById('gameCanvas');
+      ctx = canvas.getContext('2d');
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      
+      // Create background clouds
+      for (let i = 0; i < 5; i++) {
+        bgClouds.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * 200,
+          scale: 0.5 + Math.random() * 0.5,
+          speed: 0.5 + Math.random() * 0.5
+        });
+      }
+      
+      // Input handlers
+      canvas.addEventListener('click', jump);
+      canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); });
+      window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' || e.code === 'ArrowUp') {
+          e.preventDefault();
+          jump();
+        }
+      });
+      
+      // Start render loop
+      render();
+    }
+    
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    
+    function startGame(difficulty) {
+      currentDifficulty = difficulty;
+      gameState = 'playing';
+      score = 0;
+      frameCount = 0;
+      obstacles = [];
+      
+      const config = DIFFICULTY[difficulty];
+      player.y = canvas.height / 2;
+      player.velocity = config.jumpStrength;
+      
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('gameOverScreen').classList.add('hidden');
+      
+      updateScore();
+    }
+    
+    function jump() {
+      if (gameState !== 'playing') return;
+      const config = DIFFICULTY[currentDifficulty];
+      player.velocity = config.jumpStrength;
+    }
+    
+    function update() {
+      if (gameState !== 'playing') return;
+      
+      frameCount++;
+      const config = DIFFICULTY[currentDifficulty];
+      
+      // Update player
+      player.velocity += config.gravity;
+      player.y += player.velocity;
+      player.rotation = player.velocity * 2;
+      
+      // Ground collision
+      if (player.y > canvas.height - 100) {
+        gameOver();
+        return;
+      }
+      
+      // Ceiling collision
+      if (player.y < 0) {
+        player.y = 0;
+        player.velocity = 0;
+      }
+      
+      // Spawn obstacles
+      if (frameCount > 100 && frameCount % config.spawnRate === 0) {
+        const height = 80 + Math.random() * 120;
+        obstacles.push({
+          x: canvas.width,
+          y: canvas.height - height - 50,
+          width: 60,
+          height: height,
+          type: Math.random() > 0.8 ? 'bird' : 'storm'
+        });
+      }
+      
+      // Update obstacles
+      obstacles = obstacles.filter(obs => {
+        obs.x -= config.gameSpeed;
+        return obs.x > -100;
+      });
+      
+      // Update background clouds
+      bgClouds.forEach(cloud => {
+        cloud.x -= cloud.speed;
+        if (cloud.x < -200) {
+          cloud.x = canvas.width + 200;
+          cloud.y = Math.random() * 200;
+        }
+      });
+      
+      // Collision detection
+      const playerPadding = 15;
+      const playerRect = {
+        left: player.x + playerPadding,
+        right: player.x + player.width - playerPadding,
+        top: player.y + playerPadding,
+        bottom: player.y + player.height - playerPadding
+      };
+      
+      for (let obs of obstacles) {
+        const obsPadding = 10;
+        const obsRect = {
+          left: obs.x + obsPadding,
+          right: obs.x + obs.width - obsPadding,
+          top: obs.y + obsPadding,
+          bottom: obs.y + obs.height - obsPadding
+        };
+        
+        if (playerRect.left < obsRect.right &&
+            playerRect.right > obsRect.left &&
+            playerRect.top < obsRect.bottom &&
+            playerRect.bottom > obsRect.top) {
+          gameOver();
+          return;
+        }
+      }
+      
+      // Update score
+      score += currentDifficulty === 'hard' ? 2 : 1;
+      if (frameCount % 10 === 0) {
+        updateScore();
+      }
+    }
+    
+    function render() {
+      // Clear canvas with sky gradient
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, '#38bdf8');
+      gradient.addColorStop(1, '#bae6fd');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw background clouds
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      bgClouds.forEach(cloud => {
+        ctx.beginPath();
+        ctx.arc(cloud.x, cloud.y, 50 * cloud.scale, 0, Math.PI * 2);
+        ctx.arc(cloud.x + 30 * cloud.scale, cloud.y - 20 * cloud.scale, 40 * cloud.scale, 0, Math.PI * 2);
+        ctx.arc(cloud.x + 60 * cloud.scale, cloud.y, 50 * cloud.scale, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      
+      if (gameState === 'playing') {
+        // Draw player (cloud)
+        ctx.save();
+        ctx.translate(player.x + player.width/2, player.y + player.height/2);
+        ctx.rotate(player.rotation * Math.PI / 180);
+        
+        // Cloud body
+        ctx.fillStyle = 'white';
+        ctx.shadowColor = 'rgba(0,0,0,0.2)';
+        ctx.shadowBlur = 20;
+        ctx.beginPath();
+        ctx.arc(-20, 0, 25, 0, Math.PI * 2);
+        ctx.arc(0, -15, 30, 0, Math.PI * 2);
+        ctx.arc(20, 0, 25, 0, Math.PI * 2);
+        ctx.arc(0, 10, 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        
+        // Face
+        ctx.fillStyle = '#333';
+        ctx.beginPath();
+        ctx.arc(-10, -5, 4, 0, Math.PI * 2);
+        ctx.arc(10, -5, 4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Smile
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, 10, 0.2, Math.PI - 0.2);
+        ctx.stroke();
+        
+        ctx.restore();
+        
+        // Draw obstacles
+        obstacles.forEach(obs => {
+          if (obs.type === 'storm') {
+            // Storm cloud
+            ctx.fillStyle = '#475569';
+            ctx.beginPath();
+            ctx.roundRect(obs.x, obs.y, obs.width, obs.height, 10);
+            ctx.fill();
+            
+            // Lightning
+            ctx.strokeStyle = '#facc15';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(obs.x + 20, obs.y + 20);
+            ctx.lineTo(obs.x + 30, obs.y + 40);
+            ctx.lineTo(obs.x + 25, obs.y + 40);
+            ctx.lineTo(obs.x + 35, obs.y + 60);
+            ctx.stroke();
+          } else {
+            // Bird
+            ctx.fillStyle = '#f87171';
+            ctx.beginPath();
+            ctx.roundRect(obs.x, obs.y, obs.width, obs.height, 10);
+            ctx.fill();
+            
+            // Devil face
+            ctx.fillStyle = '#7f1d1d';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('👿', obs.x + obs.width/2, obs.y + 30);
+          }
+        });
+        
+        // Draw ground line
+        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height - 50);
+        ctx.lineTo(canvas.width, canvas.height - 50);
+        ctx.stroke();
+      }
+      
+      update();
+      animationId = requestAnimationFrame(render);
+    }
+    
+    function updateScore() {
+      document.getElementById('scoreDisplay').textContent = score;
+    }
+    
+    function gameOver() {
+      gameState = 'gameover';
+      document.getElementById('finalScore').textContent = score;
+      document.getElementById('difficultyText').textContent = 
+        `你在 ${currentDifficulty === 'easy' ? '休闲' : currentDifficulty === 'hard' ? '专家' : '普通'} 模式中获得了：`;
+      document.getElementById('gameOverScreen').classList.remove('hidden');
+    }
+    
+    function restartGame() {
+      startGame(currentDifficulty);
+    }
+    
+    function backToMenu() {
+      gameState = 'menu';
+      document.getElementById('gameOverScreen').classList.add('hidden');
+      document.getElementById('startScreen').classList.remove('hidden');
+    }
+    
+    // Start
+    init();
+  </script>
+</body>
+</html>

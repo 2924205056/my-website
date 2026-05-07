@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编码解码转换器</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-start:#D6EEFF;--bg-mid1:#E8F4FD;--bg-mid2:#F0F7FF;--bg-end:#F5F0FF;
+  --card-bg:rgba(255,255,255,0.85);--card-shadow:0 8px 32px rgba(100,149,237,0.15);
+  --accent:#5B9BD5;--accent-light:#A7D0F5;--accent-pink:#F2A7C3;
+  --text:#2C3E6B;--text-light:#6B84B0;--mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+  --radius:28px;--pill-radius:50px;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{
+  font-family:'Nunito',sans-serif;color:var(--text);min-height:100vh;
+  background:linear-gradient(170deg,var(--bg-start) 0%,var(--bg-mid1) 30%,var(--bg-mid2) 60%,var(--bg-end) 100%);
+  background-attachment:fixed;overflow-x:hidden;
+}
+
+.cloud{
+  position:fixed;border-radius:50%;pointer-events:none;z-index:0;
+  background:rgba(255,255,255,0.7);filter:blur(1px);
+}
+.cloud::before,.cloud::after{
+  content:'';position:absolute;background:inherit;border-radius:50%;
+}
+.cloud-1{width:180px;height:60px;top:8%;left:-200px;animation:floatCloud 35s linear infinite}
+.cloud-1::before{width:90px;height:50px;top:-25px;left:30px}
+.cloud-1::after{width:70px;height:40px;top:-15px;left:80px}
+
+.cloud-2{width:140px;height:45px;top:18%;left:-160px;animation:floatCloud 42s linear 5s infinite;opacity:0.6}
+.cloud-2::before{width:70px;height:40px;top:-20px;left:25px}
+.cloud-2::after{width:55px;height:32px;top:-12px;left:65px}
+
+.cloud-3{width:200px;height:65px;top:35%;left:-220px;animation:floatCloud 50s linear 12s infinite;opacity:0.5}
+.cloud-3::before{width:100px;height:55px;top:-28px;left:40px}
+.cloud-3::after{width:80px;height:45px;top:-18px;left:100px}
+
+.cloud-4{width:120px;height:40px;top:55%;left:-150px;animation:floatCloud 38s linear 20s infinite;opacity:0.55}
+.cloud-4::before{width:60px;height:35px;top:-18px;left:20px}
+.cloud-4::after{width:50px;height:28px;top:-10px;left:55px}
+
+.cloud-5{width:160px;height:52px;top:72%;left:-180px;animation:floatCloud 45s linear 8s infinite;opacity:0.45}
+.cloud-5::before{width:80px;height:45px;top:-22px;left:35px}
+.cloud-5::after{width:65px;height:36px;top:-14px;left:85px}
+
+.cloud-6{width:100px;height:35px;top:88%;left:-130px;animation:floatCloud 33s linear 15s infinite;opacity:0.5}
+.cloud-6::before{width:50px;height:30px;top:-15px;left:18px}
+.cloud-6::after{width:40px;height:24px;top:-8px;left:48px}
+
+@keyframes floatCloud{
+  from{transform:translateX(0)}
+  to{transform:translateX(calc(100vw + 300px))}
+}
+
+.container{
+  position:relative;z-index:1;max-width:1100px;margin:0 auto;
+  padding:40px 20px 60px;
+}
+
+header{text-align:center;margin-bottom:36px}
+header h1{
+  font-size:2.2rem;font-weight:800;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent-pink) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+header p{color:var(--text-light);font-size:0.95rem;margin-top:6px}
+
+.tools-bar{
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+  margin-bottom:28px;
+}
+.tool-pill{
+  padding:8px 18px;border:2px solid var(--accent-light);border-radius:var(--pill-radius);
+  background:var(--card-bg);backdrop-filter:blur(8px);cursor:pointer;
+  font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:600;
+  color:var(--text);transition:all .25s ease;user-select:none;
+}
+.tool-pill:hover{border-color:var(--accent);background:rgba(91,155,213,0.08)}
+.tool-pill.active{
+  background:linear-gradient(135deg,var(--accent),#7EB8E8);
+  color:#fff;border-color:transparent;
+  box-shadow:0 4px 16px rgba(91,155,213,0.35);
+}
+
+.hmac-row{
+  display:none;align-items:center;gap:8px;justify-content:center;
+  margin-bottom:20px;
+}
+.hmac-row.visible{display:flex}
+.hmac-row label{font-size:0.85rem;font-weight:600;color:var(--text-light)}
+.hmac-row input{
+  padding:8px 14px;border:2px solid var(--accent-light);border-radius:14px;
+  background:var(--card-bg);backdrop-filter:blur(8px);
+  font-family:var(--mono);font-size:0.85rem;color:var(--text);
+  outline:none;width:260px;transition:border-color .2s;
+}
+.hmac-row input:focus{border-color:var(--accent)}
+
+.main-card{
+  background:var(--card-bg);backdrop-filter:blur(16px);
+  border-radius:var(--radius);box-shadow:var(--card-shadow);
+  padding:28px;border:1px solid rgba(255,255,255,0.6);
+}
+
+.panels{display:flex;gap:20px;align-items:stretch}
+.panel{flex:1;display:flex;flex-direction:column;min-width:0}
+.panel-label{
+  font-size:0.8rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:1px;color:var(--text-light);margin-bottom:8px;
+}
+.panel textarea{
+  width:100%;min-height:220px;resize:vertical;
+  border:2px solid rgba(91,155,213,0.15);border-radius:16px;
+  padding:14px 16px;font-family:var(--mono);font-size:0.9rem;
+  line-height:1.6;color:var(--text);background:rgba(255,255,255,0.6);
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.panel textarea:focus{
+  border-color:var(--accent-light);
+  box-shadow:0 0 0 3px rgba(91,155,213,0.1);
+}
+.panel textarea::placeholder{color:var(--text-light);opacity:0.6}
+
+.panel-meta{
+  display:flex;justify-content:space-between;margin-top:6px;
+  font-size:0.75rem;color:var(--text-light);font-weight:600;
+}
+
+.swap-col{
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.swap-btn{
+  width:44px;height:44px;border-radius:50%;border:2px solid var(--accent-light);
+  background:var(--card-bg);backdrop-filter:blur(8px);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .25s ease;color:var(--accent);
+}
+.swap-btn:hover{
+  background:var(--accent);color:#fff;border-color:var(--accent);
+  transform:rotate(180deg);
+}
+.swap-btn svg{width:20px;height:20px}
+
+.actions{display:flex;gap:10px;margin-top:18px;justify-content:flex-end;flex-wrap:wrap}
+.action-btn{
+  padding:10px 22px;border-radius:var(--pill-radius);border:none;
+  font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;
+  cursor:pointer;transition:all .25s ease;display:flex;align-items:center;gap:6px;
+}
+.action-btn svg{width:16px;height:16px}
+.btn-copy{
+  background:linear-gradient(135deg,var(--accent),#7EB8E8);color:#fff;
+  box-shadow:0 4px 14px rgba(91,155,213,0.3);
+}
+.btn-copy:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(91,155,213,0.4)}
+.btn-clear{
+  background:rgba(242,167,195,0.15);color:var(--accent-pink);
+  border:2px solid rgba(242,167,195,0.3);
+}
+.btn-clear:hover{background:rgba(242,167,195,0.25)}
+
+.toast{
+  position:fixed;top:30px;left:50%;transform:translateX(-50%) translateY(-80px);
+  background:linear-gradient(135deg,var(--accent),#7EB8E8);color:#fff;
+  padding:12px 28px;border-radius:var(--pill-radius);font-weight:700;
+  font-size:0.9rem;box-shadow:0 8px 30px rgba(91,155,213,0.4);
+  z-index:9999;opacity:0;transition:all .4s cubic-bezier(.68,-.55,.27,1.55);
+  pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.history-section{margin-top:32px}
+.history-title{
+  font-size:1rem;font-weight:700;color:var(--text-light);
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.history-title svg{width:18px;height:18px}
+.history-list{display:flex;flex-direction:column;gap:10px}
+.history-item{
+  background:var(--card-bg);backdrop-filter:blur(12px);
+  border-radius:16px;padding:14px 18px;
+  border:1px solid rgba(255,255,255,0.5);
+  box-shadow:0 4px 16px rgba(100,149,237,0.08);
+  cursor:pointer;transition:all .2s ease;
+}
+.history-item:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(100,149,237,0.15)}
+.history-item-head{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;
+}
+.history-item-tool{
+  font-size:0.75rem;font-weight:700;
+  background:linear-gradient(135deg,var(--accent),#7EB8E8);
+  color:#fff;padding:3px 12px;border-radius:var(--pill-radius);
+}
+.history-item-time{font-size:0.72rem;color:var(--text-light)}
+.history-item-input,.history-item-output{
+  font-family:var(--mono);font-size:0.78rem;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:100%;
+}
+.history-item-input{opacity:0.6}
+.history-item-output{margin-top:2px}
+.history-empty{
+  text-align:center;color:var(--text-light);font-size:0.85rem;
+  padding:20px;opacity:0.6;
+}
+
+@media(max-width:700px){
+  .panels{flex-direction:column}
+  .swap-col{transform:rotate(90deg);margin:4px 0}
+  header h1{font-size:1.6rem}
+  .container{padding:24px 14px 40px}
+  .main-card{padding:18px}
+  .panel textarea{min-height:150px}
+  .hmac-row{flex-direction:column}
+  .hmac-row input{width:100%}
+}
+</style>
+</head>
+<body>
+
+<div class="cloud cloud-1"></div>
+<div class="cloud cloud-2"></div>
+<div class="cloud cloud-3"></div>
+<div class="cloud cloud-4"></div>
+<div class="cloud cloud-5"></div>
+<div class="cloud cloud-6"></div>
+
+<div class="toast" id="toast">已复制!</div>
+
+<div class="container">
+  <header>
+    <h1>☁️ 编码解码转换器</h1>
+    <p>实时转换，支持多种编码格式</p>
+  </header>
+
+  <div class="tools-bar" id="toolsBar">
+    <button class="tool-pill active" data-tool="base64enc">Base64编码</button>
+    <button class="tool-pill" data-tool="base64dec">Base64解码</button>
+    <button class="tool-pill" data-tool="urlenc">URL编码</button>
+    <button class="tool-pill" data-tool="urldec">URL解码</button>
+    <button class="tool-pill" data-tool="unicodeenc">Unicode编码</button>
+    <button class="tool-pill" data-tool="unicodedec">Unicode解码</button>
+    <button class="tool-pill" data-tool="md5">MD5哈希</button>
+    <button class="tool-pill" data-tool="sha256">SHA256哈希</button>
+    <button class="tool-pill" data-tool="hmacsha256">HMAC-SHA256</button>
+  </div>
+
+  <div class="hmac-row" id="hmacRow">
+    <label>密钥:</label>
+    <input type="text" id="hmacKey" placeholder="请输入HMAC密钥" autocomplete="off">
+  </div>
+
+  <div class="main-card">
+    <div class="panels">
+      <div class="panel">
+        <div class="panel-label">输入</div>
+        <textarea id="inputArea" placeholder="在此输入文本..."></textarea>
+        <div class="panel-meta">
+          <span id="inputCharCount">0 字符</span>
+          <span id="inputByteCount">0 字节</span>
+        </div>
+      </div>
+      <div class="swap-col">
+        <button class="swap-btn" id="swapBtn" title="交换输入输出">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 16l-4-4 4-4"/><path d="M17 8l4 4-4 4"/><line x1="3" y1="12" x2="21" y2="12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="panel">
+        <div class="panel-label">输出</div>
+        <textarea id="outputArea" placeholder="转换结果..." readonly></textarea>
+        <div class="panel-meta">
+          <span id="outputCharCount">0 字符</span>
+          <span id="outputByteCount">0 字节</span>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="action-btn btn-clear" id="clearBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        清空
+      </button>
+      <button class="action-btn btn-copy" id="copyBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+        </svg>
+        复制结果
+      </button>
+    </div>
+  </div>
+
+  <div class="history-section">
+    <div class="history-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+      最近转换
+    </div>
+    <div class="history-list" id="historyList">
+      <div class="history-empty">暂无转换记录</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var inputArea = document.getElementById('inputArea');
+  var outputArea = document.getElementById('outputArea');
+  var toolsBar = document.getElementById('toolsBar');
+  var hmacRow = document.getElementById('hmacRow');
+  var hmacKeyInput = document.getElementById('hmacKey');
+  var swapBtn = document.getElementById('swapBtn');
+  var copyBtn = document.getElementById('copyBtn');
+  var clearBtn = document.getElementById('clearBtn');
+  var toast = document.getElementById('toast');
+  var historyList = document.getElementById('historyList');
+  var inputCharCount = document.getElementById('inputCharCount');
+  var inputByteCount = document.getElementById('inputByteCount');
+  var outputCharCount = document.getElementById('outputCharCount');
+  var outputByteCount = document.getElementById('outputByteCount');
+
+  var currentTool = 'base64enc';
+  var history = [];
+  var toastTimer = null;
+
+  var toolNames = {
+    base64enc:'Base64编码',base64dec:'Base64解码',
+    urlenc:'URL编码',urldec:'URL解码',
+    unicodeenc:'Unicode编码',unicodedec:'Unicode解码',
+    md5:'MD5哈希',sha256:'SHA256哈希',hmacsha256:'HMAC-SHA256'
+  };
+
+  function getByteLen(str){
+    return new Blob([str]).size;
+  }
+
+  function updateCounts(){
+    var iv = inputArea.value;
+    var ov = outputArea.value;
+    inputCharCount.textContent = iv.length + ' 字符';
+    inputByteCount.textContent = getByteLen(iv) + ' 字节';
+    outputCharCount.textContent = ov.length + ' 字符';
+    outputByteCount.textContent = getByteLen(ov) + ' 字节';
+  }
+
+  function showToast(msg){
+    toast.textContent = msg || '已复制!';
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){toast.classList.remove('show')},1800);
+  }
+
+  function utf8ToBytes(str){
+    var bytes = [];
+    for(var i=0;i<str.length;i++){
+      var c = str.charCodeAt(i);
+      if(c<0x80) bytes.push(c);
+      else if(c<0x800){bytes.push(0xc0|(c>>6));bytes.push(0x80|(c&0x3f))}
+      else if(c<0xd800||c>=0xe000){
+        bytes.push(0xe0|(c>>12));bytes.push(0x80|((c>>6)&0x3f));bytes.push(0x80|(c&0x3f));
+      }else{
+        i++;
+        c = 0x10000+(((c&0x3ff)<<10)|(str.charCodeAt(i)&0x3ff));
+        bytes.push(0xf0|(c>>18));bytes.push(0x80|((c>>12)&0x3f));
+        bytes.push(0x80|((c>>6)&0x3f));bytes.push(0x80|(c&0x3f));
+      }
+    }
+    return bytes;
+  }
+
+  function md5(str){
+    var bytes = utf8ToBytes(str);
+    var len = bytes.length;
+    bytes.push(0x80);
+    while(bytes.length%64!==56) bytes.push(0);
+    var bitLen = len*8;
+    bytes.push(bitLen&0xff);bytes.push((bitLen>>8)&0xff);
+    bytes.push((bitLen>>16)&0xff);bytes.push((bitLen>>24)&0xff);
+    bytes.push(0);bytes.push(0);bytes.push(0);bytes.push(0);
+
+    var a0=0x67452301,b0=0xefcdab89,c0=0x98badcfe,d0=0x10325476;
+    var S=[7,12,17,22,7,12,17,22,7,12,17,22,7,12,17,22,
+           5,9,14,20,5,9,14,20,5,9,14,20,5,9,14,20,
+           4,11,16,23,4,11,16,23,4,11,16,23,4,11,16,23,
+           6,10,15,21,6,10,15,21,6,10,15,21,6,10,15,21];
+    var K=[];
+    for(var i=0;i<64;i++) K[i]=Math.floor(Math.abs(Math.sin(i+1))*0x100000000);
+
+    function add32(x,y){return(x+y)&0xffffffff}
+    function rotl(x,n){return(x<<n)|(x>>>(32-n))}
+
+    for(var offset=0;offset<bytes.length;offset+=64){
+      var M=[];
+      for(var j=0;j<16;j++){
+        M[j]=bytes[offset+j*4]|(bytes[offset+j*4+1]<<8)|(bytes[offset+j*4+2]<<16)|(bytes[offset+j*4+3]<<24);
+      }
+      var A=a0,B=b0,C=c0,D=d0;
+      for(var i=0;i<64;i++){
+        var F,g;
+        if(i<16){F=(B&C)|((~B)&D);g=i}
+        else if(i<32){F=(D&B)|((~D)&C);g=(5*i+1)%16}
+        else if(i<48){F=B^C^D;g=(3*i+5)%16}
+        else{F=C^(B|(~D));g=(7*i)%16}
+        F=add32(F,add32(A,add32(K[i],M[g])));
+        A=D;D=C;C=B;B=add32(B,rotl(F,S[i]));
+      }
+      a0=add32(a0,A);b0=add32(b0,B);c0=add32(c0,C);d0=add32(d0,D);
+    }
+
+    function toHex(n){return(('0000000'+(n>>>0).toString(16)).slice(-8))}
+    return toHex(a0)+toHex(b0)+toHex(c0)+toHex(d0);
+  }
+
+  async function sha256(text){
+    var encoder = new TextEncoder();
+    var data = encoder.encode(text);
+    var hash = await crypto.subtle.digest('SHA-256',data);
+    return Array.from(new Uint8Array(hash)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
+  }
+
+  async function hmacSha256(key,text){
+    var encoder = new TextEncoder();
+    var keyData = encoder.encode(key);
+    var cryptoKey = await crypto.subtle.importKey('raw',keyData,{name:'HMAC',hash:'SHA-256'},false,['sign']);
+    var data = encoder.encode(text);
+    var sig = await crypto.subtle.sign('HMAC',cryptoKey,data);
+    return Array.from(new Uint8Array(sig)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
+  }
+
+  var convertPending = false;
+  var convertTimer = null;
+
+  async function doConvert(){
+    var input = inputArea.value;
+    if(!input){
+      outputArea.value = '';
+      updateCounts();
+      return;
+    }
+    var result = '';
+    try{
+      switch(currentTool){
+        case 'base64enc':
+          result = btoa(unescape(encodeURIComponent(input)));
+          break;
+        case 'base64dec':
+          result = decodeURIComponent(escape(atob(input.trim())));
+          break;
+        case 'urlenc':
+          result = encodeURIComponent(input);
+          break;
+        case 'urldec':
+          result = decodeURIComponent(input);
+          break;
+        case 'unicodeenc':
+          result = Array.from(input).map(function(c){
+            var code = c.codePointAt(0);
+            return code > 0x7f ? '\\u'+code.toString(16).padStart(4,'0') : c;
+          }).join('');
+          break;
+        case 'unicodedec':
+          result = input.replace(/\\u([0-9a-fA-F]{4,6})/g,function(_,hex){
+            return String.fromCodePoint(parseInt(hex,16));
+          });
+          break;
+        case 'md5':
+          result = md5(input);
+          break;
+        case 'sha256':
+          result = await sha256(input);
+          break;
+        case 'hmacsha256':
+          var key = hmacKeyInput.value;
+          if(!key){result='请输入HMAC密钥'}else{result=await hmacSha256(key,input)}
+          break;
+      }
+    }catch(e){
+      result = '⚠️ 转换失败: '+e.message;
+    }
+    outputArea.value = result;
+    updateCounts();
+  }
+
+  function addHistory(input,output){
+    var now = new Date();
+    var timeStr = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
+    history.unshift({tool:currentTool,toolName:toolNames[currentTool],input:input,output:output,time:timeStr});
+    if(history.length>5) history.pop();
+    renderHistory();
+  }
+
+  function renderHistory(){
+    if(history.length===0){
+      historyList.innerHTML='<div class="history-empty">暂无转换记录</div>';
+      return;
+    }
+    historyList.innerHTML = history.map(function(h){
+      return '<div class="history-item" data-input="'+escAttr(h.input)+'" data-output="'+escAttr(h.output)+'">'+
+        '<div class="history-item-head"><span class="history-item-tool">'+h.toolName+'</span><span class="history-item-time">'+h.time+'</span></div>'+
+        '<div class="history-item-input">入: '+escHtml(h.input)+'</div>'+
+        '<div class="history-item-output">出: '+escHtml(h.output)+'</div>'+
+      '</div>';
+    }).join('');
+  }
+
+  function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+  function escAttr(s){return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+  var lastInput = '';
+  var debounceTimer = null;
+
+  function onInputChange(){
+    var val = inputArea.value;
+    if(val===lastInput) return;
+    lastInput = val;
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function(){
+      var prevOutput = outputArea.value;
+      doConvert().then(function(){
+        if(val && outputArea.value && outputArea.value.indexOf('⚠️')!==0){
+          addHistory(val,outputArea.value);
+        }
+      });
+    },150);
+  }
+
+  inputArea.addEventListener('input',onInputChange);
+  hmacKeyInput.addEventListener('input',function(){
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function(){doConvert()},200);
+  });
+
+  toolsBar.addEventListener('click',function(e){
+    var pill = e.target.closest('.tool-pill');
+    if(!pill) return;
+    toolsBar.querySelectorAll('.tool-pill').forEach(function(p){p.classList.remove('active')});
+    pill.classList.add('active');
+    currentTool = pill.dataset.tool;
+    hmacRow.classList.toggle('visible',currentTool==='hmacsha256');
+    lastInput = '';
+    onInputChange();
+  });
+
+  swapBtn.addEventListener('click',function(){
+    var tmp = inputArea.value;
+    inputArea.value = outputArea.value;
+    outputArea.value = tmp;
+    lastInput = inputArea.value;
+    updateCounts();
+  });
+
+  copyBtn.addEventListener('click',function(){
+    if(!outputArea.value) return;
+    navigator.clipboard.writeText(outputArea.value).then(function(){
+      showToast('已复制!');
+    }).catch(function(){
+      outputArea.select();
+      document.execCommand('copy');
+      showToast('已复制!');
+    });
+  });
+
+  clearBtn.addEventListener('click',function(){
+    inputArea.value = '';
+    outputArea.value = '';
+    lastInput = '';
+    updateCounts();
+  });
+
+  historyList.addEventListener('click',function(e){
+    var item = e.target.closest('.history-item');
+    if(!item) return;
+    inputArea.value = item.dataset.input;
+    outputArea.value = item.dataset.output;
+    lastInput = item.dataset.input;
+    updateCounts();
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+
+  updateCounts();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>倒计时 · Countdown</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --blue-1: #9fd0ff;
+  --blue-2: #dff2ff;
+  --blue-3: #edf8ff;
+  --pink: #F472B6;
+  --pink-light: #f9a8d4;
+  --white: #ffffff;
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --shadow-soft: 0 8px 32px rgba(159, 208, 255, 0.25);
+  --shadow-card: 0 4px 24px rgba(159, 208, 255, 0.18);
+  --radius: 24px;
+  --radius-sm: 16px;
+  --radius-xs: 12px;
+}
+
+html { font-size: 16px; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(170deg, #D6EEFF 0%, #E8F4FD 30%, #F0F7FF 60%, #F5F0FF 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: #2d3748;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.clouds-container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.cloud {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  filter: blur(1px);
+}
+
+.cloud::before, .cloud::after {
+  content: '';
+  position: absolute;
+  background: inherit;
+  border-radius: 50%;
+}
+
+.cloud-1 {
+  width: 120px; height: 50px;
+  top: 8%; left: -150px;
+  animation: floatCloud 35s linear infinite;
+}
+.cloud-1::before { width: 60px; height: 60px; top: -30px; left: 20px; }
+.cloud-1::after { width: 80px; height: 55px; top: -25px; left: 50px; }
+
+.cloud-2 {
+  width: 160px; height: 60px;
+  top: 20%; left: -200px;
+  animation: floatCloud 50s linear infinite 8s;
+  opacity: 0.6;
+}
+.cloud-2::before { width: 80px; height: 70px; top: -35px; left: 25px; }
+.cloud-2::after { width: 100px; height: 65px; top: -30px; left: 65px; }
+
+.cloud-3 {
+  width: 100px; height: 40px;
+  top: 35%; left: -130px;
+  animation: floatCloud 42s linear infinite 15s;
+  opacity: 0.5;
+}
+.cloud-3::before { width: 50px; height: 50px; top: -25px; left: 15px; }
+.cloud-3::after { width: 65px; height: 45px; top: -20px; left: 40px; }
+
+.cloud-4 {
+  width: 180px; height: 65px;
+  top: 55%; left: -220px;
+  animation: floatCloud 55s linear infinite 5s;
+  opacity: 0.4;
+}
+.cloud-4::before { width: 90px; height: 75px; top: -38px; left: 30px; }
+.cloud-4::after { width: 110px; height: 70px; top: -32px; left: 75px; }
+
+.cloud-5 {
+  width: 90px; height: 35px;
+  top: 72%; left: -120px;
+  animation: floatCloud 38s linear infinite 20s;
+  opacity: 0.35;
+}
+.cloud-5::before { width: 45px; height: 45px; top: -22px; left: 12px; }
+.cloud-5::after { width: 55px; height: 40px; top: -18px; left: 35px; }
+
+.cloud-6 {
+  width: 140px; height: 55px;
+  top: 88%; left: -170px;
+  animation: floatCloud 48s linear infinite 12s;
+  opacity: 0.3;
+}
+.cloud-6::before { width: 70px; height: 65px; top: -32px; left: 22px; }
+.cloud-6::after { width: 85px; height: 58px; top: -28px; left: 58px; }
+
+@keyframes floatCloud {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(100vw + 300px)); }
+}
+
+.app-container {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+.page-title {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.page-title h1 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #6ba3d6, #F472B6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.page-title p {
+  font-size: 0.95rem;
+  color: #7ba3c4;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.mode-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 6px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--glass-border);
+}
+
+.mode-tab {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: var(--radius-xs);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: #7ba3c4;
+}
+
+.mode-tab.active {
+  background: linear-gradient(135deg, #9fd0ff, #b8dcff);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(159, 208, 255, 0.4);
+}
+
+.mode-tab:not(.active):hover {
+  background: rgba(159, 208, 255, 0.15);
+  color: #5a8db8;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-card);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+
+.timer-setup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.time-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.time-input-group label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #7ba3c4;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.time-input {
+  width: 80px;
+  height: 80px;
+  text-align: center;
+  font-family: 'Nunito', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #3a6fa0;
+  background: rgba(223, 242, 255, 0.6);
+  border: 2px solid rgba(159, 208, 255, 0.4);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: all 0.3s ease;
+  -moz-appearance: textfield;
+}
+
+.time-input::-webkit-outer-spin-button,
+.time-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.time-input:focus {
+  border-color: var(--blue-1);
+  box-shadow: 0 0 0 4px rgba(159, 208, 255, 0.3);
+  background: rgba(223, 242, 255, 0.9);
+}
+
+.time-separator {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #9fd0ff;
+  margin-top: 18px;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  padding: 12px 28px;
+  border: none;
+  border-radius: var(--radius-xs);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #9fd0ff, #7ab8f5);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(159, 208, 255, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(159, 208, 255, 0.5);
+}
+
+.btn-primary:active { transform: translateY(0); }
+
+.btn-pink {
+  background: linear-gradient(135deg, #F472B6, #ec4899);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(244, 114, 182, 0.35);
+}
+
+.btn-pink:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(244, 114, 182, 0.45);
+}
+
+.btn-ghost {
+  background: rgba(159, 208, 255, 0.15);
+  color: #5a8db8;
+  border: 1px solid rgba(159, 208, 255, 0.3);
+}
+
+.btn-ghost:hover {
+  background: rgba(159, 208, 255, 0.25);
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+
+.flip-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.flip-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.flip-card {
+  width: 80px;
+  height: 96px;
+  perspective: 400px;
+  position: relative;
+}
+
+.flip-card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.flip-card-top, .flip-card-bottom {
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  background: linear-gradient(180deg, #e8f4fd, #dff2ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flip-card-top {
+  top: 0;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 1px solid rgba(159, 208, 255, 0.3);
+  align-items: flex-end;
+  box-shadow: 0 -2px 8px rgba(159, 208, 255, 0.1);
+}
+
+.flip-card-top .flip-num {
+  transform: translateY(50%);
+}
+
+.flip-card-bottom {
+  bottom: 0;
+  border-radius: 0 0 12px 12px;
+  align-items: flex-start;
+  background: linear-gradient(180deg, #d6eeff, #dff2ff);
+  box-shadow: 0 2px 8px rgba(159, 208, 255, 0.15);
+}
+
+.flip-card-bottom .flip-num {
+  transform: translateY(-50%);
+}
+
+.flip-num {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: #3a6fa0;
+  line-height: 1;
+}
+
+.flip-card-back-top, .flip-card-back-bottom {
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+}
+
+.flip-card-back-top {
+  top: 0;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 1px solid rgba(159, 208, 255, 0.3);
+  align-items: flex-end;
+  background: linear-gradient(180deg, #c8e4f8, #d0e9fc);
+  transform-origin: bottom center;
+  z-index: 2;
+}
+
+.flip-card-back-top .flip-num {
+  transform: translateY(50%);
+}
+
+.flip-card-back-bottom {
+  bottom: 0;
+  border-radius: 0 0 12px 12px;
+  align-items: flex-start;
+  background: linear-gradient(180deg, #bddcee, #c8e4f8);
+  transform-origin: top center;
+  transform: rotateX(90deg);
+  z-index: 2;
+}
+
+.flip-card-back-bottom .flip-num {
+  transform: translateY(-50%);
+}
+
+.flip-card.animating .flip-card-back-top {
+  animation: flipTop 0.3s ease-in forwards;
+}
+
+.flip-card.animating .flip-card-back-bottom {
+  animation: flipBottom 0.3s 0.3s ease-out forwards;
+}
+
+@keyframes flipTop {
+  0% { transform: rotateX(0deg); }
+  100% { transform: rotateX(-90deg); }
+}
+
+@keyframes flipBottom {
+  0% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0deg); }
+}
+
+.flip-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #7ba3c4;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.flip-separator {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #9fd0ff;
+  margin-top: -20px;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0.3; }
+}
+
+.countdown-section { display: none; }
+.countdown-section.active { display: block; }
+
+.target-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.form-group label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #7ba3c4;
+}
+
+.form-input {
+  padding: 12px 16px;
+  border: 2px solid rgba(159, 208, 255, 0.3);
+  border-radius: var(--radius-xs);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #3a6fa0;
+  background: rgba(223, 242, 255, 0.4);
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  border-color: var(--blue-1);
+  box-shadow: 0 0 0 4px rgba(159, 208, 255, 0.2);
+  background: rgba(223, 242, 255, 0.7);
+}
+
+.form-input::placeholder {
+  color: #a0c4e0;
+}
+
+.saved-section {
+  margin-top: 8px;
+}
+
+.saved-section h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #4a7fad;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saved-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.saved-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 2px 12px rgba(159, 208, 255, 0.12);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.saved-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(159, 208, 255, 0.2);
+}
+
+.saved-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.saved-item-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #3a6fa0;
+}
+
+.saved-item-date {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #7ba3c4;
+}
+
+.saved-item-remaining {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.saved-item-count {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--pink);
+}
+
+.saved-item-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #a0c4e0;
+}
+
+.saved-item-delete {
+  background: none;
+  border: none;
+  color: #c4d8e8;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  margin-left: 12px;
+  font-family: 'Nunito', sans-serif;
+}
+
+.saved-item-delete:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px 20px;
+  color: #a0c4e0;
+}
+
+.empty-state-icon {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+  opacity: 0.6;
+}
+
+.empty-state p {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(45, 55, 72, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 16px 64px rgba(159, 208, 255, 0.3);
+  padding: 32px;
+  width: 100%;
+  max-width: 440px;
+  animation: modalIn 0.3s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal h2 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #3a6fa0;
+  margin-bottom: 20px;
+}
+
+.modal .form-group { margin-bottom: 16px; }
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.active-countdown {
+  text-align: center;
+}
+
+.active-countdown .event-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #3a6fa0;
+  margin-bottom: 8px;
+}
+
+.active-countdown .target-date-display {
+  font-size: 0.85rem;
+  color: #7ba3c4;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.running-timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.running-timer .flip-display {
+  margin: 0;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 6px;
+  background: rgba(159, 208, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #9fd0ff, #F472B6);
+  border-radius: 3px;
+  transition: width 1s linear;
+  width: 100%;
+}
+
+.celebration-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 200;
+  pointer-events: none;
+  display: none;
+}
+
+.celebration-overlay.active {
+  display: block;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: confettiFall 3s ease-out forwards;
+}
+
+@keyframes confettiFall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh) rotate(720deg) scale(0.3);
+  }
+}
+
+.celebration-text {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 201;
+  text-align: center;
+  display: none;
+  animation: celebTextIn 0.6s ease;
+}
+
+.celebration-text.active {
+  display: block;
+}
+
+@keyframes celebTextIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.celebration-text h2 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #F472B6, #9fd0ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.celebration-text p {
+  font-size: 1.1rem;
+  color: #7ba3c4;
+  font-weight: 700;
+}
+
+.add-btn-float {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #F472B6, #ec4899);
+  color: #fff;
+  border: none;
+  font-size: 1.8rem;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(244, 114, 182, 0.4);
+  transition: all 0.3s ease;
+  z-index: 10;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.add-btn-float.visible {
+  display: flex;
+}
+
+.add-btn-float:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 32px rgba(244, 114, 182, 0.5);
+}
+
+@media (max-width: 520px) {
+  .flip-card { width: 60px; height: 72px; }
+  .flip-num { font-size: 2.6rem; }
+  .flip-separator { font-size: 1.8rem; margin-top: -14px; }
+  .time-input { width: 64px; height: 64px; font-size: 1.6rem; }
+  .page-title h1 { font-size: 1.7rem; }
+  .glass-card { padding: 20px; }
+  .modal { padding: 24px; }
+}
+
+@media (max-width: 380px) {
+  .flip-card { width: 48px; height: 58px; }
+  .flip-num { font-size: 2rem; }
+  .flip-display { gap: 4px; }
+  .flip-separator { font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="clouds-container">
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+  <div class="cloud cloud-4"></div>
+  <div class="cloud cloud-5"></div>
+  <div class="cloud cloud-6"></div>
+</div>
+
+<div class="app-container">
+  <div class="page-title">
+    <h1>⏳ 倒计时</h1>
+    <p>记录每一个重要时刻</p>
+  </div>
+
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-mode="timer" onclick="switchMode('timer')">倒计时器</button>
+    <button class="mode-tab" data-mode="target" onclick="switchMode('target')">目标日期</button>
+  </div>
+
+  <div id="timerSection" class="countdown-section active">
+    <div class="glass-card">
+      <div class="timer-setup" id="timerSetup">
+        <div class="time-inputs">
+          <div class="time-input-group">
+            <label>时</label>
+            <input type="number" class="time-input" id="inputHours" min="0" max="99" value="0">
+          </div>
+          <span class="time-separator">:</span>
+          <div class="time-input-group">
+            <label>分</label>
+            <input type="number" class="time-input" id="inputMinutes" min="0" max="59" value="5">
+          </div>
+          <span class="time-separator">:</span>
+          <div class="time-input-group">
+            <label>秒</label>
+            <input type="number" class="time-input" id="inputSeconds" min="0" max="59" value="0">
+          </div>
+        </div>
+        <div class="timer-controls">
+          <button class="btn btn-primary" onclick="startTimer()">▶ 开始</button>
+          <button class="btn btn-ghost" onclick="resetTimer()">↺ 重置</button>
+        </div>
+      </div>
+      <div class="running-timer" id="timerRunning" style="display:none;">
+        <div class="flip-display" id="timerFlipDisplay"></div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="timerProgress"></div>
+        </div>
+        <div class="timer-controls">
+          <button class="btn btn-primary" id="timerPauseBtn" onclick="togglePauseTimer()">⏸ 暂停</button>
+          <button class="btn btn-ghost" onclick="resetTimer()">↺ 重置</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="targetSection" class="countdown-section">
+    <div class="glass-card">
+      <div class="active-countdown" id="activeCountdown" style="display:none;">
+        <div class="event-name" id="activeEventName"></div>
+        <div class="target-date-display" id="activeTargetDate"></div>
+        <div class="flip-display" id="targetFlipDisplay"></div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-ghost btn-sm" onclick="closeActiveCountdown()">← 返回列表</button>
+        </div>
+      </div>
+      <div id="targetList">
+        <div class="saved-section">
+          <h3>📌 我的倒计时</h3>
+          <div class="saved-list" id="savedList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button class="add-btn-float" id="addBtnFloat" onclick="openModal()">+</button>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2>✨ 新建倒计时</h2>
+    <div class="form-group">
+      <label>事件名称</label>
+      <input type="text" class="form-input" id="modalEventName" placeholder="例如：生日、考试、旅行…" maxlength="20">
+    </div>
+    <div class="form-group">
+      <label>目标日期</label>
+      <input type="date" class="form-input" id="modalEventDate">
+    </div>
+    <div class="form-group">
+      <label>目标时间（可选）</label>
+      <input type="time" class="form-input" id="modalEventTime" value="00:00">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn btn-pink" onclick="saveCountdown()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="celebration-overlay" id="celebrationOverlay"></div>
+<div class="celebration-text" id="celebrationText">
+  <h2>🎉 时间到！</h2>
+  <p id="celebrationEventName"></p>
+</div>
+
+<script>
+var currentMode = 'timer';
+var timerInterval = null;
+var timerPaused = false;
+var timerRemaining = 0;
+var timerTotal = 0;
+var targetInterval = null;
+var activeTargetId = null;
+var previousFlipValues = {};
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(function(tab) {
+    tab.classList.toggle('active', tab.dataset.mode === mode);
+  });
+  document.getElementById('timerSection').classList.toggle('active', mode === 'timer');
+  document.getElementById('targetSection').classList.toggle('active', mode === 'target');
+  document.getElementById('addBtnFloat').classList.toggle('visible', mode === 'target');
+
+  if (mode === 'target') {
+    renderSavedList();
+  }
+  if (mode !== 'target') {
+    closeActiveCountdown();
+  }
+}
+
+function pad(n) {
+  return n < 10 ? '0' + n : '' + n;
+}
+
+function buildFlipDisplay(containerId, values, labels) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  var html = '';
+  for (var i = 0; i < values.length; i++) {
+    if (i > 0) {
+      html += '<span class="flip-separator">:</span>';
+    }
+    var key = containerId + '-' + i;
+    var prevVal = previousFlipValues[key];
+    var newVal = values[i];
+    var shouldAnimate = prevVal !== undefined && prevVal !== newVal;
+
+    html += '<div class="flip-unit">';
+    html += '<div class="flip-card' + (shouldAnimate ? ' animating' : '') + '">';
+    html += '<div class="flip-card-inner">';
+    html += '<div class="flip-card-top"><span class="flip-num">' + (shouldAnimate ? prevVal : newVal) + '</span></div>';
+    html += '<div class="flip-card-bottom"><span class="flip-num">' + (shouldAnimate ? prevVal : newVal) + '</span></div>';
+    html += '<div class="flip-card-back-top"><span class="flip-num">' + newVal + '</span></div>';
+    html += '<div class="flip-card-back-bottom"><span class="flip-num">' + newVal + '</span></div>';
+    html += '</div></div>';
+    html += '<span class="flip-label">' + labels[i] + '</span>';
+    html += '</div>';
+
+    previousFlipValues[key] = newVal;
+  }
+  container.innerHTML = html;
+
+  if (container.querySelectorAll('.flip-card.animating').length > 0) {
+    setTimeout(function() {
+      container.querySelectorAll('.flip-card.animating').forEach(function(card) {
+        card.classList.remove('animating');
+      });
+      container.querySelectorAll('.flip-card-top .flip-num, .flip-card-bottom .flip-num').forEach(function(el) {
+        var unit = el.closest('.flip-unit');
+        var backNum = unit.querySelector('.flip-card-back-bottom .flip-num');
+        if (backNum) el.textContent = backNum.textContent;
+      });
+    }, 650);
+  }
+}
+
+function startTimer() {
+  var h = parseInt(document.getElementById('inputHours').value) || 0;
+  var m = parseInt(document.getElementById('inputMinutes').value) || 0;
+  var s = parseInt(document.getElementById('inputSeconds').value) || 0;
+  timerTotal = h * 3600 + m * 60 + s;
+  if (timerTotal <= 0) return;
+
+  timerRemaining = timerTotal;
+  timerPaused = false;
+  previousFlipValues = {};
+
+  document.getElementById('timerSetup').style.display = 'none';
+  document.getElementById('timerRunning').style.display = 'flex';
+  document.getElementById('timerPauseBtn').textContent = '⏸ 暂停';
+
+  updateTimerDisplay();
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(function() {
+    if (!timerPaused) {
+      timerRemaining--;
+      if (timerRemaining <= 0) {
+        timerRemaining = 0;
+        clearInterval(timerInterval);
+        timerInterval = null;
+        updateTimerDisplay();
+        triggerCelebration('倒计时结束');
+        return;
+      }
+      updateTimerDisplay();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  var h = Math.floor(timerRemaining / 3600);
+  var m = Math.floor((timerRemaining % 3600) / 60);
+  var s = timerRemaining % 60;
+  buildFlipDisplay('timerFlipDisplay', [pad(h), pad(m), pad(s)], ['时', '分', '秒']);
+  var pct = timerTotal > 0 ? (timerRemaining / timerTotal * 100) : 0;
+  document.getElementById('timerProgress').style.width = pct + '%';
+}
+
+function togglePauseTimer() {
+  timerPaused = !timerPaused;
+  document.getElementById('timerPauseBtn').textContent = timerPaused ? '▶ 继续' : '⏸ 暂停';
+}
+
+function resetTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  timerRemaining = 0;
+  timerTotal = 0;
+  timerPaused = false;
+  previousFlipValues = {};
+  document.getElementById('timerSetup').style.display = 'flex';
+  document.getElementById('timerRunning').style.display = 'none';
+}
+
+function getSavedCountdowns() {
+  try {
+    return JSON.parse(localStorage.getItem('countdowns') || '[]');
+  } catch(e) {
+    return [];
+  }
+}
+
+function setSavedCountdowns(data) {
+  localStorage.setItem('countdowns', JSON.stringify(data));
+}
+
+function renderSavedList() {
+  var list = getSavedCountdowns();
+  var container = document.getElementById('savedList');
+  if (list.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">☁️</div><p>还没有倒计时，点击 + 添加一个吧</p></div>';
+    return;
+  }
+  var html = '';
+  var now = Date.now();
+  list.forEach(function(item) {
+    var diff = item.target - now;
+    var expired = diff <= 0;
+    var days = 0, hours = 0, minutes = 0, seconds = 0;
+    if (diff > 0) {
+      days = Math.floor(diff / 86400000);
+      hours = Math.floor((diff % 86400000) / 3600000);
+      minutes = Math.floor((diff % 3600000) / 60000);
+      seconds = Math.floor((diff % 60000) / 1000);
+    }
+    var dateStr = new Date(item.target).toLocaleString('zh-CN', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
+    html += '<div class="saved-item" onclick="viewCountdown(\'' + item.id + '\')">';
+    html += '<div class="saved-item-info">';
+    html += '<div class="saved-item-name">' + escapeHtml(item.name) + '</div>';
+    html += '<div class="saved-item-date">' + dateStr + '</div>';
+    html += '</div>';
+    html += '<div class="saved-item-remaining">';
+    if (expired) {
+      html += '<div class="saved-item-count" style="color:#a0c4e0;">已到期</div>';
+    } else if (days > 0) {
+      html += '<div class="saved-item-count">' + days + '天</div>';
+      html += '<div class="saved-item-label">' + pad(hours) + ':' + pad(minutes) + ':' + pad(seconds) + '</div>';
+    } else {
+      html += '<div class="saved-item-count">' + pad(hours) + ':' + pad(minutes) + ':' + pad(seconds) + '</div>';
+    }
+    html += '</div>';
+    html += '<button class="saved-item-delete" onclick="event.stopPropagation();deleteCountdown(\'' + item.id + '\')" title="删除">×</button>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function viewCountdown(id) {
+  var list = getSavedCountdowns();
+  var item = list.find(function(c) { return c.id === id; });
+  if (!item) return;
+  activeTargetId = id;
+  previousFlipValues = {};
+  document.getElementById('targetList').style.display = 'none';
+  document.getElementById('activeCountdown').style.display = 'block';
+  document.getElementById('activeEventName').textContent = item.name;
+  document.getElementById('activeTargetDate').textContent = new Date(item.target).toLocaleString('zh-CN', {
+    year: 'numeric', month: 'long', day: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+  updateTargetDisplay();
+  if (targetInterval) clearInterval(targetInterval);
+  targetInterval = setInterval(updateTargetDisplay, 1000);
+}
+
+function updateTargetDisplay() {
+  var list = getSavedCountdowns();
+  var item = list.find(function(c) { return c.id === activeTargetId; });
+  if (!item) { closeActiveCountdown(); return; }
+
+  var now = Date.now();
+  var diff = item.target - now;
+  if (diff <= 0) {
+    buildFlipDisplay('targetFlipDisplay', ['00', '00', '00', '00'], ['天', '时', '分', '秒']);
+    clearInterval(targetInterval);
+    targetInterval = null;
+    triggerCelebration(item.name);
+    return;
+  }
+  var days = Math.floor(diff / 86400000);
+  var hours = Math.floor((diff % 86400000) / 3600000);
+  var minutes = Math.floor((diff % 3600000) / 60000);
+  var seconds = Math.floor((diff % 60000) / 1000);
+  buildFlipDisplay('targetFlipDisplay', [pad(days), pad(hours), pad(minutes), pad(seconds)], ['天', '时', '分', '秒']);
+}
+
+function closeActiveCountdown() {
+  if (targetInterval) { clearInterval(targetInterval); targetInterval = null; }
+  activeTargetId = null;
+  previousFlipValues = {};
+  document.getElementById('activeCountdown').style.display = 'none';
+  document.getElementById('targetList').style.display = 'block';
+  renderSavedList();
+}
+
+function deleteCountdown(id) {
+  var list = getSavedCountdowns().filter(function(c) { return c.id !== id; });
+  setSavedCountdowns(list);
+  if (activeTargetId === id) {
+    closeActiveCountdown();
+  } else {
+    renderSavedList();
+  }
+}
+
+function openModal() {
+  document.getElementById('modalOverlay').classList.add('active');
+  var tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  document.getElementById('modalEventDate').value = tomorrow.toISOString().split('T')[0];
+  document.getElementById('modalEventName').value = '';
+  document.getElementById('modalEventTime').value = '00:00';
+  setTimeout(function() {
+    document.getElementById('modalEventName').focus();
+  }, 100);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+}
+
+function saveCountdown() {
+  var name = document.getElementById('modalEventName').value.trim();
+  var date = document.getElementById('modalEventDate').value;
+  var time = document.getElementById('modalEventTime').value || '00:00';
+  if (!name) { document.getElementById('modalEventName').focus(); return; }
+  if (!date) { document.getElementById('modalEventDate').focus(); return; }
+
+  var target = new Date(date + 'T' + time + ':00').getTime();
+  if (target <= Date.now()) {
+    alert('请选择一个未来的日期！');
+    return;
+  }
+
+  var list = getSavedCountdowns();
+  list.push({
+    id: 'cd_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+    name: name,
+    target: target
+  });
+  setSavedCountdowns(list);
+  closeModal();
+  renderSavedList();
+}
+
+function triggerCelebration(eventName) {
+  var overlay = document.getElementById('celebrationOverlay');
+  var textEl = document.getElementById('celebrationText');
+  document.getElementById('celebrationEventName').textContent = eventName || '';
+
+  overlay.innerHTML = '';
+  overlay.classList.add('active');
+  textEl.classList.add('active');
+
+  var colors = ['#F472B6', '#9fd0ff', '#fbbf24', '#a78bfa', '#34d399', '#f87171', '#60a5fa', '#f9a8d4'];
+  for (var i = 0; i < 80; i++) {
+    var confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.left = Math.random() * 100 + '%';
+    confetti.style.top = -10 + 'px';
+    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.width = (Math.random() * 8 + 6) + 'px';
+    confetti.style.height = (Math.random() * 8 + 6) + 'px';
+    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+    confetti.style.animationDelay = (Math.random() * 1.5) + 's';
+    overlay.appendChild(confetti);
+  }
+
+  setTimeout(function() {
+    overlay.classList.remove('active');
+    textEl.classList.remove('active');
+    overlay.innerHTML = '';
+  }, 4500);
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.querySelectorAll('.time-input').forEach(function(input) {
+  input.addEventListener('input', function() {
+    var max = parseInt(this.max);
+    var val = parseInt(this.value);
+    if (isNaN(val) || val < 0) this.value = 0;
+    else if (val > max) this.value = max;
+  });
+  input.addEventListener('focus', function() {
+    this.select();
+  });
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeModal();
+  }
+});
+
+renderSavedList();
+</script>
+</body>
+</html>

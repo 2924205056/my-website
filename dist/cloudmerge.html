@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>云端合成：进化之路</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --font-display: 'SF Pro Display', -apple-system, 'Segoe UI', system-ui, sans-serif;
+      --font-body: -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+    
+    body {
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+      font-family: var(--font-body);
+      background: #0a0e1a;
+    }
+    
+    canvas { display: block; }
+    
+    /* ===== Background ===== */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(168, 85, 247, 0.1) 0%, transparent 60%),
+        linear-gradient(180deg, #0a0e1a 0%, #1a1b3a 40%, #1e293b 100%);
+      z-index: 0;
+    }
+    
+    .bg-noise {
+      position: fixed;
+      inset: 0;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    /* ===== UI Container ===== */
+    .ui-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+    
+    .ui-layer > * { pointer-events: auto; }
+    
+    /* ===== Glass Panel ===== */
+    .glass {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+    }
+    
+    .glass-light {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+    }
+    
+    /* ===== Score Panel ===== */
+    .score-panel {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .score-label {
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .score-value {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 50%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+    
+    /* ===== High Score ===== */
+    .highscore-panel {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      padding: 14px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .highscore-value {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1;
+    }
+    
+    /* ===== Next Preview ===== */
+    .next-panel {
+      position: absolute;
+      top: 100px;
+      right: 24px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 90px;
+    }
+    
+    .next-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.4);
+    }
+    
+    #nextCanvas {
+      border-radius: 12px;
+    }
+    
+    /* ===== Mute Button ===== */
+    .mute-btn {
+      position: absolute;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .mute-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.9);
+      transform: translateX(-50%) scale(1.05);
+    }
+    
+    .mute-icon {
+      font-size: 16px;
+      transition: transform 0.3s ease;
+    }
+    
+    .mute-btn:hover .mute-icon {
+      transform: scale(1.2);
+    }
+    
+    /* ===== Footer ===== */
+    .footer {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 24px;
+      text-align: center;
+    }
+    
+    .footer-text {
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.25);
+      letter-spacing: 0.05em;
+    }
+    
+    /* ===== Game Over Screen ===== */
+    .gameover {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10, 14, 26, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+    
+    .gameover.active {
+      display: flex;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .gameover-card {
+      background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 32px;
+      padding: 48px 56px;
+      text-align: center;
+      max-width: 380px;
+      animation: slideUp 0.5s ease;
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    
+    .gameover-emoji {
+      font-size: 72px;
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    
+    .gameover-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 8px;
+    }
+    
+    .gameover-subtitle {
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 32px;
+    }
+    
+    .gameover-score {
+      font-family: 'Outfit', sans-serif;
+      font-size: 64px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      line-height: 1;
+    }
+    
+    .gameover-score-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.3);
+      margin-bottom: 40px;
+    }
+    
+    .restart-btn {
+      width: 100%;
+      padding: 16px 32px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%);
+      color: white;
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 32px rgba(124, 58, 237, 0.3);
+    }
+    
+    .restart-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 40px rgba(124, 58, 237, 0.4);
+    }
+    
+    .restart-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+    
+    /* ===== Decorative Elements ===== */
+    .deco-orb {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(60px);
+      z-index: 0;
+    }
+    
+    .deco-orb-1 {
+      width: 300px;
+      height: 300px;
+      background: rgba(124, 58, 237, 0.15);
+      top: -100px;
+      left: -100px;
+      animation: orbFloat1 20s ease-in-out infinite;
+    }
+    
+    .deco-orb-2 {
+      width: 250px;
+      height: 250px;
+      background: rgba(59, 130, 246, 0.12);
+      bottom: -80px;
+      right: -80px;
+      animation: orbFloat2 25s ease-in-out infinite;
+    }
+    
+    .deco-orb-3 {
+      width: 180px;
+      height: 180px;
+      background: rgba(236, 72, 153, 0.1);
+      top: 40%;
+      right: 20%;
+      animation: orbFloat3 18s ease-in-out infinite;
+    }
+    
+    @keyframes orbFloat1 {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(40px, 30px); }
+      66% { transform: translate(-20px, 50px); }
+    }
+    
+    @keyframes orbFloat2 {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(-30px, -40px); }
+      66% { transform: translate(50px, -20px); }
+    }
+    
+    @keyframes orbFloat3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(20px, 30px) scale(1.1); }
+    }
+    
+    /* ===== Mobile ===== */
+    @media (max-width: 640px) {
+      .score-panel { top: 16px; left: 16px; padding: 12px 18px; }
+      .score-value { font-size: 28px; }
+      .highscore-panel { top: 16px; right: 16px; padding: 10px 14px; }
+      .highscore-value { font-size: 18px; }
+      .next-panel { top: 80px; right: 16px; width: 70px; padding: 12px; }
+      .mute-btn { top: 16px; padding: 8px 16px; font-size: 12px; }
+      .gameover-card { margin: 0 20px; padding: 36px 32px; border-radius: 24px; }
+      .gameover-title { font-size: 26px; }
+      .gameover-score { font-size: 52px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Layers -->
+  <div class="bg-layer"></div>
+  <div class="bg-noise"></div>
+  
+  <!-- Decorative Orbs -->
+  <div class="deco-orb deco-orb-1"></div>
+  <div class="deco-orb deco-orb-2"></div>
+  <div class="deco-orb deco-orb-3"></div>
+  
+  <!-- Game Canvas -->
+  <canvas id="gameCanvas"></canvas>
+  
+  <!-- UI Layer -->
+  <div class="ui-layer">
+    <!-- Score -->
+    <div class="score-panel glass-light">
+      <span class="score-label">分数</span>
+      <span class="score-value" id="scoreDisplay">0</span>
+    </div>
+    
+    <!-- Mute Button -->
+    <button class="mute-btn glass" id="muteBtn" onclick="toggleMute()">
+      <span class="mute-icon">🔇</span>
+      <span class="mute-text">音效</span>
+    </button>
+    
+    <!-- High Score -->
+    <div class="highscore-panel glass">
+      <span class="score-label">最高分</span>
+      <span class="highscore-value" id="highScoreDisplay">0</span>
+    </div>
+    
+    <!-- Next Preview -->
+    <div class="next-panel glass-light">
+      <span class="next-label">下一个</span>
+      <canvas id="nextCanvas" width="58" height="58"></canvas>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      <p class="footer-text">点击放置云朵，相同云朵合并进化</p>
+    </div>
+  </div>
+  
+  <!-- Game Over Screen -->
+  <div class="gameover" id="gameOverScreen">
+    <div class="gameover-card">
+      <div class="gameover-emoji">☁️</div>
+      <h2 class="gameover-title">云朵满啦!</h2>
+      <p class="gameover-subtitle">再接再厉，继续进化</p>
+      <div class="gameover-score" id="finalScore">0</div>
+      <div class="gameover-score-label">最终分数</div>
+      <button class="restart-btn" onclick="resetGame()">
+        <span>再来一局 ↻</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const CLOUD_TYPES = [
+      { emoji: '💨', name: '水汽', radius: 20, color: '#93c5fd', score: 1, glow: 'rgba(147, 197, 253, 0.4)' },
+      { emoji: '🌫️', name: '薄雾', radius: 26, color: '#60a5fa', score: 3, glow: 'rgba(96, 165, 250, 0.4)' },
+      { emoji: '☁️', name: '白云', radius: 32, color: '#38bdf8', score: 6, glow: 'rgba(56, 189, 248, 0.4)' },
+      { emoji: '🌧️', name: '细雨', radius: 38, color: '#0ea5e9', score: 10, glow: 'rgba(14, 165, 233, 0.4)' },
+      { emoji: '⛈️', name: '雷雨', radius: 44, color: '#0284c7', score: 15, glow: 'rgba(2, 132, 199, 0.4)' },
+      { emoji: '🌈', name: '彩虹', radius: 50, color: '#8b5cf6', score: 22, glow: 'rgba(139, 92, 246, 0.4)' },
+      { emoji: '✨', name: '星光', radius: 58, color: '#a78bfa', score: 30, glow: 'rgba(167, 139, 250, 0.4)' },
+      { emoji: '🌟', name: '明星', radius: 66, color: '#f59e0b', score: 40, glow: 'rgba(245, 158, 11, 0.4)' },
+      { emoji: '🌤️', name: '晴云', radius: 74, color: '#f97316', score: 55, glow: 'rgba(249, 115, 22, 0.4)' },
+      { emoji: '🔮', name: '幻云', radius: 82, color: '#ec4899', score: 70, glow: 'rgba(236, 72, 153, 0.4)' },
+      { emoji: '👑', name: '云王', radius: 90, color: '#eab308', score: 100, glow: 'rgba(234, 179, 8, 0.4)' },
+    ];
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const nextCanvas = document.getElementById('nextCanvas');
+    const nextCtx = nextCanvas.getContext('2d');
+    
+    let W, H, gameLeft, gameRight, gameTop, gameBottom;
+    const GRAVITY = 0.6;
+    const DAMPING = 0.5;
+    
+    let balls = [];
+    let score = 0;
+    let highScore = parseInt(localStorage.getItem('cloudMergeHighScore') || '0');
+    let nextType = 0;
+    let dropX = 0;
+    let canDrop = true;
+    let gameOver = false;
+    let effects = [];
+    let overDangerLineTimer = null;
+    let audioCtx = null;
+    let bgmPlaying = false;
+    let muted = true;
+    
+    document.getElementById('highScoreDisplay').textContent = highScore;
+    
+    function resize() {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W;
+      canvas.height = H;
+      gameLeft = Math.max(50, W * 0.15);
+      gameRight = Math.min(W - 50, W * 0.85);
+      gameTop = 120;
+      gameBottom = H - 80;
+      dropX = (gameLeft + gameRight) / 2;
+    }
+    
+    resize();
+    window.addEventListener('resize', resize);
+    
+    function randomNext() {
+      nextType = Math.floor(Math.random() * 4);
+    }
+    
+    randomNext();
+    let currentType = nextType;
+    randomNext();
+    drawNext();
+    
+    // ===== Audio =====
+    function initAudio() {
+      if (audioCtx) return;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    
+    window.toggleMute = function() {
+      muted = !muted;
+      const btn = document.getElementById('muteBtn');
+      const icon = btn.querySelector('.mute-icon');
+      const text = btn.querySelector('.mute-text');
+      if (muted) {
+        icon.textContent = '🔇';
+        text.textContent = '音效';
+        stopBGM();
+      } else {
+        icon.textContent = '🔊';
+        text.textContent = '音乐中';
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        startBGM();
+      }
+    };
+    
+    function startBGM() {
+      if (bgmPlaying) return;
+      bgmPlaying = true;
+      const melody = [262, 294, 330, 349, 392, 349, 330, 294];
+      const bass = [131, 147, 165, 175, 196, 175, 165, 147];
+      let noteIndex = 0;
+      function playNote(freq, duration, type, volume) {
+        if (!audioCtx || muted || audioCtx.state !== 'running') return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      }
+      function playLoop() {
+        if (!bgmPlaying) return;
+        const m = melody[noteIndex % melody.length];
+        const b = bass[noteIndex % bass.length];
+        playNote(m, 0.8, 'sine', 0.08);
+        playNote(b, 1.2, 'triangle', 0.05);
+        noteIndex++;
+        setTimeout(playLoop, 600);
+      }
+      playLoop();
+    }
+    
+    function playMergeSound() {
+      if (!audioCtx || muted || audioCtx.state !== 'running') return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(784, audioCtx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.2);
+    }
+    
+    function playDropSound() {
+      if (!audioCtx || muted || audioCtx.state !== 'running') return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.15);
+    }
+    
+    function playGameOverSound() {
+      if (!audioCtx || muted || audioCtx.state !== 'running') return;
+      const notes = [392, 349, 330, 262];
+      notes.forEach((freq, i) => {
+        setTimeout(() => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.4);
+        }, i * 200);
+      });
+    }
+    
+    function stopBGM() {
+      bgmPlaying = false;
+    }
+    
+    // ===== Drawing =====
+    function drawCloud(type, x, y, scale = 1, ctxRef = ctx) {
+      const cloud = CLOUD_TYPES[type];
+      const r = cloud.radius * scale;
+      
+      // Outer glow
+      ctxRef.shadowColor = cloud.glow;
+      ctxRef.shadowBlur = 20 * scale;
+      
+      // Main body
+      const grad = ctxRef.createRadialGradient(x, y, 0, x, y, r);
+      grad.addColorStop(0, cloud.color);
+      grad.addColorStop(1, cloud.glow.replace('0.4', '0.2'));
+      ctxRef.beginPath();
+      ctxRef.arc(x, y, r, 0, Math.PI * 2);
+      ctxRef.fillStyle = grad;
+      ctxRef.fill();
+      ctxRef.shadowBlur = 0;
+      
+      // Inner highlight
+      const innerGrad = ctxRef.createRadialGradient(x - r*0.3, y - r*0.3, 0, x, y, r * 0.8);
+      innerGrad.addColorStop(0, 'rgba(255,255,255,0.2)');
+      innerGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctxRef.beginPath();
+      ctxRef.arc(x, y, r, 0, Math.PI * 2);
+      ctxRef.fillStyle = innerGrad;
+      ctxRef.fill();
+      
+      // Border
+      ctxRef.strokeStyle = 'rgba(255,255,255,0.25)';
+      ctxRef.lineWidth = 1.5 * scale;
+      ctxRef.stroke();
+      
+      // Emoji
+      ctxRef.font = `${r * 0.9}px Arial`;
+      ctxRef.textAlign = 'center';
+      ctxRef.textBaseline = 'middle';
+      ctxRef.fillText(cloud.emoji, x, y);
+    }
+    
+    function drawNext() {
+      nextCtx.clearRect(0, 0, 58, 58);
+      drawCloud(nextType, 29, 29, 0.5, nextCtx);
+    }
+    
+    // ===== Input =====
+    function handleMove(x) {
+      if (canDrop && !gameOver) {
+        dropX = Math.max(gameLeft + 30, Math.min(gameRight - 30, x));
+      }
+    }
+    
+    function handleClick() {
+      if (canDrop && !gameOver) {
+        dropBall();
+      }
+    }
+    
+    canvas.addEventListener('mousemove', e => handleMove(e.clientX));
+    canvas.addEventListener('click', () => { initAudio(); handleClick(); });
+    canvas.addEventListener('touchmove', e => { e.preventDefault(); handleMove(e.touches[0].clientX); }, { passive: false });
+    canvas.addEventListener('touchend', e => { e.preventDefault(); initAudio(); handleClick(); });
+    
+    function dropBall() {
+      canDrop = false;
+      playDropSound();
+      const cloud = CLOUD_TYPES[currentType];
+      balls.push({
+        x: dropX,
+        y: gameTop + 20,
+        vx: 0,
+        vy: 0,
+        type: currentType,
+        r: cloud.radius,
+        merging: false
+      });
+      setTimeout(() => {
+        currentType = nextType;
+        randomNext();
+        drawNext();
+        canDrop = true;
+      }, 300);
+    }
+    
+    function resolveCollision(a, b) {
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      let dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist === 0) dist = 0.1;
+      const minDist = a.r + b.r;
+      if (dist < minDist) {
+        const overlap = (minDist - dist) / 2;
+        const nx = dx / dist;
+        const ny = dy / dist;
+        a.x -= nx * overlap;
+        a.y -= ny * overlap;
+        b.x += nx * overlap;
+        b.y += ny * overlap;
+        const dvx = a.vx - b.vx;
+        const dvy = a.vy - b.vy;
+        const dot = dvx * nx + dvy * ny;
+        if (dot > 0) {
+          a.vx -= nx * dot * DAMPING;
+          a.vy -= ny * dot * DAMPING;
+          b.vx += nx * dot * DAMPING;
+          b.vy += ny * dot * DAMPING;
+        }
+      }
+    }
+    
+    function mergeBalls(a, b) {
+      if (a.merging || b.merging) return;
+      a.merging = true;
+      b.merging = true;
+      if (a.type < CLOUD_TYPES.length - 1) {
+        const newType = a.type + 1;
+        const cloud = CLOUD_TYPES[newType];
+        const newX = (a.x + b.x) / 2;
+        const newY = (a.y + b.y) / 2;
+        balls = balls.filter(ball => ball !== a && ball !== b);
+        balls.push({ x: newX, y: newY, vx: 0, vy: -3, type: newType, r: cloud.radius, merging: false });
+        score += cloud.score * 2;
+        playMergeSound();
+        for (let i = 0; i < 16; i++) {
+          const angle = (Math.PI * 2 / 16) * i;
+          effects.push({ x: newX, y: newY, vx: Math.cos(angle) * 5, vy: Math.sin(angle) * 5, life: 1, color: cloud.glow });
+        }
+      } else {
+        balls = balls.filter(ball => ball !== b);
+        score += CLOUD_TYPES[a.type].score;
+      }
+      document.getElementById('scoreDisplay').textContent = score;
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('cloudMergeHighScore', highScore);
+        document.getElementById('highScoreDisplay').textContent = highScore;
+      }
+    }
+    
+    function checkMerge() {
+      for (let i = 0; i < balls.length; i++) {
+        for (let j = i + 1; j < balls.length; j++) {
+          const a = balls[i], b = balls[j];
+          if (a.merging || b.merging) continue;
+          const dist = Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+          if (dist < a.r + b.r && a.type === b.type) {
+            mergeBalls(a, b);
+            return;
+          }
+        }
+      }
+    }
+    
+    function update() {
+      if (gameOver) return;
+      for (let ball of balls) {
+        ball.vy += GRAVITY;
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+        ball.vx *= 0.98;
+        if (ball.x - ball.r < gameLeft) { ball.x = gameLeft + ball.r; ball.vx = -ball.vx * DAMPING; }
+        if (ball.x + ball.r > gameRight) { ball.x = gameRight - ball.r; ball.vx = -ball.vx * DAMPING; }
+        if (ball.y + ball.r > gameBottom) { ball.y = gameBottom - ball.r; ball.vy = -ball.vy * DAMPING; ball.vx *= 0.9; }
+      }
+      for (let i = 0; i < balls.length; i++) {
+        for (let j = i + 1; j < balls.length; j++) {
+          if (!balls[i].merging && !balls[j].merging) resolveCollision(balls[i], balls[j]);
+        }
+      }
+      checkMerge();
+      for (let ball of balls) {
+        if (ball.y - ball.r < gameTop + 5 && ball.y > gameTop) {
+          if (!overDangerLineTimer) {
+            overDangerLineTimer = setTimeout(() => {
+              if (balls.some(b => b.y - b.r < gameTop + 5 && b.y > gameTop)) endGame();
+              overDangerLineTimer = null;
+            }, 3000);
+          }
+          break;
+        }
+      }
+      effects = effects.filter(e => { e.x += e.vx; e.y += e.vy; e.life -= 0.025; return e.life > 0; });
+    }
+    
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      
+      // Stars
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      for (let i = 0; i < 60; i++) {
+        const x = (i * 37) % W;
+        const y = (i * 53) % H;
+        ctx.beginPath();
+        ctx.arc(x, y, 0.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      
+      // Game area subtle highlight
+      ctx.fillStyle = 'rgba(255,255,255,0.02)';
+      ctx.fillRect(gameLeft, gameTop, gameRight - gameLeft, gameBottom - gameTop);
+      
+      // Walls
+      const wallGrad = ctx.createLinearGradient(gameLeft - 4, 0, gameLeft + 4, 0);
+      wallGrad.addColorStop(0, 'rgba(255,255,255,0.05)');
+      wallGrad.addColorStop(1, 'rgba(255,255,255,0.1)');
+      ctx.fillStyle = wallGrad;
+      ctx.fillRect(gameLeft - 4, gameTop, 8, gameBottom - gameTop);
+      
+      const wallGrad2 = ctx.createLinearGradient(gameRight - 4, 0, gameRight + 4, 0);
+      wallGrad2.addColorStop(0, 'rgba(255,255,255,0.1)');
+      wallGrad2.addColorStop(1, 'rgba(255,255,255,0.05)');
+      ctx.fillStyle = wallGrad2;
+      ctx.fillRect(gameRight - 4, gameTop, 8, gameBottom - gameTop);
+      
+      // Bottom
+      ctx.fillStyle = 'rgba(255,255,255,0.08)';
+      ctx.fillRect(gameLeft, gameBottom - 2, gameRight - gameLeft, 4);
+      
+      // Danger line
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.3)';
+      ctx.setLineDash([6, 8]);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(gameLeft, gameTop);
+      ctx.lineTo(gameRight, gameTop);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      // Guide
+      if (canDrop && !gameOver) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        ctx.setLineDash([3, 6]);
+        ctx.beginPath();
+        ctx.moveTo(dropX, gameTop + 20);
+        ctx.lineTo(dropX, gameBottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        drawCloud(currentType, dropX, gameTop + 20, 0.7);
+      }
+      
+      // Balls
+      balls.forEach(ball => drawCloud(ball.type, ball.x, ball.y));
+      
+      // Effects
+      effects.forEach(e => {
+        ctx.globalAlpha = e.life;
+        ctx.fillStyle = e.color;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+      
+      update();
+      requestAnimationFrame(draw);
+    }
+    
+    function endGame() {
+      gameOver = true;
+      stopBGM();
+      playGameOverSound();
+      document.getElementById('finalScore').textContent = score;
+      document.getElementById('gameOverScreen').classList.add('active');
+    }
+    
+    function resetGame() {
+      balls = [];
+      score = 0;
+      gameOver = false;
+      canDrop = true;
+      effects = [];
+      overDangerLineTimer = null;
+      document.getElementById('scoreDisplay').textContent = 0;
+      document.getElementById('gameOverScreen').classList.remove('active');
+      randomNext();
+      currentType = nextType;
+      randomNext();
+      drawNext();
+      if (!muted) startBGM();
+    }
+    
+    draw();
+  </script>
+</body>
+</html>

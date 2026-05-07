@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VocabMaster - 智能生词提取工坊</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: linear-gradient(180deg, #dff2ff 0%, #edf8ff 40%, #f5f0ff 100%);
+  min-height: 100vh;
+  color: #334155;
+  line-height: 1.6;
+}
+
+.top-nav {
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.7);
+  border-bottom: 1px solid rgba(255,255,255,0.5);
+  padding: 12px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.top-nav a {
+  color: #6366f1; text-decoration: none; font-weight: 600; font-size: 14px;
+  display: flex; align-items: center; gap: 6px;
+  transition: color 0.2s;
+}
+.top-nav a:hover { color: #4f46e5; }
+.top-nav .logo {
+  font-size: 20px; font-weight: 700;
+  background: linear-gradient(135deg, #FF6B6B, #FF85A2);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.top-nav .logo span { font-size: 13px; font-weight: 400; -webkit-text-fill-color: #94a3b8; margin-left: 8px; }
+
+.container {
+  max-width: 1400px; margin: 0 auto; padding: 24px;
+  display: grid; grid-template-columns: 380px 1fr; gap: 24px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .container { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+}
+
+.left-panel { display: flex; flex-direction: column; gap: 20px; }
+.card-title {
+  font-size: 16px; font-weight: 700; color: #1e293b;
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.card-title .icon { font-size: 20px; }
+
+.upload-zone {
+  border: 2px dashed #c7d2fe; border-radius: 12px;
+  padding: 32px 20px; text-align: center;
+  cursor: pointer; transition: all 0.3s;
+  background: rgba(238,242,255,0.4);
+}
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: #818cf8; background: rgba(238,242,255,0.7);
+}
+.upload-zone .upload-icon { font-size: 40px; margin-bottom: 8px; }
+.upload-zone p { color: #64748b; font-size: 14px; }
+.upload-zone .hint { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+.upload-zone input[type="file"] { display: none; }
+
+.file-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.file-item {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.6); border-radius: 8px;
+  padding: 8px 12px; font-size: 13px;
+}
+.file-item .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #475569; }
+.file-item .remove {
+  cursor: pointer; color: #f87171; font-size: 16px; font-weight: bold;
+  width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; transition: background 0.2s;
+}
+.file-item .remove:hover { background: rgba(248,113,113,0.15); }
+
+.text-area-wrap textarea {
+  width: 100%; min-height: 120px; border: 1px solid #e2e8f0;
+  border-radius: 10px; padding: 12px; font-size: 14px;
+  resize: vertical; outline: none; transition: border-color 0.2s;
+  background: rgba(255,255,255,0.6); color: #334155;
+  font-family: inherit;
+}
+.text-area-wrap textarea:focus { border-color: #818cf8; }
+.text-area-wrap textarea::placeholder { color: #94a3b8; }
+
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.setting-row label { font-size: 14px; color: #475569; font-weight: 500; }
+.setting-row .value { font-size: 13px; color: #6366f1; font-weight: 600; min-width: 20px; text-align: center; }
+
+input[type="range"] {
+  -webkit-appearance: none; width: 140px; height: 6px;
+  background: linear-gradient(90deg, #c7d2fe, #a5b4fc); border-radius: 3px; outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px;
+  background: linear-gradient(135deg, #FF6B6B, #FF85A2);
+  border-radius: 50%; cursor: pointer; box-shadow: 0 2px 6px rgba(255,107,107,0.4);
+}
+
+select {
+  padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 8px;
+  font-size: 13px; color: #475569; background: rgba(255,255,255,0.8);
+  outline: none; cursor: pointer;
+}
+select:focus { border-color: #818cf8; }
+
+.toggle-wrap { display: flex; align-items: center; gap: 10px; }
+.toggle {
+  position: relative; width: 44px; height: 24px; cursor: pointer;
+}
+.toggle input { display: none; }
+.toggle .slider {
+  position: absolute; inset: 0; background: #cbd5e1; border-radius: 12px;
+  transition: background 0.3s;
+}
+.toggle .slider::before {
+  content: ''; position: absolute; width: 18px; height: 18px;
+  left: 3px; top: 3px; background: white; border-radius: 50%;
+  transition: transform 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.toggle input:checked + .slider { background: linear-gradient(135deg, #FF6B6B, #FF85A2); }
+.toggle input:checked + .slider::before { transform: translateX(20px); }
+
+.btn-extract {
+  width: 100%; padding: 14px; border: none; border-radius: 12px;
+  background: linear-gradient(135deg, #FF6B6B, #FF85A2);
+  color: white; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(255,107,107,0.35);
+}
+.btn-extract:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,107,107,0.45); }
+.btn-extract:active { transform: translateY(0); }
+.btn-extract:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.right-panel { min-height: 400px; }
+.result-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
+}
+.result-header h2 { font-size: 18px; color: #1e293b; }
+.result-count { font-size: 13px; color: #64748b; background: rgba(99,102,241,0.1); padding: 4px 12px; border-radius: 20px; }
+
+.export-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-export {
+  padding: 8px 16px; border: 1px solid #e2e8f0; border-radius: 8px;
+  background: rgba(255,255,255,0.7); color: #475569; font-size: 13px;
+  cursor: pointer; transition: all 0.2s; font-weight: 500;
+}
+.btn-export:hover { border-color: #818cf8; color: #6366f1; background: rgba(238,242,255,0.5); }
+
+.word-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+.word-card {
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  transition: all 0.2s;
+  cursor: default;
+}
+.word-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.9);
+}
+.word-card .word {
+  font-size: 15px; font-weight: 600; color: #1e293b;
+  margin-bottom: 4px; word-break: break-all;
+}
+.word-card .freq {
+  font-size: 11px; color: #94a3b8;
+}
+
+.empty-state {
+  text-align: center; padding: 60px 20px; color: #94a3b8;
+}
+.empty-state .empty-icon { font-size: 64px; margin-bottom: 16px; opacity: 0.5; }
+.empty-state p { font-size: 15px; }
+
+.loading {
+  text-align: center; padding: 40px; color: #6366f1;
+}
+.spinner {
+  width: 36px; height: 36px; border: 3px solid #e2e8f0;
+  border-top-color: #FF85A2; border-radius: 50%;
+  animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+  background: #1e293b; color: white; padding: 12px 24px; border-radius: 10px;
+  font-size: 14px; z-index: 999; opacity: 0; transition: all 0.3s;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ===== Beginner's Guide ===== */
+.guide-section {
+  max-width: 1400px; margin: 0 auto 24px; padding: 0 24px;
+}
+.guide-card {
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+.guide-toggle {
+  width: 100%; padding: 16px 24px; border: none; background: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+  font-size: 16px; font-weight: 700; color: #1e293b;
+  transition: background 0.2s;
+}
+.guide-toggle:hover { background: rgba(238,242,255,0.4); }
+.guide-toggle .arrow {
+  font-size: 12px; transition: transform 0.3s; color: #94a3b8;
+}
+.guide-toggle.open .arrow { transform: rotate(90deg); }
+.guide-body {
+  max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+}
+.guide-body.open { max-height: 800px; }
+.guide-tabs {
+  display: flex; border-bottom: 1px solid #e2e8f0; padding: 0 24px;
+  gap: 0; overflow-x: auto;
+}
+.guide-tab {
+  padding: 12px 20px; border: none; background: none; cursor: pointer;
+  font-size: 14px; font-weight: 500; color: #64748b;
+  border-bottom: 2px solid transparent; transition: all 0.2s;
+  white-space: nowrap;
+}
+.guide-tab:hover { color: #6366f1; }
+.guide-tab.active { color: #6366f1; border-bottom-color: #6366f1; font-weight: 600; }
+.guide-content { padding: 20px 24px; display: none; }
+.guide-content.active { display: block; }
+.guide-content h3 { font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 10px; }
+.guide-content p, .guide-content li {
+  font-size: 14px; color: #475569; line-height: 1.8;
+}
+.guide-content ul { padding-left: 20px; margin-bottom: 10px; }
+.guide-content li { margin-bottom: 4px; }
+.guide-content a {
+  color: #6366f1; text-decoration: none; font-weight: 500;
+}
+.guide-content a:hover { text-decoration: underline; }
+.guide-step {
+  display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;
+}
+.guide-step-num {
+  width: 28px; height: 28px; min-width: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, #FF6B6B, #FF85A2);
+  color: white; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+}
+.guide-step-text { font-size: 14px; color: #475569; padding-top: 3px; }
+
+/* ===== Custom Known Words Upload ===== */
+.custom-known-section {
+  margin-top: 16px; padding-top: 16px;
+  border-top: 1px dashed #e2e8f0;
+}
+.custom-known-label {
+  font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.custom-known-upload {
+  border: 2px dashed #d1d5db; border-radius: 10px;
+  padding: 16px; text-align: center; cursor: pointer;
+  transition: all 0.3s; background: rgba(255,255,255,0.3);
+  font-size: 13px; color: #64748b;
+}
+.custom-known-upload:hover { border-color: #818cf8; background: rgba(238,242,255,0.4); }
+.custom-known-upload input[type="file"] { display: none; }
+.custom-known-status {
+  margin-top: 8px; font-size: 12px; color: #6366f1;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.custom-known-status .count { font-weight: 600; }
+.btn-clear-custom {
+  padding: 3px 10px; border: 1px solid #fca5a5; border-radius: 6px;
+  background: rgba(254,202,202,0.3); color: #ef4444; font-size: 11px;
+  cursor: pointer; transition: all 0.2s; font-weight: 500;
+}
+.btn-clear-custom:hover { background: rgba(254,202,202,0.5); }
+
+/* ===== Public Word Library ===== */
+.library-section {
+  max-width: 1400px; margin: 32px auto 40px; padding: 0 24px;
+}
+.library-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+}
+.library-header h2 {
+  font-size: 20px; font-weight: 700; color: #1e293b;
+  display: flex; align-items: center; gap: 8px;
+}
+.library-search {
+  padding: 10px 16px; border: 1px solid #e2e8f0; border-radius: 10px;
+  font-size: 14px; color: #334155; background: rgba(255,255,255,0.7);
+  outline: none; width: 280px; max-width: 100%;
+  transition: border-color 0.2s;
+}
+.library-search:focus { border-color: #818cf8; }
+.library-search::placeholder { color: #94a3b8; }
+.library-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+}
+@media (max-width: 900px) {
+  .library-grid { grid-template-columns: 1fr; }
+}
+@media (min-width: 901px) and (max-width: 1100px) {
+  .library-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.library-card {
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  transition: all 0.3s;
+}
+.library-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+}
+.library-card-title {
+  font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 6px;
+}
+.library-card-desc {
+  font-size: 13px; color: #64748b; margin-bottom: 10px;
+}
+.library-card-count {
+  font-size: 12px; color: #6366f1; font-weight: 600;
+  background: rgba(99,102,241,0.1); padding: 3px 10px; border-radius: 12px;
+  display: inline-block;
+}
+.library-card-actions {
+  margin-top: 12px; display: flex; gap: 8px;
+}
+.library-card-actions button {
+  padding: 5px 12px; border: 1px solid #e2e8f0; border-radius: 6px;
+  background: rgba(255,255,255,0.7); color: #475569; font-size: 12px;
+  cursor: pointer; transition: all 0.2s; font-weight: 500;
+}
+.library-card-actions button:hover {
+  border-color: #818cf8; color: #6366f1;
+}
+.library-words-panel {
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+  display: none;
+}
+.library-words-panel.open { display: block; }
+.library-words-list {
+  max-height: 200px; overflow-y: auto;
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 10px;
+}
+.library-word-tag {
+  padding: 3px 10px; background: rgba(238,242,255,0.6);
+  border-radius: 6px; font-size: 12px; color: #475569;
+}
+.library-empty {
+  text-align: center; padding: 40px; color: #94a3b8;
+  font-size: 14px;
+}
+.library-loading {
+  text-align: center; padding: 40px; color: #6366f1; font-size: 14px;
+}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="logo">VocabMaster<span>智能生词提取工坊</span></div>
+  <a href="/">&#8592; 返回主页</a>
+</nav>
+
+<!-- ===== Feature 2: Beginner's Guide ===== -->
+<div class="guide-section">
+  <div class="guide-card">
+    <button class="guide-toggle" id="guideToggle" onclick="toggleGuide()">
+      <span>&#127919; 新手指南</span>
+      <span class="arrow">&#9654;</span>
+    </button>
+    <div class="guide-body" id="guideBody">
+      <div class="guide-tabs">
+        <button class="guide-tab active" onclick="switchGuideTab(this, 'guideTab1')">&#128161; 操作指引</button>
+        <button class="guide-tab" onclick="switchGuideTab(this, 'guideTab2')">&#127916; 影视字幕</button>
+        <button class="guide-tab" onclick="switchGuideTab(this, 'guideTab3')">&#128218; 原著阅读</button>
+        <button class="guide-tab" onclick="switchGuideTab(this, 'guideTab4')">&#127911; 听力素材</button>
+      </div>
+      <div class="guide-content active" id="guideTab1">
+        <div class="guide-step">
+          <div class="guide-step-num">1</div>
+          <div class="guide-step-text"><strong>上传素材</strong> -- 拖拽或点击上传 .txt / .srt / .docx 文件，也可以直接粘贴文本内容</div>
+        </div>
+        <div class="guide-step">
+          <div class="guide-step-num">2</div>
+          <div class="guide-step-text"><strong>设置规则</strong> -- 调整最短词长、排序方式，开启/关闭已知词汇过滤，或上传自定义熟词表</div>
+        </div>
+        <div class="guide-step">
+          <div class="guide-step-num">3</div>
+          <div class="guide-step-text"><strong>提取生词</strong> -- 点击「开始提取生词」，系统会自动过滤停用词和已知词汇</div>
+        </div>
+        <div class="guide-step">
+          <div class="guide-step-num">4</div>
+          <div class="guide-step-text"><strong>导出词书</strong> -- 复制全部、下载 TXT 或打包 ZIP，方便导入 Anki 等记忆工具</div>
+        </div>
+      </div>
+      <div class="guide-content" id="guideTab2">
+        <h3>推荐使用 .srt 字幕文件提取口语词汇</h3>
+        <p>影视字幕包含大量日常口语表达，是学习地道英语的绝佳素材。上传 .srt 文件后，系统会自动清理时间戳和序号，只保留对话文本。</p>
+        <ul>
+          <li><a href="https://www.opensubtitles.org" target="_blank">OpenSubtitles</a> -- 全球最大的字幕库，支持多语言</li>
+          <li><a href="https://subhd.tv" target="_blank">SubHD</a> -- 中英双语字幕资源丰富</li>
+          <li><a href="https://zimuku.org" target="_blank">字幕库</a> -- 国产影视字幕社区</li>
+          <li><a href="https://yysub.com" target="_blank">人人影视字幕</a> -- 经典美剧英文字幕</li>
+        </ul>
+        <p style="margin-top:8px;color:#94a3b8;font-size:13px;">提示：推荐选择英文字幕（非双语），以获得更准确的词频统计。</p>
+      </div>
+      <div class="guide-content" id="guideTab3">
+        <h3>从英文原著中提取生词</h3>
+        <p>阅读英文原著是扩大词汇量最有效的方式之一。将整本书的文本上传后，可以快速定位自己不认识的单词。</p>
+        <ul>
+          <li><a href="https://www.gutenberg.org" target="_blank">Project Gutenberg</a> -- 超过 70,000 本免费英文电子书</li>
+          <li><a href="https://standardebooks.org" target="_blank">Standard Ebooks</a> -- 精排版的公共领域电子书</li>
+          <li><a href="https://www.lingq.com" target="_blank">LingQ</a> -- 在线阅读平台，自带生词标注</li>
+          <li><a href="https://archive.org" target="_blank">Internet Archive</a> -- 数字图书馆，大量英文原版书</li>
+        </ul>
+        <p style="margin-top:8px;color:#94a3b8;font-size:13px;">提示：建议选择适合自己水平的书籍，从简单的开始逐步挑战更高难度。</p>
+      </div>
+      <div class="guide-content" id="guideTab4">
+        <h3>从听力 transcript 中提取生词</h3>
+        <p>听力材料通常包含大量学术和正式用语，适合备考和提升专业词汇量。</p>
+        <ul>
+          <li><a href="https://www.ted.com" target="_blank">TED Talks</a> -- 每场演讲都有完整 transcript，可复制文本</li>
+          <li><a href="https://www.bbc.co.uk/learningenglish" target="_blank">BBC Learning English</a> -- 带文本的听力素材</li>
+          <li><a href="https://www.npr.org/transcripts" target="_blank">NPR Transcripts</a> -- 新闻广播文字稿</li>
+          <li><a href="https://podcasts.apple.com" target="_blank">Apple Podcasts</a> -- 部分播客提供 transcript</li>
+        </ul>
+        <p style="margin-top:8px;color:#94a3b8;font-size:13px;">提示：将 transcript 文本保存为 .txt 文件后上传，即可提取生词。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="left-panel">
+    <div class="card">
+      <div class="card-title"><span class="icon">&#128196;</span> 上传文件</div>
+      <div class="upload-zone" id="uploadZone">
+        <div class="upload-icon">&#9729;&#65039;</div>
+        <p>拖拽文件到此处，或点击选择</p>
+        <div class="hint">支持 .txt / .srt / .docx，可多选</div>
+        <input type="file" id="fileInput" multiple accept=".txt,.srt,.docx">
+      </div>
+      <div class="file-list" id="fileList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">&#9997;&#65039;</span> 粘贴文本</div>
+      <div class="text-area-wrap">
+        <textarea id="textInput" placeholder="在此粘贴英文文本内容...&#10;&#10;支持直接粘贴文章、字幕等内容"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">&#9881;&#65039;</span> 提取设置</div>
+      <div class="setting-row">
+        <label>最短词长</label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input type="range" id="minLength" min="2" max="10" value="3">
+          <span class="value" id="minLengthVal">3</span>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label>排序方式</label>
+        <select id="sortMode">
+          <option value="order">出现顺序</option>
+          <option value="alpha">A-Z</option>
+          <option value="freq">词频（高到低）</option>
+          <option value="random">随机</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label>屏蔽已知词汇</label>
+        <div class="toggle-wrap">
+          <label class="toggle">
+            <input type="checkbox" id="filterKnown" checked>
+            <span class="slider"></span>
+          </label>
+          <span style="font-size:12px;color:#94a3b8;">过滤中考+高考词</span>
+        </div>
+      </div>
+
+      <!-- ===== Feature 1: Custom Known Words Upload ===== -->
+      <div class="custom-known-section">
+        <div class="custom-known-label">
+          <span>&#128220;</span> 自定义熟词表
+        </div>
+        <div class="custom-known-upload" id="customKnownUpload">
+          <input type="file" id="customKnownInput" accept=".txt">
+          <div>&#128194; 上传 .txt 熟词表（每行一个单词）</div>
+        </div>
+        <div class="custom-known-status" id="customKnownStatus" style="display:none;">
+          <span class="count" id="customKnownCount"></span>
+          <button class="btn-clear-custom" onclick="clearCustomKnown()">&#10005; 清除</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-extract" id="btnExtract" onclick="extractVocab()">
+      &#9729;&#65039; 开始提取生词
+    </button>
+  </div>
+
+  <div class="card right-panel" id="rightPanel">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">&#9729;&#65039;</div>
+      <p>上传文件或粘贴文本后，点击「开始提取生词」</p>
+    </div>
+    <div id="resultArea" style="display:none;">
+      <div class="result-header">
+        <div>
+          <h2>提取结果</h2>
+          <span class="result-count" id="resultCount"></span>
+        </div>
+        <div class="export-btns">
+          <button class="btn-export" onclick="copyAll()">&#128203; 复制全部</button>
+          <button class="btn-export" onclick="downloadTxt()">&#128196; 下载 TXT</button>
+          <button class="btn-export" onclick="downloadZip()">&#128230; 下载 ZIP</button>
+        </div>
+      </div>
+      <div class="word-grid" id="wordGrid"></div>
+    </div>
+    <div class="loading" id="loadingState" style="display:none;">
+      <div class="spinner"></div>
+      <p>正在提取生词...</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Feature 3: Public Word Library ===== -->
+<div class="library-section">
+  <div class="library-header">
+    <h2>&#128218; 公共词书库</h2>
+    <input type="text" class="library-search" id="librarySearch" placeholder="&#128269; 搜索词书..." oninput="filterLibrary()">
+  </div>
+  <div id="libraryContainer">
+    <div class="library-loading" id="libraryLoading">
+      <div class="spinner"></div>
+      <p>正在加载词书库...</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var uploadedFiles = [];
+var extractedWords = [];
+var knownVocabSet = null;
+var knownVocabLoaded = false;
+
+// ===== Feature 1: Custom Known Words =====
+var customKnownSet = new Set();
+
+var STOP_WORDS = new Set([
+  'the','be','to','of','and','a','in','that','have','i','it','for','not','on',
+  'with','he','as','you','do','at','this','but','his','by','from','they','we',
+  'her','she','or','an','will','my','one','all','would','there','their','what',
+  'so','up','out','if','about','who','get','which','go','me','when','make','can',
+  'like','time','no','just','him','know','take','people','into','year','your',
+  'good','some','could','them','see','other','than','then','now','look','only',
+  'come','its','over','think','also','back','after','use','two','how','our',
+  'work','first','well','way','even','new','want','because','any','these','give',
+  'day','most','us','is','am','are','was','were','been','being','has','had',
+  'having','does','did','doing','shall','should','may','might','must','need',
+  'dare','ought','used'
+]);
+
+var LEMMA_RULES = [
+  { pattern: /ies$/, replace: 'y' },
+  { pattern: /ied$/, replace: 'y' },
+  { pattern: /ying$/, replace: 'ie' },
+  { pattern: /ing$/, replace: '' },
+  { pattern: /eed$/, replace: 'ee' },
+  { pattern: /ed$/, replace: '' },
+  { pattern: /er$/, replace: '' },
+  { pattern: /est$/, replace: '' },
+  { pattern: /es$/, replace: '' },
+  { pattern: /s$/, replace: '' },
+];
+
+function lemmatize(word) {
+  for (var i = 0; i < LEMMA_RULES.length; i++) {
+    var rule = LEMMA_RULES[i];
+    if (rule.pattern.test(word)) {
+      var base = word.replace(rule.pattern, rule.replace);
+      if (base.length >= 2) return base;
+    }
+  }
+  return word;
+}
+
+function loadKnownVocab() {
+  if (knownVocabLoaded) return Promise.resolve();
+  return fetch('/data/known-vocab.json')
+    .then(function(resp) {
+      if (!resp.ok) throw new Error('Failed');
+      return resp.json();
+    })
+    .then(function(data) {
+      knownVocabSet = new Set(data.map(function(w) { return w.toLowerCase(); }));
+    })
+    .catch(function(e) {
+      console.warn('Could not load known-vocab.json:', e);
+      knownVocabSet = null;
+    })
+    .then(function() { knownVocabLoaded = true; });
+}
+
+var uploadZone = document.getElementById('uploadZone');
+var fileInput = document.getElementById('fileInput');
+
+uploadZone.addEventListener('click', function() { fileInput.click(); });
+uploadZone.addEventListener('dragover', function(e) { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', function() { uploadZone.classList.remove('drag-over'); });
+uploadZone.addEventListener('drop', function(e) {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', function(e) { handleFiles(e.target.files); });
+
+function handleFiles(files) {
+  for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+    var ext = file.name.split('.').pop().toLowerCase();
+    if (['txt', 'srt', 'docx'].indexOf(ext) !== -1) {
+      uploadedFiles.push(file);
+    }
+  }
+  renderFileList();
+}
+
+function removeFile(index) {
+  uploadedFiles.splice(index, 1);
+  renderFileList();
+}
+
+function renderFileList() {
+  var container = document.getElementById('fileList');
+  var html = '';
+  for (var i = 0; i < uploadedFiles.length; i++) {
+    html += '<div class="file-item">' +
+      '<span class="name">' + escapeHtml(uploadedFiles[i].name) + '</span>' +
+      '<span class="remove" onclick="removeFile(' + i + ')">&times;</span>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function readFileAsText(file) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onload = function() { resolve(reader.result); };
+    reader.onerror = reject;
+    reader.readAsText(file, 'utf-8');
+  });
+}
+
+function readDocxFile(file) {
+  return file.arrayBuffer().then(function(buf) {
+    return mammoth.extractRawText({ arrayBuffer: buf });
+  }).then(function(result) { return result.value; });
+}
+
+function cleanSrt(text) {
+  text = text.replace(/<[^>]+>/g, '');
+  text = text.replace(/\d{2}:\d{2}:\d{2}[,.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,.]\d{3}/g, '');
+  text = text.replace(/^\d+\s*$/gm, '');
+  text = text.replace(/\{[^}]*\}/g, '');
+  text = text.replace(/\[[^\]]*\]/g, '');
+  return text;
+}
+
+function getAllText() {
+  var promises = [];
+  for (var i = 0; i < uploadedFiles.length; i++) {
+    (function(file) {
+      var ext = file.name.split('.').pop().toLowerCase();
+      var p;
+      if (ext === 'docx') {
+        p = readDocxFile(file);
+      } else {
+        p = readFileAsText(file);
+      }
+      promises.push(p.then(function(text) {
+        if (ext === 'srt') text = cleanSrt(text);
+        return text;
+      }));
+    })(uploadedFiles[i]);
+  }
+  return Promise.all(promises).then(function(results) {
+    var allText = results.join('\n');
+    var pasteText = document.getElementById('textInput').value.trim();
+    if (pasteText) allText += '\n' + pasteText;
+    return allText;
+  });
+}
+
+function extractWords(text) {
+  var minLength = parseInt(document.getElementById('minLength').value);
+  var filterKnown = document.getElementById('filterKnown').checked;
+  var rawWords = text.toLowerCase().match(/[a-z]+/g) || [];
+  var wordMap = new Map();
+  var orderCounter = 0;
+
+  for (var i = 0; i < rawWords.length; i++) {
+    var raw = rawWords[i];
+    if (raw.length < minLength) continue;
+    var lemma = lemmatize(raw);
+    if (lemma.length < minLength) continue;
+    if (STOP_WORDS.has(lemma)) continue;
+    if (filterKnown && knownVocabSet && knownVocabSet.has(lemma)) continue;
+    // Feature 1: also check customKnownSet
+    if (filterKnown && customKnownSet.has(lemma)) continue;
+    if (!wordMap.has(lemma)) {
+      wordMap.set(lemma, { freq: 0, order: orderCounter++ });
+    }
+    wordMap.get(lemma).freq++;
+  }
+  return wordMap;
+}
+
+function sortWords(wordMap) {
+  var sortMode = document.getElementById('sortMode').value;
+  var entries = [];
+  wordMap.forEach(function(data, word) {
+    entries.push({ word: word, freq: data.freq, order: data.order });
+  });
+
+  switch (sortMode) {
+    case 'order':
+      entries.sort(function(a, b) { return a.order - b.order; });
+      break;
+    case 'alpha':
+      entries.sort(function(a, b) { return a.word.localeCompare(b.word); });
+      break;
+    case 'freq':
+      entries.sort(function(a, b) { return b.freq - a.freq || a.word.localeCompare(b.word); });
+      break;
+    case 'random':
+      for (var i = entries.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = entries[i]; entries[i] = entries[j]; entries[j] = tmp;
+      }
+      break;
+  }
+  return entries;
+}
+
+function extractVocab() {
+  getAllText().then(function(text) {
+    if (!text.trim()) {
+      showToast('请先上传文件或粘贴文本内容');
+      return;
+    }
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('resultArea').style.display = 'none';
+    document.getElementById('loadingState').style.display = 'block';
+
+    var p = Promise.resolve();
+    if (document.getElementById('filterKnown').checked && !knownVocabLoaded) {
+      p = loadKnownVocab();
+    }
+    return p.then(function() {
+      return new Promise(function(resolve) { setTimeout(resolve, 100); });
+    }).then(function() {
+      var wordMap = extractWords(text);
+      extractedWords = sortWords(wordMap);
+      document.getElementById('loadingState').style.display = 'none';
+
+      if (extractedWords.length === 0) {
+        var es = document.getElementById('emptyState');
+        es.style.display = 'block';
+        es.innerHTML = '<div class="empty-icon">&#128533;</div><p>未提取到生词，请尝试调整最短词长或关闭已知词汇过滤</p>';
+        return;
+      }
+      renderResults();
+    });
+  }).catch(function(e) {
+    document.getElementById('loadingState').style.display = 'none';
+    var es = document.getElementById('emptyState');
+    es.style.display = 'block';
+    es.innerHTML = '<div class="empty-icon">&#9888;&#65039;</div><p>提取出错：' + escapeHtml(e.message) + '</p>';
+  });
+}
+
+function renderResults() {
+  var area = document.getElementById('resultArea');
+  var grid = document.getElementById('wordGrid');
+  var count = document.getElementById('resultCount');
+  count.textContent = '共 ' + extractedWords.length + ' 个生词';
+  var html = '';
+  for (var i = 0; i < extractedWords.length; i++) {
+    html += '<div class="word-card"><div class="word">' + escapeHtml(extractedWords[i].word) +
+      '</div><div class="freq">&times;' + extractedWords[i].freq + '</div></div>';
+  }
+  grid.innerHTML = html;
+  area.style.display = 'block';
+}
+
+function copyAll() {
+  if (!extractedWords.length) return;
+  var text = extractedWords.map(function(w) { return w.word; }).join('\n');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('已复制全部生词到剪贴板');
+    }).catch(function() { fallbackCopy(text); });
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  showToast('已复制全部生词到剪贴板');
+}
+
+function downloadTxt() {
+  if (!extractedWords.length) return;
+  var text = extractedWords.map(function(w) { return w.word; }).join('\n');
+  var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'vocab-master-words.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('TXT 文件已下载');
+}
+
+function downloadZip() {
+  if (!extractedWords.length) return;
+  if (typeof JSZip === 'undefined') {
+    showToast('JSZip 库加载失败，请检查网络连接');
+    return;
+  }
+  var zip = new JSZip();
+  var words = extractedWords.map(function(w) { return w.word; });
+  var perFile = 500;
+  var totalFiles = Math.ceil(words.length / perFile);
+  for (var i = 0; i < totalFiles; i++) {
+    var chunk = words.slice(i * perFile, (i + 1) * perFile);
+    zip.file('vocab-part' + (i + 1) + '.txt', chunk.join('\n'));
+  }
+  zip.generateAsync({ type: 'blob' }).then(function(blob) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'vocab-master-words.zip';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('ZIP 已下载（' + totalFiles + ' 个文件）');
+  });
+}
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function showToast(msg) {
+  var toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(function() { toast.classList.remove('show'); }, 2500);
+}
+
+document.getElementById('minLength').addEventListener('input', function(e) {
+  document.getElementById('minLengthVal').textContent = e.target.value;
+});
+
+// ===== Feature 1: Custom Known Words Upload Logic =====
+(function() {
+  var uploadEl = document.getElementById('customKnownUpload');
+  var inputEl = document.getElementById('customKnownInput');
+
+  uploadEl.addEventListener('click', function() { inputEl.click(); });
+
+  inputEl.addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var text = ev.target.result;
+      var lines = text.split(/[\r\n]+/);
+      customKnownSet = new Set();
+      for (var i = 0; i < lines.length; i++) {
+        var word = lines[i].trim().toLowerCase();
+        if (word && /^[a-z]+$/.test(word)) {
+          customKnownSet.add(word);
+        }
+      }
+      document.getElementById('customKnownCount').textContent =
+        '已加载 ' + customKnownSet.size + ' 个自定义熟词';
+      document.getElementById('customKnownStatus').style.display = 'flex';
+      showToast('自定义熟词表已加载，共 ' + customKnownSet.size + ' 个单词');
+    };
+    reader.readAsText(file, 'utf-8');
+    inputEl.value = '';
+  });
+})();
+
+function clearCustomKnown() {
+  customKnownSet = new Set();
+  document.getElementById('customKnownStatus').style.display = 'none';
+  document.getElementById('customKnownCount').textContent = '';
+  showToast('自定义熟词表已清除');
+}
+
+// ===== Feature 2: Beginner's Guide Logic =====
+function toggleGuide() {
+  var toggle = document.getElementById('guideToggle');
+  var body = document.getElementById('guideBody');
+  toggle.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+function switchGuideTab(tabEl, contentId) {
+  // deactivate all tabs
+  var tabs = tabEl.parentElement.querySelectorAll('.guide-tab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].classList.remove('active');
+  }
+  // deactivate all content
+  var body = tabEl.parentElement.parentElement;
+  var contents = body.querySelectorAll('.guide-content');
+  for (var i = 0; i < contents.length; i++) {
+    contents[i].classList.remove('active');
+  }
+  // activate selected
+  tabEl.classList.add('active');
+  document.getElementById(contentId).classList.add('active');
+}
+
+// ===== Feature 3: Public Word Library Logic =====
+var libraryData = {};  // { filename: { title, desc, words: [] } }
+
+(function loadLibrary() {
+  var container = document.getElementById('libraryContainer');
+  fetch('/data/library/info.json')
+    .then(function(resp) {
+      if (!resp.ok) throw new Error('Failed');
+      return resp.json();
+    })
+    .then(function(info) {
+      var filenames = Object.keys(info);
+      if (filenames.length === 0) {
+        container.innerHTML = '<div class="library-empty">&#9729;&#65039; 暂无词书数据</div>';
+        return;
+      }
+      // Load all word files
+      var promises = filenames.map(function(fn) {
+        return fetch('/data/library/' + fn)
+          .then(function(r) {
+            if (!r.ok) throw new Error('Failed to load ' + fn);
+            return r.text();
+          })
+          .then(function(text) {
+            var words = text.split(/[\r\n]+/).map(function(w) { return w.trim(); }).filter(function(w) { return w; });
+            libraryData[fn] = {
+              title: info[fn].title || fn,
+              desc: info[fn].desc || '',
+              words: words
+            };
+          })
+          .catch(function() {
+            libraryData[fn] = {
+              title: info[fn].title || fn,
+              desc: info[fn].desc || '',
+              words: []
+            };
+          });
+      });
+      return Promise.all(promises);
+    })
+    .then(function() {
+      renderLibrary();
+    })
+    .catch(function() {
+      container.innerHTML = '<div class="library-empty">&#9729;&#65039; 暂无数据</div>';
+    });
+})();
+
+function renderLibrary(filter) {
+  var container = document.getElementById('libraryContainer');
+  var filterText = (filter || '').toLowerCase().trim();
+  var filenames = Object.keys(libraryData);
+
+  if (filenames.length === 0) {
+    container.innerHTML = '<div class="library-empty">&#9729;&#65039; 暂无词书数据</div>';
+    return;
+  }
+
+  var html = '<div class="library-grid">';
+  for (var i = 0; i < filenames.length; i++) {
+    var fn = filenames[i];
+    var item = libraryData[fn];
+    // Apply filter
+    if (filterText) {
+      var match = item.title.toLowerCase().indexOf(filterText) !== -1 ||
+                  item.desc.toLowerCase().indexOf(filterText) !== -1 ||
+                  item.words.some(function(w) { return w.toLowerCase().indexOf(filterText) !== -1; });
+      if (!match) continue;
+    }
+    html += '<div class="library-card" id="lib-card-' + i + '">';
+    html += '<div class="library-card-title">' + escapeHtml(item.title) + '</div>';
+    html += '<div class="library-card-desc">' + escapeHtml(item.desc) + '</div>';
+    html += '<div class="library-card-count">' + item.words.length + ' 个词汇</div>';
+    html += '<div class="library-card-actions">';
+    html += '<button onclick="toggleLibraryWords(\'' + fn + '\', this)">&#128196; 查看词表</button>';
+    html += '<button onclick="copyLibraryWords(\'' + fn + '\')">&#128203; 复制</button>';
+    html += '<button onclick="downloadLibraryWords(\'' + fn + '\')">&#128229; 下载</button>';
+    html += '</div>';
+    html += '<div class="library-words-panel" id="lib-words-' + fn + '">';
+    html += '<div class="library-words-list">';
+    for (var j = 0; j < item.words.length; j++) {
+      html += '<span class="library-word-tag">' + escapeHtml(item.words[j]) + '</span>';
+    }
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  if (html === '<div class="library-grid"></div>') {
+    container.innerHTML = '<div class="library-empty">&#128269; 未找到匹配的词书</div>';
+  } else {
+    container.innerHTML = html;
+  }
+}
+
+function filterLibrary() {
+  var query = document.getElementById('librarySearch').value;
+  renderLibrary(query);
+}
+
+function toggleLibraryWords(fn, btnEl) {
+  var panel = document.getElementById('lib-words-' + fn);
+  if (!panel) return;
+  var isOpen = panel.classList.contains('open');
+  if (isOpen) {
+    panel.classList.remove('open');
+    btnEl.innerHTML = '&#128196; 查看词表';
+  } else {
+    panel.classList.add('open');
+    btnEl.innerHTML = '&#128196; 收起词表';
+  }
+}
+
+function copyLibraryWords(fn) {
+  var item = libraryData[fn];
+  if (!item || !item.words.length) return;
+  var text = item.words.join('\n');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('已复制「' + item.title + '」词表到剪贴板');
+    }).catch(function() { fallbackCopyLib(text, item.title); });
+  } else {
+    fallbackCopyLib(text, item.title);
+  }
+}
+
+function fallbackCopyLib(text, title) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  showToast('已复制「' + title + '」词表到剪贴板');
+}
+
+function downloadLibraryWords(fn) {
+  var item = libraryData[fn];
+  if (!item || !item.words.length) return;
+  var text = item.words.join('\n');
+  var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = fn.replace('.txt', '') + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('已下载「' + item.title + '」');
+}
+</script>
+</body>
+</html>

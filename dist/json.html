@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON 格式化工具</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky-light: #D6EEFF;
+  --sky-mid: #E8F4FD;
+  --sky-pale: #F0F7FF;
+  --sky-lavender: #F5F0FF;
+  --cloud-white: rgba(255,255,255,0.85);
+  --cloud-border: rgba(255,255,255,0.6);
+  --shadow-blue: rgba(100,149,237,0.15);
+  --shadow-blue-deep: rgba(100,149,237,0.25);
+  --accent-blue: #5B9BD5;
+  --accent-pink: #E8A0BF;
+  --accent-purple: #9B7FD4;
+  --text-primary: #2C3E6B;
+  --text-secondary: #6B7FA3;
+  --text-muted: #9AACCC;
+  --key-color: #1A3A6B;
+  --string-color: #2E9E5A;
+  --number-color: #3B7DD8;
+  --boolean-color: #8B5CF6;
+  --null-color: #E88D3F;
+  --bracket-color: #9AACCC;
+  --error-color: #E85D75;
+  --success-color: #4CAF7D;
+  --radius: 28px;
+  --radius-sm: 14px;
+  --radius-xs: 8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(170deg, #D6EEFF 0%, #E8F4FD 30%, #F0F7FF 60%, #F5F0FF 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+.cloud {
+  position: fixed;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.5;
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(1px);
+}
+.cloud::before, .cloud::after {
+  content: '';
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+
+.cloud-1 {
+  width: 200px; height: 60px;
+  top: 8%; left: -5%;
+  animation: floatCloud 35s linear infinite;
+}
+.cloud-1::before { width: 100px; height: 80px; top: -40px; left: 30px; }
+.cloud-1::after { width: 120px; height: 70px; top: -30px; left: 80px; }
+
+.cloud-2 {
+  width: 160px; height: 50px;
+  top: 20%; left: -10%;
+  animation: floatCloud 45s linear infinite;
+  animation-delay: -10s;
+  opacity: 0.35;
+}
+.cloud-2::before { width: 80px; height: 60px; top: -30px; left: 20px; }
+.cloud-2::after { width: 100px; height: 55px; top: -25px; left: 60px; }
+
+.cloud-3 {
+  width: 240px; height: 70px;
+  top: 45%; left: -15%;
+  animation: floatCloud 55s linear infinite;
+  animation-delay: -20s;
+  opacity: 0.3;
+}
+.cloud-3::before { width: 120px; height: 90px; top: -50px; left: 40px; }
+.cloud-3::after { width: 140px; height: 80px; top: -35px; left: 100px; }
+
+.cloud-4 {
+  width: 180px; height: 55px;
+  top: 65%; left: -8%;
+  animation: floatCloud 40s linear infinite;
+  animation-delay: -5s;
+  opacity: 0.4;
+}
+.cloud-4::before { width: 90px; height: 70px; top: -35px; left: 25px; }
+.cloud-4::after { width: 110px; height: 60px; top: -28px; left: 70px; }
+
+.cloud-5 {
+  width: 140px; height: 45px;
+  top: 80%; left: -12%;
+  animation: floatCloud 50s linear infinite;
+  animation-delay: -30s;
+  opacity: 0.25;
+}
+.cloud-5::before { width: 70px; height: 55px; top: -28px; left: 15px; }
+.cloud-5::after { width: 90px; height: 50px; top: -22px; left: 50px; }
+
+.cloud-6 {
+  width: 220px; height: 65px;
+  top: 30%; left: -20%;
+  animation: floatCloud 60s linear infinite;
+  animation-delay: -15s;
+  opacity: 0.2;
+}
+.cloud-6::before { width: 110px; height: 85px; top: -45px; left: 35px; }
+.cloud-6::after { width: 130px; height: 75px; top: -32px; left: 90px; }
+
+@keyframes floatCloud {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(100vw + 300px)); }
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px 60px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+.header p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.card {
+  background: var(--cloud-white);
+  border: 1px solid var(--cloud-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px var(--shadow-blue), 0 2px 8px var(--shadow-blue);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+  align-items: center;
+}
+
+.btn {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.3px;
+}
+.btn:active { transform: scale(0.96); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-blue), #7BB8E8);
+  color: white;
+  box-shadow: 0 4px 14px rgba(91,155,213,0.35);
+}
+.btn-primary:hover {
+  box-shadow: 0 6px 20px rgba(91,155,213,0.5);
+  transform: translateY(-1px);
+}
+
+.btn-pink {
+  background: linear-gradient(135deg, var(--accent-pink), #F0B8D0);
+  color: white;
+  box-shadow: 0 4px 14px rgba(232,160,191,0.35);
+}
+.btn-pink:hover {
+  box-shadow: 0 6px 20px rgba(232,160,191,0.5);
+  transform: translateY(-1px);
+}
+
+.btn-purple {
+  background: linear-gradient(135deg, var(--accent-purple), #B49AE8);
+  color: white;
+  box-shadow: 0 4px 14px rgba(155,127,212,0.35);
+}
+.btn-purple:hover {
+  box-shadow: 0 6px 20px rgba(155,127,212,0.5);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: rgba(91,155,213,0.08);
+  color: var(--accent-blue);
+  border: 1.5px solid rgba(91,155,213,0.2);
+}
+.btn-ghost:hover {
+  background: rgba(91,155,213,0.15);
+  border-color: rgba(91,155,213,0.35);
+}
+
+.btn-danger {
+  background: rgba(232,93,117,0.08);
+  color: var(--error-color);
+  border: 1.5px solid rgba(232,93,117,0.2);
+}
+.btn-danger:hover {
+  background: rgba(232,93,117,0.15);
+  border-color: rgba(232,93,117,0.35);
+}
+
+.btn-sm {
+  padding: 7px 16px;
+  font-size: 0.82rem;
+  border-radius: var(--radius-xs);
+}
+
+.spacer { flex: 1; }
+
+.stats {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.stat-badge {
+  background: rgba(91,155,213,0.08);
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(91,155,213,0.12);
+}
+
+textarea {
+  width: 100%;
+  min-height: 220px;
+  font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', monospace;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  padding: 18px 20px;
+  border: 2px solid rgba(91,155,213,0.15);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.6);
+  color: var(--text-primary);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+textarea:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 4px rgba(91,155,213,0.1);
+}
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.output-header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.output-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.view-toggle {
+  display: flex;
+  background: rgba(91,155,213,0.08);
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  border: 1px solid rgba(91,155,213,0.12);
+}
+.view-toggle button {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.view-toggle button.active {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.output-area {
+  min-height: 200px;
+  max-height: 600px;
+  overflow: auto;
+  padding: 18px 20px;
+  border: 2px solid rgba(91,155,213,0.12);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.5);
+  font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', monospace;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+  position: relative;
+}
+
+.output-area .line {
+  display: block;
+  position: relative;
+}
+.output-area .line:hover {
+  background: rgba(91,155,213,0.06);
+  border-radius: 4px;
+}
+
+.json-key { color: var(--key-color); font-weight: 700; }
+.json-string { color: var(--string-color); }
+.json-number { color: var(--number-color); }
+.json-boolean { color: var(--boolean-color); font-weight: 700; }
+.json-null { color: var(--null-color); font-style: italic; }
+.json-bracket { color: var(--bracket-color); }
+.json-colon { color: var(--text-muted); }
+.json-comma { color: var(--text-muted); }
+
+.error-msg {
+  color: var(--error-color);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 14px 18px;
+  background: rgba(232,93,117,0.08);
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(232,93,117,0.15);
+  font-family: 'Nunito', sans-serif;
+}
+.error-msg .error-line {
+  font-family: 'SFMono-Regular', 'Consolas', monospace;
+  background: rgba(232,93,117,0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-top: 6px;
+  display: inline-block;
+  font-size: 0.85rem;
+}
+
+.path-display {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(44,62,107,0.92);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 24px;
+  font-family: 'SFMono-Regular', 'Consolas', monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.path-display.visible { opacity: 1; }
+
+.toast {
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: rgba(76,175,125,0.95);
+  color: white;
+  padding: 10px 28px;
+  border-radius: 24px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  z-index: 200;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(76,175,125,0.3);
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.tree-view {
+  font-family: 'SFMono-Regular', 'Consolas', monospace;
+  font-size: 0.88rem;
+  line-height: 1.8;
+}
+.tree-node {
+  padding-left: 22px;
+  position: relative;
+}
+.tree-node::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(91,155,213,0.15);
+}
+.tree-toggle {
+  cursor: pointer;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.tree-toggle:hover {
+  background: rgba(91,155,213,0.06);
+  border-radius: 4px;
+}
+.tree-arrow {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  text-align: center;
+  line-height: 16px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.tree-arrow.collapsed {
+  transform: rotate(-90deg);
+}
+.tree-children.collapsed {
+  display: none;
+}
+.tree-key {
+  color: var(--key-color);
+  font-weight: 700;
+  cursor: default;
+}
+.tree-value-string { color: var(--string-color); }
+.tree-value-number { color: var(--number-color); }
+.tree-value-boolean { color: var(--boolean-color); font-weight: 700; }
+.tree-value-null { color: var(--null-color); font-style: italic; }
+.tree-bracket { color: var(--bracket-color); }
+.tree-count {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  margin-left: 4px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text-muted);
+}
+.empty-state .icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+.empty-state p {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .container { padding: 24px 12px 40px; }
+  .card { padding: 18px; border-radius: 20px; }
+  .header h1 { font-size: 1.6rem; }
+  .toolbar { gap: 6px; }
+  .btn { padding: 8px 14px; font-size: 0.82rem; }
+  textarea { min-height: 160px; font-size: 0.82rem; }
+  .output-area { font-size: 0.82rem; }
+}
+
+.output-area::-webkit-scrollbar,
+textarea::-webkit-scrollbar {
+  width: 6px;
+}
+.output-area::-webkit-scrollbar-track,
+textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+.output-area::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb {
+  background: rgba(91,155,213,0.2);
+  border-radius: 3px;
+}
+.output-area::-webkit-scrollbar-thumb:hover,
+textarea::-webkit-scrollbar-thumb:hover {
+  background: rgba(91,155,213,0.35);
+}
+</style>
+</head>
+<body>
+
+<div class="cloud cloud-1"></div>
+<div class="cloud cloud-2"></div>
+<div class="cloud cloud-3"></div>
+<div class="cloud cloud-4"></div>
+<div class="cloud cloud-5"></div>
+<div class="cloud cloud-6"></div>
+
+<div class="toast" id="toast">已复制!</div>
+<div class="path-display" id="pathDisplay"></div>
+
+<div class="container">
+  <div class="header">
+    <h1>☁️ JSON 格式化工具</h1>
+    <p>美化、压缩、校验你的 JSON 数据</p>
+  </div>
+
+  <div class="card">
+    <div class="toolbar">
+      <button class="btn btn-primary" onclick="beautify()">✨ 格式化</button>
+      <button class="btn btn-pink" onclick="minify()">📦 压缩</button>
+      <button class="btn btn-purple" onclick="validate()">🔍 校验</button>
+      <button class="btn btn-ghost btn-sm" onclick="loadSample()">📋 示例数据</button>
+      <span class="spacer"></span>
+      <div class="stats">
+        <span class="stat-badge" id="charCount">0 字符</span>
+        <span class="stat-badge" id="depthIndicator">深度 0</span>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="clearAll()">🗑 清空</button>
+    </div>
+    <textarea id="jsonInput" placeholder='在此粘贴 JSON 数据，例如：{"name": "张三", "age": 25}' spellcheck="false"></textarea>
+  </div>
+
+  <div class="card">
+    <div class="output-header">
+      <h2>📄 输出结果</h2>
+      <div class="output-actions">
+        <div class="view-toggle">
+          <button class="active" id="btnTextView" onclick="switchView('text')">文本</button>
+          <button id="btnTreeView" onclick="switchView('tree')">树形</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="copyOutput()">📋 复制</button>
+      </div>
+    </div>
+    <div class="output-area" id="outputArea">
+      <div class="empty-state">
+        <div class="icon">☁️</div>
+        <p>在上方输入 JSON 数据，点击按钮开始处理</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const input = document.getElementById('jsonInput');
+const outputArea = document.getElementById('outputArea');
+const charCountEl = document.getElementById('charCount');
+const depthEl = document.getElementById('depthIndicator');
+const pathDisplay = document.getElementById('pathDisplay');
+const toastEl = document.getElementById('toast');
+
+let currentView = 'text';
+let currentOutput = '';
+let pathMap = new Map();
+
+const sampleJSON = {
+  "项目": "JSON 格式化工具",
+  "版本": "2.0.0",
+  "描述": "一个美观的 JSON 格式化、压缩和校验工具",
+  "作者": {
+    "姓名": "云朵开发者",
+    "邮箱": "cloud@example.com",
+    "社交": {
+      "GitHub": "https://github.com/example",
+      "博客": "https://blog.example.com"
+    }
+  },
+  "功能": ["格式化", "压缩", "校验", "语法高亮", "树形视图", "路径显示"],
+  "配置": {
+    "缩进": 2,
+    "主题": "天空",
+    "动画": true,
+    "最大深度": null
+  },
+  "统计": {
+    "用户数": 12580,
+    "评分": 4.9,
+    "推荐": true,
+    "开源": true
+  },
+  "标签": ["工具", "JSON", "前端", "开发"],
+  "已废弃": null
+};
+
+input.addEventListener('input', () => {
+  updateStats();
+});
+
+function updateStats() {
+  const text = input.value;
+  charCountEl.textContent = text.length + ' 字符';
+  if (text.trim()) {
+    try {
+      const parsed = JSON.parse(text);
+      depthEl.textContent = '深度 ' + getDepth(parsed);
+    } catch {
+      depthEl.textContent = '深度 -';
+    }
+  } else {
+    depthEl.textContent = '深度 0';
+  }
+}
+
+function getDepth(obj) {
+  if (obj === null || typeof obj !== 'object') return 0;
+  let max = 0;
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      max = Math.max(max, getDepth(obj[key]));
+    }
+  }
+  return max + 1;
+}
+
+function beautify() {
+  const text = input.value.trim();
+  if (!text) return;
+  try {
+    const parsed = JSON.parse(text);
+    currentOutput = JSON.stringify(parsed, null, 2);
+    if (currentView === 'text') {
+      renderHighlighted(currentOutput, parsed);
+    } else {
+      renderTree(parsed);
+    }
+    updateStats();
+  } catch (e) {
+    showError(e);
+  }
+}
+
+function minify() {
+  const text = input.value.trim();
+  if (!text) return;
+  try {
+    const parsed = JSON.parse(text);
+    currentOutput = JSON.stringify(parsed);
+    if (currentView === 'text') {
+      renderHighlighted(currentOutput, parsed);
+    } else {
+      renderTree(parsed);
+    }
+    updateStats();
+  } catch (e) {
+    showError(e);
+  }
+}
+
+function validate() {
+  const text = input.value.trim();
+  if (!text) return;
+  try {
+    JSON.parse(text);
+    outputArea.innerHTML = '<div style="padding:14px 18px;background:rgba(76,175,125,0.08);border:1px solid rgba(76,175,125,0.15);border-radius:8px;color:var(--success-color);font-weight:700;font-family:Nunito,sans-serif;">✅ JSON 格式正确！</div>';
+  } catch (e) {
+    showError(e);
+  }
+}
+
+function showError(e) {
+  const msg = e.message;
+  let lineInfo = '';
+  const posMatch = msg.match(/position\s+(\d+)/i);
+  if (posMatch) {
+    const pos = parseInt(posMatch[1]);
+    const beforePos = input.value.substring(0, pos);
+    const lineNum = beforePos.split('\n').length;
+    const colNum = pos - beforePos.lastIndexOf('\n');
+    lineInfo = `<div class="error-line">第 ${lineNum} 行，第 ${colNum} 列（位置 ${pos}）</div>`;
+  }
+  outputArea.innerHTML = `<div class="error-msg">❌ JSON 格式错误：${escapeHtml(msg)}${lineInfo}</div>`;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function renderHighlighted(jsonStr, parsed) {
+  pathMap.clear();
+  const lines = jsonStr.split('\n');
+  let html = '';
+  lines.forEach((line, lineIdx) => {
+    html += '<span class="line">' + highlightLine(line, lineIdx) + '</span>\n';
+  });
+  outputArea.innerHTML = html;
+
+  outputArea.querySelectorAll('.json-key[data-path]').forEach(el => {
+    el.addEventListener('mouseenter', (e) => {
+      pathDisplay.textContent = el.dataset.path;
+      pathDisplay.classList.add('visible');
+    });
+    el.addEventListener('mouseleave', () => {
+      pathDisplay.classList.remove('visible');
+    });
+  });
+}
+
+function highlightLine(line) {
+  let result = '';
+  let i = 0;
+  while (i < line.length) {
+    if (line[i] === '"') {
+      let j = i + 1;
+      while (j < line.length && line[j] !== '"') {
+        if (line[j] === '\\') j++;
+        j++;
+      }
+      const str = line.substring(i, j + 1);
+      const afterColon = line.substring(0, i).trimEnd().endsWith(':');
+      if (afterColon) {
+        result += '<span class="json-string">' + escapeHtml(str) + '</span>';
+      } else {
+        result += '<span class="json-key" data-path="">' + escapeHtml(str) + '</span>';
+      }
+      i = j + 1;
+    } else if (line[i] === ':') {
+      result += '<span class="json-colon">: </span>';
+      i += 2;
+    } else if (line[i] === ',') {
+      result += '<span class="json-comma">,</span>';
+      i++;
+    } else if (/[{}\[\]]/.test(line[i])) {
+      result += '<span class="json-bracket">' + line[i] + '</span>';
+      i++;
+    } else if (/[\d\-]/.test(line[i]) && (i === 0 || /[\s:,]/.test(line[i-1]))) {
+      let j = i;
+      if (line[j] === '-') j++;
+      while (j < line.length && /[\d.eE+\-]/.test(line[j])) j++;
+      result += '<span class="json-number">' + escapeHtml(line.substring(i, j)) + '</span>';
+      i = j;
+    } else if (line.substring(i, i+4) === 'true') {
+      result += '<span class="json-boolean">true</span>';
+      i += 4;
+    } else if (line.substring(i, i+5) === 'false') {
+      result += '<span class="json-boolean">false</span>';
+      i += 5;
+    } else if (line.substring(i, i+4) === 'null') {
+      result += '<span class="json-null">null</span>';
+      i += 4;
+    } else {
+      result += escapeHtml(line[i]);
+      i++;
+    }
+  }
+  return result;
+}
+
+function renderHighlightedWithPath(jsonStr, parsed) {
+  pathMap.clear();
+  const pathRegistry = [];
+  buildPathRegistry(parsed, '', pathRegistry);
+
+  let formatted = JSON.stringify(parsed, null, 2);
+  let html = '';
+  const lines = formatted.split('\n');
+
+  const pathStack = [];
+  let currentPath = '';
+
+  lines.forEach((line) => {
+    let lineHtml = '';
+    const trimmed = line.trimStart();
+
+    if (trimmed.startsWith('}')) {
+      pathStack.pop();
+      currentPath = pathStack.length > 0 ? pathStack[pathStack.length - 1] : '';
+    }
+    if (trimmed.startsWith(']')) {
+      pathStack.pop();
+      currentPath = pathStack.length > 0 ? pathStack[pathStack.length - 1] : '';
+    }
+
+    const keyMatch = trimmed.match(/^"([^"]+)"\s*:/);
+    if (keyMatch) {
+      const key = keyMatch[1];
+      let newPath;
+      if (currentPath) {
+        newPath = currentPath + '.' + key;
+      } else {
+        newPath = key;
+      }
+
+      const valuePart = trimmed.substring(keyMatch[0].length).trimStart();
+      lineHtml = getIndent(line) + '<span class="json-key" data-path="' + escapeHtml(newPath) + '">' + escapeHtml('"' + key + '"') + '</span><span class="json-colon">: </span>';
+
+      if (valuePart.startsWith('{')) {
+        lineHtml += '<span class="json-bracket">{</span>';
+        pathStack.push(newPath);
+        currentPath = newPath;
+      } else if (valuePart.startsWith('[')) {
+        lineHtml += '<span class="json-bracket">[</span>';
+        pathStack.push(newPath);
+        currentPath = newPath;
+      } else {
+        lineHtml += highlightValue(valuePart);
+      }
+    } else if (trimmed.startsWith('{')) {
+      lineHtml = getIndent(line) + '<span class="json-bracket">{</span>';
+      if (pathStack.length === 0) {
+        pathStack.push('$');
+        currentPath = '$';
+      }
+    } else if (trimmed.startsWith('[')) {
+      lineHtml = getIndent(line) + '<span class="json-bracket">[</span>';
+    } else if (trimmed.startsWith('}')) {
+      lineHtml = getIndent(line) + '<span class="json-bracket">}</span>';
+      if (trimmed.endsWith(',')) {
+        lineHtml += '<span class="json-comma">,</span>';
+      }
+    } else if (trimmed.startsWith(']')) {
+      lineHtml = getIndent(line) + '<span class="json-bracket">]</span>';
+      if (trimmed.endsWith(',')) {
+        lineHtml += '<span class="json-comma">,</span>';
+      }
+    } else {
+      lineHtml = getIndent(line) + highlightValue(trimmed);
+    }
+
+    html += '<span class="line">' + lineHtml + '</span>\n';
+  });
+
+  outputArea.innerHTML = html;
+
+  outputArea.querySelectorAll('.json-key[data-path]').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      pathDisplay.textContent = el.dataset.path;
+      pathDisplay.classList.add('visible');
+    });
+    el.addEventListener('mouseleave', () => {
+      pathDisplay.classList.remove('visible');
+    });
+  });
+}
+
+function getIndent(line) {
+  const spaces = line.length - line.trimStart().length;
+  return '<span style="visibility:hidden">' + ' '.repeat(spaces) + '</span>';
+}
+
+function highlightValue(val) {
+  if (!val) return '';
+  let result = '';
+  let remaining = val;
+
+  if (remaining.startsWith('"')) {
+    let j = 1;
+    while (j < remaining.length && remaining[j] !== '"') {
+      if (remaining[j] === '\\') j++;
+      j++;
+    }
+    result += '<span class="json-string">' + escapeHtml(remaining.substring(0, j + 1)) + '</span>';
+    remaining = remaining.substring(j + 1);
+    if (remaining.startsWith(',')) {
+      result += '<span class="json-comma">,</span>';
+      remaining = remaining.substring(1);
+    }
+  } else if (remaining.startsWith('true')) {
+    result += '<span class="json-boolean">true</span>';
+    remaining = remaining.substring(4);
+    if (remaining.startsWith(',')) {
+      result += '<span class="json-comma">,</span>';
+      remaining = remaining.substring(1);
+    }
+  } else if (remaining.startsWith('false')) {
+    result += '<span class="json-boolean">false</span>';
+    remaining = remaining.substring(5);
+    if (remaining.startsWith(',')) {
+      result += '<span class="json-comma">,</span>';
+      remaining = remaining.substring(1);
+    }
+  } else if (remaining.startsWith('null')) {
+    result += '<span class="json-null">null</span>';
+    remaining = remaining.substring(4);
+    if (remaining.startsWith(',')) {
+      result += '<span class="json-comma">,</span>';
+      remaining = remaining.substring(1);
+    }
+  } else if (/^[\d\-]/.test(remaining)) {
+    let j = 0;
+    if (remaining[j] === '-') j++;
+    while (j < remaining.length && /[\d.eE+\-]/.test(remaining[j])) j++;
+    result += '<span class="json-number">' + escapeHtml(remaining.substring(0, j)) + '</span>';
+    remaining = remaining.substring(j);
+    if (remaining.startsWith(',')) {
+      result += '<span class="json-comma">,</span>';
+      remaining = remaining.substring(1);
+    }
+  }
+
+  return result;
+}
+
+function buildPathRegistry(obj, prefix, registry) {
+  if (obj === null || typeof obj !== 'object') return;
+  if (Array.isArray(obj)) {
+    obj.forEach((item, idx) => {
+      const path = prefix + '[' + idx + ']';
+      registry.push({ path, value: item });
+      buildPathRegistry(item, path, registry);
+    });
+  } else {
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const path = prefix ? prefix + '.' + key : key;
+        registry.push({ path, value: obj[key] });
+        buildPathRegistry(obj[key], path, registry);
+      }
+    }
+  }
+}
+
+function renderTree(parsed) {
+  pathMap.clear();
+  outputArea.innerHTML = '<div class="tree-view">' + buildTreeHTML(parsed, '$', true) + '</div>';
+
+  outputArea.querySelectorAll('.tree-toggle').forEach(el => {
+    el.addEventListener('click', () => {
+      const arrow = el.querySelector('.tree-arrow');
+      const children = el.parentElement.querySelector('.tree-children');
+      if (arrow && children) {
+        arrow.classList.toggle('collapsed');
+        children.classList.toggle('collapsed');
+      }
+    });
+  });
+
+  outputArea.querySelectorAll('.tree-key[data-path]').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      pathDisplay.textContent = el.dataset.path;
+      pathDisplay.classList.add('visible');
+    });
+    el.addEventListener('mouseleave', () => {
+      pathDisplay.classList.remove('visible');
+    });
+  });
+}
+
+function buildTreeHTML(obj, path, isRoot) {
+  if (obj === null) return '<span class="tree-value-null">null</span>';
+  if (typeof obj === 'string') return '<span class="tree-value-string">' + escapeHtml(JSON.stringify(obj)) + '</span>';
+  if (typeof obj === 'number') return '<span class="tree-value-number">' + obj + '</span>';
+  if (typeof obj === 'boolean') return '<span class="tree-value-boolean">' + obj + '</span>';
+
+  const isArray = Array.isArray(obj);
+  const entries = isArray ? obj.map((v, i) => [i, v]) : Object.entries(obj);
+  const open = isArray ? '[' : '{';
+  const close = isArray ? ']' : '}';
+  const count = entries.length;
+
+  let html = '<span class="tree-toggle">';
+  html += '<span class="tree-arrow">▼</span>';
+  html += '<span class="tree-bracket">' + open + '</span>';
+  html += '<span class="tree-count">' + count + ' 项</span>';
+  html += '</span>';
+
+  html += '<div class="tree-children">';
+  entries.forEach(([key, value], idx) => {
+    const keyPath = isArray ? path + '[' + key + ']' : (path === '$' ? '$.' + key : path + '.' + key);
+    html += '<div class="tree-node">';
+    if (!isArray) {
+      html += '<span class="tree-key" data-path="' + escapeHtml(keyPath) + '">' + escapeHtml(JSON.stringify(key)) + '</span>';
+      html += '<span class="json-colon">: </span>';
+    }
+    html += buildTreeHTML(value, keyPath, false);
+    if (idx < entries.length - 1) html += '<span class="json-comma">,</span>';
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '<span class="tree-bracket">' + close + '</span>';
+
+  return html;
+}
+
+function switchView(view) {
+  currentView = view;
+  document.getElementById('btnTextView').classList.toggle('active', view === 'text');
+  document.getElementById('btnTreeView').classList.toggle('active', view === 'tree');
+
+  const text = input.value.trim();
+  if (!text) return;
+  try {
+    const parsed = JSON.parse(text);
+    if (view === 'text') {
+      currentOutput = JSON.stringify(parsed, null, 2);
+      renderHighlightedWithPath(currentOutput, parsed);
+    } else {
+      renderTree(parsed);
+    }
+  } catch {}
+}
+
+function copyOutput() {
+  if (!currentOutput) return;
+  navigator.clipboard.writeText(currentOutput).then(() => {
+    showToast();
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = currentOutput;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast();
+  });
+}
+
+function showToast() {
+  toastEl.classList.add('show');
+  setTimeout(() => toastEl.classList.remove('show'), 1800);
+}
+
+function clearAll() {
+  input.value = '';
+  currentOutput = '';
+  outputArea.innerHTML = '<div class="empty-state"><div class="icon">☁️</div><p>在上方输入 JSON 数据，点击按钮开始处理</p></div>';
+  updateStats();
+}
+
+function loadSample() {
+  input.value = JSON.stringify(sampleJSON, null, 2);
+  updateStats();
+  beautify();
+}
+
+updateStats();
+</script>
+</body>
+</html>

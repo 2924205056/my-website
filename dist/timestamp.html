@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unix 时间戳转换器</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-start: #D6EEFF;
+  --bg-30: #E8F4FD;
+  --bg-60: #F0F7FF;
+  --bg-end: #F5F0FF;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-border: rgba(255, 255, 255, 0.6);
+  --shadow: 0 8px 32px rgba(100, 160, 220, 0.18), 0 2px 8px rgba(100, 160, 220, 0.08);
+  --shadow-hover: 0 12px 40px rgba(100, 160, 220, 0.25), 0 4px 12px rgba(100, 160, 220, 0.12);
+  --accent: #5B9BD5;
+  --accent-light: #A8D4FF;
+  --accent-pink: #F0A0C0;
+  --text: #2C3E5A;
+  --text-secondary: #6B84A3;
+  --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  --font: 'Nunito', -apple-system, sans-serif;
+  --radius: 28px;
+  --radius-sm: 16px;
+  --radius-xs: 10px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  color: var(--text);
+  background: linear-gradient(170deg, var(--bg-start) 0%, var(--bg-30) 30%, var(--bg-60) 60%, var(--bg-end) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+.cloud {
+  position: fixed;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  filter: blur(1px);
+  z-index: 0;
+  pointer-events: none;
+}
+.cloud::before, .cloud::after {
+  content: '';
+  position: absolute;
+  background: inherit;
+  border-radius: 50%;
+}
+
+.cloud-1 {
+  width: 200px; height: 60px;
+  top: 8%; left: -220px;
+  animation: floatCloud 35s linear infinite;
+  opacity: 0.6;
+}
+.cloud-1::before { width: 100px; height: 80px; top: -40px; left: 30px; }
+.cloud-1::after { width: 120px; height: 70px; top: -30px; left: 80px; }
+
+.cloud-2 {
+  width: 160px; height: 50px;
+  top: 18%; left: -180px;
+  animation: floatCloud 45s linear infinite 8s;
+  opacity: 0.5;
+}
+.cloud-2::before { width: 80px; height: 65px; top: -35px; left: 25px; }
+.cloud-2::after { width: 100px; height: 55px; top: -25px; left: 65px; }
+
+.cloud-3 {
+  width: 240px; height: 70px;
+  top: 30%; left: -260px;
+  animation: floatCloud 50s linear infinite 15s;
+  opacity: 0.45;
+}
+.cloud-3::before { width: 120px; height: 90px; top: -45px; left: 40px; }
+.cloud-3::after { width: 140px; height: 80px; top: -35px; left: 100px; }
+
+.cloud-4 {
+  width: 180px; height: 55px;
+  top: 50%; left: -200px;
+  animation: floatCloud 40s linear infinite 5s;
+  opacity: 0.55;
+}
+.cloud-4::before { width: 90px; height: 70px; top: -38px; left: 30px; }
+.cloud-4::after { width: 110px; height: 60px; top: -28px; left: 75px; }
+
+.cloud-5 {
+  width: 220px; height: 65px;
+  top: 65%; left: -240px;
+  animation: floatCloud 55s linear infinite 20s;
+  opacity: 0.4;
+}
+.cloud-5::before { width: 110px; height: 85px; top: -42px; left: 35px; }
+.cloud-5::after { width: 130px; height: 75px; top: -32px; left: 90px; }
+
+.cloud-6 {
+  width: 150px; height: 45px;
+  top: 80%; left: -170px;
+  animation: floatCloud 38s linear infinite 12s;
+  opacity: 0.5;
+}
+.cloud-6::before { width: 75px; height: 60px; top: -32px; left: 20px; }
+.cloud-6::after { width: 95px; height: 50px; top: -22px; left: 60px; }
+
+@keyframes floatCloud {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(100vw + 300px)); }
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 20px 60px;
+}
+
+.page-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--text);
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.page-subtitle {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 36px;
+  font-weight: 600;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title .icon {
+  font-size: 1.3rem;
+}
+
+.current-ts-display {
+  text-align: center;
+  padding: 12px 0 20px;
+}
+.current-ts-number {
+  font-family: var(--mono);
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 2px;
+  transition: opacity 0.15s;
+  line-height: 1.2;
+}
+.current-ts-number.animating {
+  opacity: 0.5;
+}
+.current-ts-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 6px;
+  font-weight: 600;
+}
+.current-date-display {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(91, 155, 213, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-bottom: 20px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.tab-btn.active {
+  background: white;
+  color: var(--accent);
+  box-shadow: 0 2px 12px rgba(91, 155, 213, 0.2);
+}
+.tab-btn:hover:not(.active) {
+  color: var(--text);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.input-group {
+  margin-bottom: 16px;
+}
+.input-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.input-field {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid rgba(91, 155, 213, 0.2);
+  border-radius: var(--radius-xs);
+  font-family: var(--mono);
+  font-size: 1rem;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.7);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.15);
+}
+.input-field::placeholder {
+  color: #B0C4DE;
+  font-weight: 400;
+}
+
+.convert-btn {
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--accent), #7BB8E8);
+  color: white;
+  border: none;
+  border-radius: var(--radius-xs);
+  font-family: var(--font);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+.convert-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(91, 155, 213, 0.35);
+}
+.convert-btn:active {
+  transform: translateY(0);
+}
+
+.quick-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.quick-btn {
+  padding: 7px 14px;
+  background: rgba(91, 155, 213, 0.1);
+  border: 1.5px solid rgba(91, 155, 213, 0.2);
+  border-radius: 20px;
+  font-family: var(--font);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.quick-btn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.result-section {
+  margin-top: 20px;
+  display: none;
+}
+.result-section.visible { display: block; }
+
+.result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(91, 155, 213, 0.06);
+  border-radius: var(--radius-xs);
+  margin-bottom: 8px;
+  transition: background 0.2s;
+}
+.result-item:hover {
+  background: rgba(91, 155, 213, 0.12);
+}
+.result-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  min-width: 80px;
+}
+.result-value {
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  color: var(--text);
+  flex: 1;
+  text-align: right;
+  word-break: break-all;
+  margin: 0 10px;
+}
+.copy-btn {
+  padding: 5px 12px;
+  background: rgba(91, 155, 213, 0.12);
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.copy-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.date-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.date-inputs .input-field {
+  font-family: var(--font);
+  font-size: 0.9rem;
+}
+.date-inputs-full {
+  grid-template-columns: 1fr 1fr;
+}
+
+.timezone-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.timezone-row label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.timezone-select {
+  flex: 1;
+  padding: 10px 14px;
+  border: 2px solid rgba(91, 155, 213, 0.2);
+  border-radius: var(--radius-xs);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.7);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.timezone-select:focus {
+  border-color: var(--accent);
+}
+
+.diff-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.diff-input-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.diff-result {
+  text-align: center;
+  padding: 20px;
+}
+.diff-big-number {
+  font-family: var(--mono);
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1.2;
+}
+.diff-unit {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+.diff-details {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.diff-detail-item {
+  text-align: center;
+}
+.diff-detail-number {
+  font-family: var(--mono);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.diff-detail-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-80px);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 10px 24px;
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent);
+  box-shadow: 0 8px 32px rgba(91, 155, 213, 0.25);
+  backdrop-filter: blur(12px);
+  z-index: 9999;
+  opacity: 0;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.big-ts-result {
+  text-align: center;
+  padding: 16px 0;
+}
+.big-ts-number {
+  font-family: var(--mono);
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 1px;
+  line-height: 1.2;
+}
+.big-ts-ms {
+  font-family: var(--mono);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+@media (max-width: 640px) {
+  .container { padding: 24px 14px 40px; }
+  .card { padding: 20px 18px; border-radius: 22px; }
+  .current-ts-number { font-size: 2.2rem; }
+  .big-ts-number { font-size: 1.8rem; }
+  .diff-big-number { font-size: 1.8rem; }
+  .date-inputs { grid-template-columns: 1fr; }
+  .diff-inputs { grid-template-columns: 1fr; }
+  .page-title { font-size: 1.5rem; }
+  .input-row { flex-direction: column; }
+  .convert-btn { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="cloud cloud-1"></div>
+<div class="cloud cloud-2"></div>
+<div class="cloud cloud-3"></div>
+<div class="cloud cloud-4"></div>
+<div class="cloud cloud-5"></div>
+<div class="cloud cloud-6"></div>
+
+<div class="toast" id="toast">已复制!</div>
+
+<div class="container">
+  <div class="page-title">☁️ Unix 时间戳转换器</div>
+  <div class="page-subtitle">轻巧的云端时间工具 · 秒级 & 毫秒级自动识别</div>
+
+  <div class="card">
+    <div class="current-ts-display">
+      <div class="current-ts-number" id="currentTs">0000000000</div>
+      <div class="current-ts-label">当前 Unix 时间戳（秒）</div>
+      <div class="current-date-display" id="currentDate"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="ts2date">时间戳 → 日期</button>
+      <button class="tab-btn" data-tab="date2ts">日期 → 时间戳</button>
+    </div>
+
+    <div class="tab-content active" id="ts2date">
+      <div class="input-group">
+        <label>输入 Unix 时间戳</label>
+        <div class="input-row">
+          <input type="text" class="input-field" id="tsInput" placeholder="例如 1700000000 或 1700000000000">
+          <button class="convert-btn" onclick="convertTs2Date()">转换</button>
+        </div>
+      </div>
+      <div class="quick-btns">
+        <button class="quick-btn" onclick="quickTs('now')">当前时间</button>
+        <button class="quick-btn" onclick="quickTs('today0')">今天0点</button>
+        <button class="quick-btn" onclick="quickTs('todayEnd')">今天23:59:59</button>
+        <button class="quick-btn" onclick="quickTs('monday')">本周一</button>
+        <button class="quick-btn" onclick="quickTs('month1')">本月1号</button>
+      </div>
+      <div class="timezone-row">
+        <label>时区</label>
+        <select class="timezone-select" id="tzSelect1" onchange="convertTs2Date()">
+          <option value="0">UTC+0 伦敦</option>
+          <option value="8" selected>UTC+8 北京</option>
+          <option value="9">UTC+9 东京</option>
+          <option value="-5">UTC-5 纽约</option>
+          <option value="-8">UTC-8 洛杉矶</option>
+          <option value="1">UTC+1 巴黎</option>
+          <option value="5.5">UTC+5:30 孟买</option>
+          <option value="10">UTC+10 悉尼</option>
+        </select>
+      </div>
+      <div class="result-section" id="ts2dateResult"></div>
+    </div>
+
+    <div class="tab-content" id="date2ts">
+      <div class="date-inputs">
+        <input type="date" class="input-field" id="dateInput">
+        <input type="time" class="input-field" id="timeInput" step="1" value="00:00:00">
+      </div>
+      <div class="quick-btns">
+        <button class="quick-btn" onclick="quickDate('now')">当前时间</button>
+        <button class="quick-btn" onclick="quickDate('today0')">今天0点</button>
+        <button class="quick-btn" onclick="quickDate('todayEnd')">今天23:59:59</button>
+        <button class="quick-btn" onclick="quickDate('monday')">本周一</button>
+        <button class="quick-btn" onclick="quickDate('month1')">本月1号</button>
+      </div>
+      <div class="timezone-row">
+        <label>时区</label>
+        <select class="timezone-select" id="tzSelect2" onchange="convertDate2Ts()">
+          <option value="0">UTC+0 伦敦</option>
+          <option value="8" selected>UTC+8 北京</option>
+          <option value="9">UTC+9 东京</option>
+          <option value="-5">UTC-5 纽约</option>
+          <option value="-8">UTC-8 洛杉矶</option>
+          <option value="1">UTC+1 巴黎</option>
+          <option value="5.5">UTC+5:30 孟买</option>
+          <option value="10">UTC+10 悉尼</option>
+        </select>
+      </div>
+      <div style="text-align:center;margin-top:8px;">
+        <button class="convert-btn" onclick="convertDate2Ts()">转换</button>
+      </div>
+      <div class="result-section" id="date2tsResult"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">⏱</span> 日期差值计算</div>
+    <div class="diff-inputs">
+      <div class="diff-input-group">
+        <label>开始日期</label>
+        <input type="date" class="input-field" id="diffDate1">
+        <input type="time" class="input-field" id="diffTime1" step="1" value="00:00:00" style="margin-top:8px;">
+      </div>
+      <div class="diff-input-group">
+        <label>结束日期</label>
+        <input type="date" class="input-field" id="diffDate2">
+        <input type="time" class="input-field" id="diffTime2" step="1" value="00:00:00" style="margin-top:8px;">
+      </div>
+    </div>
+    <div style="text-align:center;margin-bottom:12px;">
+      <button class="convert-btn" onclick="calcDiff()">计算差值</button>
+    </div>
+    <div class="result-section" id="diffResult"></div>
+  </div>
+</div>
+
+<script>
+var toastTimer = null;
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg || '已复制!';
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { t.classList.remove('show'); }, 1600);
+}
+
+function copyText(text) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function() { showToast('已复制!'); });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('已复制!');
+  }
+}
+
+function getDateWithTz(ts, offset) {
+  var utc = ts + offset * 3600000;
+  var d = new Date(utc);
+  return d;
+}
+
+function pad(n, l) {
+  l = l || 2;
+  var s = String(n);
+  while (s.length < l) s = '0' + s;
+  return s;
+}
+
+function formatISO(d, offset) {
+  var sign = offset >= 0 ? '+' : '-';
+  var absOff = Math.abs(offset);
+  var h = Math.floor(absOff);
+  var m = (absOff - h) * 60;
+  return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()) +
+    'T' + pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds()) +
+    sign + pad(h) + ':' + pad(m);
+}
+
+function formatRFC2822(d, offset) {
+  var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var sign = offset >= 0 ? '+' : '-';
+  var absOff = Math.abs(offset);
+  var h = Math.floor(absOff);
+  var m = (absOff - h) * 60;
+  return days[d.getUTCDay()] + ', ' + pad(d.getUTCDate()) + ' ' + months[d.getUTCMonth()] +
+    ' ' + d.getUTCFullYear() + ' ' + pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) +
+    ':' + pad(d.getUTCSeconds()) + ' ' + sign + pad(h) + pad(m);
+}
+
+function formatLocale(d, offset) {
+  var fakeLocal = new Date(d.getTime() - new Date().getTimezoneOffset() * 60000);
+  return fakeLocal.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+}
+
+function relativeTime(ts) {
+  var now = Math.floor(Date.now() / 1000);
+  var diff = now - ts;
+  var absDiff = Math.abs(diff);
+  var future = diff < 0;
+  var prefix = future ? '' : '';
+  var suffix = future ? '后' : '前';
+
+  if (absDiff < 60) return prefix + absDiff + '秒' + suffix;
+  if (absDiff < 3600) return prefix + Math.floor(absDiff / 60) + '分钟' + suffix;
+  if (absDiff < 86400) return prefix + Math.floor(absDiff / 3600) + '小时' + suffix;
+  if (absDiff < 2592000) return prefix + Math.floor(absDiff / 86400) + '天' + suffix;
+  if (absDiff < 31536000) return prefix + Math.floor(absDiff / 2592000) + '个月' + suffix;
+  return prefix + Math.floor(absDiff / 31536000) + '年' + suffix;
+}
+
+function formatCustom(d) {
+  return d.getUTCFullYear() + '年' + pad(d.getUTCMonth() + 1) + '月' + pad(d.getUTCDate()) + '日 ' +
+    pad(d.getUTCHours()) + '时' + pad(d.getUTCMinutes()) + '分' + pad(d.getUTCSeconds()) + '秒';
+}
+
+function resultItem(label, value) {
+  return '<div class="result-item">' +
+    '<span class="result-label">' + label + '</span>' +
+    '<span class="result-value">' + value + '</span>' +
+    '<button class="copy-btn" onclick="copyText(\'' + value.replace(/'/g, "\\'") + '\')">复制</button>' +
+    '</div>';
+}
+
+function detectTsUnit(ts) {
+  if (ts > 1e12) return 'ms';
+  return 's';
+}
+
+function convertTs2Date() {
+  var raw = document.getElementById('tsInput').value.trim();
+  if (!raw) return;
+  var ts = Number(raw);
+  if (isNaN(ts)) { showToast('请输入有效数字'); return; }
+
+  var unit = detectTsUnit(ts);
+  var ms = unit === 'ms' ? ts : ts * 1000;
+  var sec = unit === 'ms' ? Math.floor(ts / 1000) : ts;
+
+  var offset = parseFloat(document.getElementById('tzSelect1').value);
+  var d = getDateWithTz(ms, offset);
+
+  var html = '<div class="big-ts-result">' +
+    '<div class="big-ts-number">' + sec + '</div>' +
+    '<div class="big-ts-ms">毫秒: ' + ms + '</div>' +
+    '</div>';
+
+  html += resultItem('ISO 8601', formatISO(d, offset));
+  html += resultItem('RFC 2822', formatRFC2822(d, offset));
+  html += resultItem('本地格式', formatLocale(d, offset));
+  html += resultItem('相对时间', relativeTime(sec));
+  html += resultItem('自定义格式', formatCustom(d));
+  html += resultItem('星期', ['日', '一', '二', '三', '四', '五', '六'][d.getUTCDay()]);
+  html += resultItem('年中的第几天', getDayOfYear(d));
+
+  var el = document.getElementById('ts2dateResult');
+  el.innerHTML = html;
+  el.classList.add('visible');
+}
+
+function getDayOfYear(d) {
+  var start = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  var diff = d.getTime() - start.getTime();
+  return Math.floor(diff / 86400000) + 1;
+}
+
+function convertDate2Ts() {
+  var dateVal = document.getElementById('dateInput').value;
+  var timeVal = document.getElementById('timeInput').value;
+  if (!dateVal) { showToast('请选择日期'); return; }
+  if (!timeVal) timeVal = '00:00:00';
+
+  var parts = dateVal.split('-');
+  var timeParts = timeVal.split(':');
+  var y = parseInt(parts[0]);
+  var m = parseInt(parts[1]) - 1;
+  var d = parseInt(parts[2]);
+  var h = parseInt(timeParts[0]) || 0;
+  var min = parseInt(timeParts[1]) || 0;
+  var sec = parseInt(timeParts[2]) || 0;
+
+  var offset = parseFloat(document.getElementById('tzSelect2').value);
+  var utcMs = Date.UTC(y, m, d, h, min, sec) - offset * 3600000;
+  var secTs = Math.floor(utcMs / 1000);
+
+  var html = '<div class="big-ts-result">' +
+    '<div class="big-ts-number">' + secTs + '</div>' +
+    '<div class="big-ts-ms">毫秒: ' + utcMs + '</div>' +
+    '</div>';
+
+  html += resultItem('ISO 8601', formatISO(new Date(utcMs), offset));
+  html += resultItem('RFC 2822', formatRFC2822(new Date(utcMs), offset));
+  html += resultItem('本地格式', formatLocale(new Date(utcMs), offset));
+  html += resultItem('自定义格式', formatCustom(new Date(utcMs + offset * 3600000)));
+
+  var el = document.getElementById('date2tsResult');
+  el.innerHTML = html;
+  el.classList.add('visible');
+}
+
+function quickTs(type) {
+  var now = new Date();
+  var offset = parseFloat(document.getElementById('tzSelect1').value);
+  var localNow = new Date(now.getTime() + offset * 3600000);
+  var ts;
+
+  if (type === 'now') {
+    ts = Math.floor(now.getTime() / 1000);
+  } else if (type === 'today0') {
+    var d0 = Date.UTC(localNow.getUTCFullYear(), localNow.getUTCMonth(), localNow.getUTCDate(), 0, 0, 0) - offset * 3600000;
+    ts = Math.floor(d0 / 1000);
+  } else if (type === 'todayEnd') {
+    var dE = Date.UTC(localNow.getUTCFullYear(), localNow.getUTCMonth(), localNow.getUTCDate(), 23, 59, 59) - offset * 3600000;
+    ts = Math.floor(dE / 1000);
+  } else if (type === 'monday') {
+    var day = localNow.getUTCDay();
+    var diffToMon = day === 0 ? -6 : 1 - day;
+    var monDate = new Date(localNow.getTime() + diffToMon * 86400000);
+    var monMs = Date.UTC(monDate.getUTCFullYear(), monDate.getUTCMonth(), monDate.getUTCDate(), 0, 0, 0) - offset * 3600000;
+    ts = Math.floor(monMs / 1000);
+  } else if (type === 'month1') {
+    var m1Ms = Date.UTC(localNow.getUTCFullYear(), localNow.getUTCMonth(), 1, 0, 0, 0) - offset * 3600000;
+    ts = Math.floor(m1Ms / 1000);
+  }
+
+  document.getElementById('tsInput').value = ts;
+  convertTs2Date();
+}
+
+function quickDate(type) {
+  var now = new Date();
+  var offset = parseFloat(document.getElementById('tzSelect2').value);
+  var localNow = new Date(now.getTime() + offset * 3600000);
+  var dateStr, timeStr;
+
+  if (type === 'now') {
+    dateStr = localNow.getUTCFullYear() + '-' + pad(localNow.getUTCMonth() + 1) + '-' + pad(localNow.getUTCDate());
+    timeStr = pad(localNow.getUTCHours()) + ':' + pad(localNow.getUTCMinutes()) + ':' + pad(localNow.getUTCSeconds());
+  } else if (type === 'today0') {
+    dateStr = localNow.getUTCFullYear() + '-' + pad(localNow.getUTCMonth() + 1) + '-' + pad(localNow.getUTCDate());
+    timeStr = '00:00:00';
+  } else if (type === 'todayEnd') {
+    dateStr = localNow.getUTCFullYear() + '-' + pad(localNow.getUTCMonth() + 1) + '-' + pad(localNow.getUTCDate());
+    timeStr = '23:59:59';
+  } else if (type === 'monday') {
+    var day = localNow.getUTCDay();
+    var diffToMon = day === 0 ? -6 : 1 - day;
+    var monDate = new Date(localNow.getTime() + diffToMon * 86400000);
+    dateStr = monDate.getUTCFullYear() + '-' + pad(monDate.getUTCMonth() + 1) + '-' + pad(monDate.getUTCDate());
+    timeStr = '00:00:00';
+  } else if (type === 'month1') {
+    dateStr = localNow.getUTCFullYear() + '-' + pad(localNow.getUTCMonth() + 1) + '-01';
+    timeStr = '00:00:00';
+  }
+
+  document.getElementById('dateInput').value = dateStr;
+  document.getElementById('timeInput').value = timeStr;
+  convertDate2Ts();
+}
+
+function calcDiff() {
+  var d1 = document.getElementById('diffDate1').value;
+  var d2 = document.getElementById('diffDate2').value;
+  var t1 = document.getElementById('diffTime1').value || '00:00:00';
+  var t2 = document.getElementById('diffTime2').value || '00:00:00';
+
+  if (!d1 || !d2) { showToast('请选择两个日期'); return; }
+
+  var p1 = d1.split('-'), p1t = t1.split(':');
+  var p2 = d2.split('-'), p2t = t2.split(':');
+
+  var ms1 = new Date(parseInt(p1[0]), parseInt(p1[1]) - 1, parseInt(p1[2]), parseInt(p1t[0]) || 0, parseInt(p1t[1]) || 0, parseInt(p1t[2]) || 0).getTime();
+  var ms2 = new Date(parseInt(p2[0]), parseInt(p2[1]) - 1, parseInt(p2[2]), parseInt(p2t[0]) || 0, parseInt(p2t[1]) || 0, parseInt(p2t[2]) || 0).getTime();
+
+  var diff = Math.abs(ms2 - ms1);
+  var days = Math.floor(diff / 86400000);
+  var hours = Math.floor((diff % 86400000) / 3600000);
+  var minutes = Math.floor((diff % 3600000) / 60000);
+  var seconds = Math.floor((diff % 60000) / 1000);
+  var totalHours = Math.floor(diff / 3600000);
+  var totalMinutes = Math.floor(diff / 60000);
+  var totalSeconds = Math.floor(diff / 1000);
+
+  var html = '<div class="diff-result">' +
+    '<div class="diff-big-number">' + days + ' <span class="diff-unit">天</span></div>' +
+    '<div class="diff-details">' +
+    '<div class="diff-detail-item"><div class="diff-detail-number">' + hours + '</div><div class="diff-detail-label">小时</div></div>' +
+    '<div class="diff-detail-item"><div class="diff-detail-number">' + minutes + '</div><div class="diff-detail-label">分钟</div></div>' +
+    '<div class="diff-detail-item"><div class="diff-detail-number">' + seconds + '</div><div class="diff-detail-label">秒</div></div>' +
+    '</div>' +
+    '</div>';
+
+  html += resultItem('总天数', days + ' 天');
+  html += resultItem('总小时', totalHours + ' 小时');
+  html += resultItem('总分钟', totalMinutes + ' 分钟');
+  html += resultItem('总秒数', totalSeconds + ' 秒');
+
+  var el = document.getElementById('diffResult');
+  el.innerHTML = html;
+  el.classList.add('visible');
+}
+
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+document.getElementById('tsInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') convertTs2Date();
+});
+
+var lastTs = 0;
+function updateCurrentTs() {
+  var now = Math.floor(Date.now() / 1000);
+  var el = document.getElementById('currentTs');
+  var dateEl = document.getElementById('currentDate');
+  if (now !== lastTs) {
+    el.classList.add('animating');
+    setTimeout(function() {
+      el.textContent = now;
+      el.classList.remove('animating');
+    }, 80);
+    lastTs = now;
+  }
+  var offset = 8;
+  var d = getDateWithTz(Date.now(), offset);
+  dateEl.textContent = d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()) + ' ' +
+    pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds()) + ' (UTC+8)';
+}
+
+updateCurrentTs();
+setInterval(updateCurrentTs, 200);
+
+(function initDates() {
+  var now = new Date();
+  var y = now.getFullYear();
+  var m = pad(now.getMonth() + 1);
+  var d = pad(now.getDate());
+  var todayStr = y + '-' + m + '-' + d;
+  document.getElementById('dateInput').value = todayStr;
+  document.getElementById('diffDate1').value = todayStr;
+  document.getElementById('diffDate2').value = todayStr;
+})();
+</script>
+</body>
+</html>

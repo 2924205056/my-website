@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --color-sky-dark: #0EA5E9;
+  --color-sky-light: #BAE6FD;
+}
+
+@layer base {
+  body {
+    @apply bg-sky-light overflow-hidden;
+  }
+}
+
+.pixel-art {
+  image-rendering: pixelated;
+}
