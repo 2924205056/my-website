@@ -267,8 +267,14 @@
 
     /* 进入动画 */
     @keyframes cg-enter {
-      0% { opacity: 0; transform: translateX(-80px) scaleX(-1); }
-      100% { opacity: 1; transform: translateX(0) scaleX(-1); }
+      0% { opacity: 0; transform: translateX(80px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+
+    /* 云朵浮动动画 */
+    @keyframes float-bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
     }
 
     @keyframes hero-cloud-drift {
@@ -377,7 +383,7 @@
     }
 
     /* ========================================
-       容器
+       云朵切换容器
        ======================================== */
     #cloud-glider {
       position: absolute;
@@ -388,8 +394,6 @@
       z-index: 2;
       pointer-events: none;
       overflow: visible;
-      animation: cg-enter 1s ease-out;
-      transform: scaleX(-1);
     }
 
     #cloud-glider.cg-home-glider {
@@ -400,6 +404,34 @@
       height: clamp(260px, 28vw, 400px);
       margin: -72px auto 0;
       z-index: 12;
+    }
+
+    /* 云朵切换动画 */
+    .cloud-carousel {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cloud-carousel-item {
+      position: absolute;
+      opacity: 0;
+      transform: translateY(30px) scale(0.9);
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      filter: drop-shadow(0 20px 30px rgba(90, 145, 205, 0.2));
+    }
+
+    .cloud-carousel-item.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .cloud-carousel-item.fade-out {
+      opacity: 0;
+      transform: translateY(-20px) scale(1.05);
     }
 
     .cg-hero-host {
@@ -760,245 +792,57 @@
     })();
   </script>
 
-  <!-- Cloud Glider 动画 -->
+  <!-- 云朵切换动画 -->
   <div id="cloud-glider">
     <div class="cg-sky">
-
-      <!-- 背景云层 -->
-      <div class="cg-cloud-layer" style="z-index:5;">
-        <div class="cg-cloud-track" style="--speed:55s;">
-          <div class="cg-cloud-group" id="cg-bg1"></div>
-          <div class="cg-cloud-group" id="cg-bg2"></div>
+      <div class="cloud-carousel">
+        <div class="cloud-carousel-item active" style="animation: float-bob 3s ease-in-out infinite;">
+          <img src="/images/cloud-glider-final-clean.png" alt="滑板云" style="width: clamp(280px, 32vw, 420px);">
         </div>
-      </div>
-      <div class="cg-cloud-layer" style="z-index:10;">
-        <div class="cg-cloud-track" style="--speed:28s;">
-          <div class="cg-cloud-group" id="cg-mid1"></div>
-          <div class="cg-cloud-group" id="cg-mid2"></div>
+        <div class="cloud-carousel-item" style="animation: float-bob 3s ease-in-out infinite 0.3s;">
+          <img src="/images/cloud-normal.png" alt="普通云朵" style="width: clamp(280px, 32vw, 420px);">
         </div>
-      </div>
-      <div class="cg-cloud-layer" style="z-index:15;">
-        <div class="cg-cloud-track" style="--speed:14s;">
-          <div class="cg-cloud-group" id="cg-fg1"></div>
-          <div class="cg-cloud-group" id="cg-fg2"></div>
+        <div class="cloud-carousel-item" style="animation: float-bob 3s ease-in-out infinite 0.6s;">
+          <img src="/images/0641f907-e976-44bd-b2dc-f08e14852cd9.png" alt="可爱云朵" style="width: clamp(280px, 32vw, 420px);">
         </div>
-      </div>
-
-      <!-- 伴飞元素容器 -->
-      <div id="cg-companions" style="position:absolute;inset:0;z-index:20;pointer-events:none;overflow:hidden;"></div>
-
-      <!-- 滑板云角色 -->
-      <div class="cg-skater-wrap">
-        <div class="cg-skater-glow"></div>
-        <div class="cg-character">
-          <img class="cg-new-cloud" src="/images/cloud-glider-final-clean.png" alt="滑板云向前滑行">
-          <!-- 主角色 SVG（滑板云贴纸 v2） -->
-          <svg width="220" height="210" viewBox="0 0 220 210">
-            <defs>
-              <!-- 云体径向渐变（高光偏左上） -->
-              <radialGradient id="cg-body-grad" cx="35%" cy="30%" r="65%">
-                <stop offset="0%" stop-color="#E0F6FF"/>
-                <stop offset="35%" stop-color="#87CEEB"/>
-                <stop offset="75%" stop-color="#6BB8D9"/>
-                <stop offset="100%" stop-color="#5B9BD5"/>
-              </radialGradient>
-              <!-- 云体阴影 -->
-              <filter id="cg-body-shadow">
-                <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#3a7ca5" flood-opacity="0.25"/>
-              </filter>
-              <!-- 滑板彩虹渐变 -->
-              <linearGradient id="cg-board-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#FF6B6B"/>
-                <stop offset="17%" stop-color="#FFA500"/>
-                <stop offset="33%" stop-color="#FFD93D"/>
-                <stop offset="50%" stop-color="#6BCB77"/>
-                <stop offset="67%" stop-color="#4D96FF"/>
-                <stop offset="83%" stop-color="#9B59B6"/>
-                <stop offset="100%" stop-color="#FF6B9D"/>
-              </linearGradient>
-              <!-- 腮红渐变 -->
-              <radialGradient id="cg-blush-grad">
-                <stop offset="0%" stop-color="#FF69B4" stop-opacity="0.6"/>
-                <stop offset="100%" stop-color="#FFB6C1" stop-opacity="0"/>
-              </radialGradient>
-              <!-- 嘴巴内部渐变 -->
-              <linearGradient id="cg-mouth-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#FF4757"/>
-                <stop offset="100%" stop-color="#DC143C"/>
-              </linearGradient>
-              <!-- 彩虹尾迹渐变 -->
-              <linearGradient id="cg-rainbow" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#FF6B9D" stop-opacity="0.9"/>
-                <stop offset="17%" stop-color="#FFA500" stop-opacity="0.85"/>
-                <stop offset="33%" stop-color="#FFD93D" stop-opacity="0.8"/>
-                <stop offset="50%" stop-color="#6BCB77" stop-opacity="0.75"/>
-                <stop offset="67%" stop-color="#4D96FF" stop-opacity="0.7"/>
-                <stop offset="83%" stop-color="#9B59B6" stop-opacity="0.6"/>
-                <stop offset="100%" stop-color="#FF6B9D" stop-opacity="0.4"/>
-              </linearGradient>
-              <!-- 尾迹模糊 -->
-              <filter id="cg-trail-blur">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
-              </filter>
-            </defs>
-
-            <!-- 白色贴纸边框（统一轮廓） -->
-            <rect x="3" y="3" width="214" height="204" rx="22" ry="22" fill="transparent"/>
-
-            <!-- ===== 彩虹尾迹（在角色后面） ===== -->
-            <g opacity="0.9">
-              <!-- 尾迹光晕 -->
-              <path d="M-36,103 Q5,72 48,90 Q82,106 114,95" 
-                    fill="none" stroke="url(#cg-rainbow)" stroke-width="28" stroke-linecap="round" opacity="0.42" filter="url(#cg-trail-blur)"/>
-              <!-- 尾迹主体 -->
-              <path d="M-32,102 Q7,72 50,90 Q84,106 114,96" 
-                    fill="none" stroke="url(#cg-rainbow)" stroke-width="16" stroke-linecap="round" opacity="0.86"/>
-              <!-- 尾迹高光 -->
-              <path d="M-22,98 Q18,76 55,91 Q85,105 108,96" 
-                    fill="none" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.25"/>
-              <!-- 尾迹星星 -->
-              <g class="cg-trail-sparkle" style="animation-delay:0s;">
-                <path d="M22,78 L24,84 L30,86 L24,88 L22,94 L20,88 L14,86 L20,84Z" fill="#FFD93D"/>
-              </g>
-              <g class="cg-trail-sparkle" style="animation-delay:0.5s;">
-                <path d="M48,74 L49.5,78 L54,79.5 L49.5,81 L48,85 L46.5,81 L42,79.5 L46.5,78Z" fill="white"/>
-              </g>
-              <g class="cg-trail-sparkle" style="animation-delay:1.1s;">
-                <path d="M75,88 L76.5,92 L81,93.5 L76.5,95 L75,99 L73.5,95 L69,93.5 L73.5,92Z" fill="#FF6B9D"/>
-              </g>
-              <g class="cg-trail-sparkle" style="animation-delay:0.3s;">
-                <path d="M35,96 L36,99 L39,100 L36,101 L35,104 L34,101 L31,100 L34,99Z" fill="#4D96FF"/>
-              </g>
-              <g class="cg-trail-sparkle" style="animation-delay:0.8s;">
-                <path d="M60,100 L61,103 L64,104 L61,105 L60,108 L59,105 L56,104 L59,103Z" fill="#6BCB77"/>
-              </g>
-            </g>
-
-            <!-- ===== 轮子运动线 ===== -->
-            <g stroke="#555" stroke-width="1.2" stroke-linecap="round" opacity="0.45">
-              <line x1="68" y1="178" x2="60" y2="184"/>
-              <line x1="70" y1="181" x2="62" y2="187"/>
-              <line x1="72" y1="184" x2="64" y2="190"/>
-              <line x1="155" y1="178" x2="163" y2="184"/>
-              <line x1="153" y1="181" x2="161" y2="187"/>
-              <line x1="151" y1="184" x2="159" y2="190"/>
-            </g>
-
-            <!-- ===== 滑板 ===== -->
-            <g transform="translate(48, 162)">
-              <!-- 板面阴影 -->
-              <path d="M2,10 Q7,2 18,4 L82,4 Q93,2 98,10 Q93,18 82,16 L18,16 Q7,18 2,10 Z" 
-                    fill="rgba(0,0,0,0.1)" transform="translate(0,3)"/>
-              <!-- 板面主体 -->
-              <path d="M0,8 Q5,0 16,2 L80,2 Q91,0 96,8 Q91,16 80,14 L16,14 Q5,16 0,8 Z" 
-                    fill="url(#cg-board-grad)" stroke="#2C3E50" stroke-width="1.8"/>
-              <!-- 板面涂鸦图案 -->
-              <path d="M20,5 Q25,10 30,5 Q35,10 40,5 Q45,10 50,5" fill="none" stroke="rgba(0,0,0,0.18)" stroke-width="1.5"/>
-              <path d="M55,5 Q60,10 65,5 Q70,10 75,5" fill="none" stroke="rgba(0,0,0,0.18)" stroke-width="1.5"/>
-              <!-- 涂鸦飞溅点 -->
-              <circle cx="25" cy="10" r="1.2" fill="rgba(0,0,0,0.12)"/>
-              <circle cx="42" cy="11" r="0.8" fill="rgba(0,0,0,0.12)"/>
-              <circle cx="58" cy="9" r="1" fill="rgba(0,0,0,0.12)"/>
-              <circle cx="72" cy="10" r="0.7" fill="rgba(0,0,0,0.12)"/>
-              <!-- 板面高光 -->
-              <path d="M12,4 L78,4" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
-              <!-- 轮子 -->
-              <circle cx="22" cy="20" r="7" fill="#F5F5DC" stroke="#555" stroke-width="1.5"/>
-              <circle cx="22" cy="20" r="2.5" fill="#999"/>
-              <circle cx="74" cy="20" r="7" fill="#F5F5DC" stroke="#555" stroke-width="1.5"/>
-              <circle cx="74" cy="20" r="2.5" fill="#999"/>
-            </g>
-
-            <!-- ===== 腿 ===== -->
-            <g stroke="#1A1A1A" stroke-width="4" stroke-linecap="round">
-              <line x1="88" y1="130" x2="80" y2="158"/>
-              <line x1="132" y1="130" x2="140" y2="158"/>
-            </g>
-            <!-- 鞋子 -->
-            <g>
-              <rect x="68" y="155" width="22" height="10" rx="5" fill="#1A1A1A"/>
-              <rect x="70" y="162" width="18" height="3.5" rx="1.8" fill="white" opacity="0.55"/>
-              <rect x="130" y="155" width="22" height="10" rx="5" fill="#1A1A1A"/>
-              <rect x="132" y="162" width="18" height="3.5" rx="1.8" fill="white" opacity="0.55"/>
-            </g>
-
-            <!-- ===== 云体 ===== -->
-            <g filter="url(#cg-body-shadow)">
-              <!-- 五瓣云体 -->
-              <path d="M45,118 
-                       Q20,118 20,92 
-                       Q20,68 45,68 
-                       Q45,38 78,38 
-                       Q105,38 115,55 
-                       Q140,28 170,52 
-                       Q198,65 195,92 
-                       Q198,118 170,118
-                       Q170,138 142,132
-                       Q118,145 95,132
-                       Q70,145 45,118 Z" 
-                    fill="url(#cg-body-grad)"
-                    stroke="#2C3E50" stroke-width="2"/>
-              <!-- 云体高光弧线 -->
-              <path d="M55,68 Q62,48 82,45 Q98,42 108,55" 
-                    fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="3.5" stroke-linecap="round"/>
-              <path d="M125,48 Q142,32 165,50" 
-                    fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="3" stroke-linecap="round"/>
-              <path d="M38,95 Q35,85 42,78" 
-                    fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round"/>
-            </g>
-
-            <!-- ===== 脸部 ===== -->
-            <!-- 眼睛 -->
-            <g class="cg-eye-pair">
-              <!-- 左眼 -->
-              <circle cx="82" cy="85" r="18" fill="white" stroke="#2C3E50" stroke-width="1.5"/>
-              <circle cx="84" cy="87" r="12" fill="#1A1A1A"/>
-              <ellipse cx="88" cy="82" rx="4" ry="3.5" fill="white"/>
-              <circle cx="80" cy="90" r="2" fill="white" opacity="0.55"/>
-              <!-- 右眼 -->
-              <circle cx="138" cy="85" r="18" fill="white" stroke="#2C3E50" stroke-width="1.5"/>
-              <circle cx="140" cy="87" r="12" fill="#1A1A1A"/>
-              <ellipse cx="144" cy="82" rx="4" ry="3.5" fill="white"/>
-              <circle cx="136" cy="90" r="2" fill="white" opacity="0.55"/>
-            </g>
-
-            <!-- 腮红 -->
-            <ellipse cx="60" cy="102" rx="12" ry="7" fill="url(#cg-blush-grad)"/>
-            <ellipse cx="160" cy="102" rx="12" ry="7" fill="url(#cg-blush-grad)"/>
-
-            <!-- 嘴巴（D型开心笑） -->
-            <path d="M98,108 Q110,122 122,108" fill="url(#cg-mouth-grad)" stroke="#2C3E50" stroke-width="2" stroke-linejoin="round"/>
-            <!-- 舌头高光 -->
-            <ellipse cx="110" cy="115" rx="4" ry="2" fill="white" opacity="0.4"/>
-          </svg>
-
-          <!-- 风线 -->
-          <div class="cg-wind-lines">
-            <div class="cg-wind-line" style="width:130px;top:0;animation-delay:0s;"></div>
-            <div class="cg-wind-line" style="width:92px;top:22px;animation-delay:0.45s;"></div>
-            <div class="cg-wind-line" style="width:150px;top:46px;animation-delay:0.9s;"></div>
-            <div class="cg-wind-line" style="width:76px;top:70px;animation-delay:1.25s;"></div>
-          </div>
+        <div class="cloud-carousel-item" style="animation: float-bob 3s ease-in-out infinite 0.9s;">
+          <img src="/images/cloud-glider-final.png" alt="完整云朵" style="width: clamp(280px, 32vw, 420px);">
         </div>
-      </div>
-
-      <!-- 地面 -->
-      <div class="cg-ground-blur"></div>
-      <div class="cg-ground-wave"></div>
-
-      <!-- 装饰风线 -->
-      <div class="cg-deco-wind" id="cg-deco-wind"></div>
-
-      <!-- 标题 -->
-      <div class="cg-title">
-        <h1>Cloud Glider</h1>
-        <p>Infinite sky adventure</p>
       </div>
     </div>
   </div>
 
   <script>
   (function() {
+    /* 云朵轮流切换效果 */
+    function initCloudCarousel() {
+      const items = document.querySelectorAll('.cloud-carousel-item');
+      if (items.length === 0) return;
+      
+      let currentIndex = 0;
+      const interval = 3000; // 每个云朵显示3秒
+      
+      setInterval(() => {
+        // 隐藏当前云朵
+        items[currentIndex].classList.remove('active');
+        items[currentIndex].classList.add('fade-out');
+        
+        // 计算下一个云朵索引
+        currentIndex = (currentIndex + 1) % items.length;
+        
+        // 延迟显示下一个云朵
+        setTimeout(() => {
+          // 重置所有云朵状态
+          items.forEach(item => item.classList.remove('fade-out'));
+          // 显示下一个云朵
+          items[currentIndex].classList.add('active');
+        }, 500);
+      }, interval);
+    }
+    
+    // 初始化云朵切换
+    setTimeout(initCloudCarousel, 1000);
+    
     /* 生成云朵 SVG */
     function cloudSVG(size) {
       const s = document.createElementNS('http://www.w3.org/2000/svg','svg');
