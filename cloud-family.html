@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070d1f">
+<title>云朵家族 · Cloud Family</title>
+<link rel="stylesheet" href="./assets/fonts/fonts.css">
+<link rel="stylesheet" href="./cloud-dream.css">
+<style>
+  .fam-hero{max-width:1200px;margin:0 auto;width:100%;padding:20px clamp(18px,4vw,44px) 90px;flex:1}
+  .fam-head{text-align:center;padding:26px 0 8px}
+  .fam-head .tag{justify-content:center;display:inline-flex}
+  .fam-head h1{margin:14px 0 0;font-family:var(--hand);font-weight:400;
+    font-size:clamp(46px,6vw,80px);color:var(--cloud-white);text-shadow:0 0 40px rgba(140,245,216,.25)}
+  .fam-head .en{margin-top:14px;font-family:var(--mono);font-size:12px;letter-spacing:5px;color:var(--galaxy-mint)}
+  .fam-head .lede{max-width:60ch;margin:22px auto 0;font-size:16px;line-height:2;color:#cfd6f5}
+  .grid{margin-top:44px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px}
+  .card{position:relative;border-radius:24px;padding:22px 20px 20px;overflow:hidden;
+    background:linear-gradient(165deg,rgba(30,48,100,.5),rgba(12,22,48,.75));
+    border:1px solid rgba(150,180,255,.16);
+    transition:transform .35s cubic-bezier(.34,1.4,.64,1),box-shadow .35s,border-color .35s;cursor:pointer}
+  .card:hover{transform:translateY(-8px) scale(1.02);border-color:rgba(255,215,106,.5);
+    box-shadow:0 24px 60px rgba(0,0,0,.5),0 0 40px rgba(140,245,216,.12)}
+  .card .thumb{position:relative;width:100%;aspect-ratio:1;border-radius:18px;overflow:hidden;
+    box-shadow:inset 0 0 30px rgba(0,0,0,.3)}
+  .card .thumb img{width:100%;height:100%;object-fit:cover;transform:scale(1.05);transition:transform .5s}
+  .card:hover .thumb img{transform:scale(1.12) rotate(1deg)}
+  .card .nm{margin-top:16px;font-family:var(--hand);font-size:26px;color:var(--cloud-white);display:flex;align-items:baseline;gap:10px}
+  .card .nm .en{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--galaxy-mint)}
+  .card .rl{margin-top:6px;font-size:13px;color:var(--ink-mute);line-height:1.7}
+  .card .go{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;
+    background:rgba(10,18,40,.6);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;
+    color:var(--star-gold);opacity:0;transform:translateY(-6px);transition:.3s}
+  .card:hover .go{opacity:1;transform:none}
+  @media (max-width:520px){ .grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px} }
+</style>
+</head>
+<body>
+
+<canvas id="sky-stars"></canvas>
+<canvas id="sky-galaxy"></canvas>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<div class="stage">
+  <header class="top">
+    <a class="pill" href="./index.html"><span>←</span> 回到主页</a>
+    <div class="brand">CLOUD FAMILY · <b>云朵家族</b></div>
+    <span class="pill"><span class="dot"></span> 9 位成员</span>
+  </header>
+
+  <main class="fam-hero">
+    <div class="fam-head">
+      <div class="tag">CLOUD FAMILY · 梦幻绘本</div>
+      <h1>云朵家族</h1>
+      <div class="en">NINE LITTLE CLOUDS · ONE SOFT SKY</div>
+      <p class="lede">在一片会发光的夜空里，住着九朵性格各异的小云朵。它们有的会下雨，有的爱唱歌，有的烤面包，有的守着一整座图书馆。点一点任何一朵云，去它的小世界坐坐。</p>
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <footer class="foot">CLOUD FAMILY · HAND-PAINTED DREAM · ☁</footer>
+</div>
+
+<script src="./cloud-dream.js"></script>
+<script>
+const MEMBERS = [
+  {k:'weather',     zh:'云滴滴', en:'RAIN WHISPERER',   rl:'把雨滴酿成星星的天气小管家'},
+  {k:'painter',     zh:'云小画', en:'SKY PAINTER',      rl:'用晚霞和彩虹作画的小画家'},
+  {k:'singer',      zh:'云音音', en:'MELODY CLOUD',     rl:'把星星唱成歌的小歌唱家'},
+  {k:'baker',       zh:'云小厨', en:'CLOUD BAKER',      rl:'用月光烤面包的甜点师'},
+  {k:'detective',   zh:'云探探', en:'CLOUD DETECTIVE',  rl:'寻找丢失星星的小侦探'},
+  {k:'librarian',   zh:'云知知', en:'STAR LIBRARIAN',   rl:'守着发光图书馆的讲故事人'},
+  {k:'hero',        zh:'云闪闪', en:'LITTLE HERO',      rl:'披着红披风守护夜空的小英雄'},
+  {k:'photographer',zh:'云摄摄', en:'STAR PHOTOGRAPHER',rl:'收藏转瞬即逝美好的摄影师'},
+  {k:'sleeper',     zh:'云梦梦', en:'DREAM KEEPER',     rl:'把甜梦送进窗里的梦守护者'},
+];
+const grid = document.getElementById('grid');
+grid.innerHTML = MEMBERS.map(m => `
+  <a class="card" href="./cloud-${m.k}.html">
+    <span class="go">→</span>
+    <div class="thumb"><img src="./assets/cloud-heroes/web/${m.k}.webp" alt="${m.zh}" loading="lazy"></div>
+    <div class="nm">${m.zh}<span class="en">${m.en}</span></div>
+    <div class="rl">${m.rl}</div>
+  </a>`).join('');
+</script>
+</body>
+</html>

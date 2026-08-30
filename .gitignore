@@ -1,0 +1,12 @@
+# macOS 垃圾文件
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+__MACOSX
+
+# 临时/中间产物目录
+tmp/
+
+# 压缩包
+*.zip

@@ -1,0 +1,2754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>宁小包</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script>
+    // 确保 React Router 收到干净的路径 /
+    if (window.location.pathname !== '/' && !window.location.pathname.endsWith('.html')) {
+      // nothing
+    } else if (window.location.pathname.endsWith('index.html')) {
+      window.history.replaceState(null, '', './');
+    }
+  </script>
+  <script type="module" crossorigin src="./assets/index-Dg24nuQD.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DeZ8CYAY.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+
+  <style>
+    section:has(h2):has(img[alt="小康云"]) > div:has(h2) {
+      display: none !important;
+    }
+
+    section:has(h2):has(img[alt="小康云"]) {
+      display: block !important;
+      grid-template-columns: 1fr !important;
+    }
+
+    section:has(h2):has(img[alt="小康云"]) > div:has(> img[alt="小康云"]):not(.about-glass-surface),
+    section.reveal-section.grid.gap-6 > div:nth-child(2):has(> img[alt="小康云"]):not(.about-glass-surface) {
+      display: none !important;
+    }
+
+    /* ========================================
+       增强版梦幻粒子动画系统
+       ======================================== */
+    
+    /* 爱心飘浮 */
+    @keyframes heart-float {
+      0% {
+        transform: translateY(0) translateX(0) rotate(0deg) scale(0);
+        opacity: 0;
+      }
+      5% {
+        opacity: 0.8;
+        transform: translateY(-5vh) translateX(5px) rotate(15deg) scale(1);
+      }
+      25% {
+        transform: translateY(-25vh) translateX(-10px) rotate(-10deg) scale(1.1);
+      }
+      50% {
+        transform: translateY(-50vh) translateX(15px) rotate(20deg) scale(0.9);
+        opacity: 0.6;
+      }
+      75% {
+        transform: translateY(-75vh) translateX(-8px) rotate(-15deg) scale(1.05);
+        opacity: 0.4;
+      }
+      95% {
+        opacity: 0.2;
+      }
+      100% {
+        transform: translateY(-110vh) translateX(10px) rotate(30deg) scale(0.8);
+        opacity: 0;
+      }
+    }
+    
+    /* 星星闪烁 */
+    @keyframes star-twinkle {
+      0%, 100% {
+        opacity: 0.15;
+        transform: translateY(0) scale(0.8) rotate(0deg);
+        filter: blur(0px);
+      }
+      50% {
+        opacity: 1;
+        transform: translateY(-8vh) scale(1.3) rotate(180deg);
+        filter: blur(0.5px);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 255, 255, 0.4);
+      }
+    }
+    
+    /* 泡泡飘动 */
+    @keyframes bubble-float {
+      0% {
+        transform: translateY(100vh) translateX(0) scale(0.5);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.6;
+        transform: translateY(90vh) translateX(10px) scale(0.8);
+      }
+      40% {
+        transform: translateY(60vh) translateX(-15px) scale(1);
+        opacity: 0.5;
+      }
+      70% {
+        transform: translateY(30vh) translateX(20px) scale(0.9);
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(-10vh) translateX(-5px) scale(0.7);
+        opacity: 0;
+      }
+    }
+    
+    /* 泡泡光晕 */
+    @keyframes bubble-shine {
+      0%, 100% {
+        background: radial-gradient(circle at 30% 30%, 
+          rgba(255, 255, 255, 0.9) 0%, 
+          rgba(135, 206, 250, 0.4) 30%, 
+          rgba(135, 206, 250, 0.1) 60%, 
+          transparent 80%);
+      }
+      50% {
+        background: radial-gradient(circle at 70% 70%, 
+          rgba(255, 255, 255, 0.9) 0%, 
+          rgba(255, 182, 193, 0.4) 30%, 
+          rgba(255, 182, 193, 0.1) 60%, 
+          transparent 80%);
+      }
+    }
+    
+    /* 柔光漂浮 */
+    @keyframes soft-glow-drift {
+      0%, 100% {
+        opacity: 0.08;
+        transform: translateY(0) translateX(0) scale(1);
+      }
+      33% {
+        opacity: 0.15;
+        transform: translateY(-20vh) translateX(30px) scale(1.1);
+      }
+      66% {
+        opacity: 0.1;
+        transform: translateY(-40vh) translateX(-20px) scale(0.95);
+      }
+    }
+    
+    /* 花瓣旋转 */
+    @keyframes petal-fall {
+      0% {
+        transform: translateY(-10vh) translateX(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.7;
+      }
+      90% {
+        opacity: 0.5;
+      }
+      100% {
+        transform: translateY(110vh) translateX(50px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    /* 主容器 */
+    .magical-particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 20;
+      overflow: hidden;
+    }
+    
+    /* 爱心 */
+    .magic-heart {
+      position: absolute;
+      bottom: -60px;
+      animation: heart-float linear infinite;
+      filter: drop-shadow(0 0 10px currentColor);
+    }
+    
+    /* 星星 */
+    .magic-star {
+      position: absolute;
+      bottom: -30px;
+      animation: star-twinkle ease-in-out infinite;
+    }
+    
+    .magic-star::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: inherit;
+      border-radius: 50%;
+    }
+    
+    /* 泡泡 */
+    .magic-bubble {
+      position: absolute;
+      bottom: -80px;
+      border-radius: 50%;
+      animation: bubble-float linear infinite;
+      animation-name: bubble-float, bubble-shine;
+      animation-duration: inherit, 4s;
+      animation-timing-function: linear, ease-in-out;
+      animation-iteration-count: infinite, infinite;
+    }
+    
+    /* 柔光 */
+    .magic-glow {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        rgba(180, 215, 250, 0.25) 0%,
+        rgba(200, 230, 255, 0.15) 40%,
+        transparent 70%);
+      animation: soft-glow-drift ease-in-out infinite;
+      filter: blur(30px);
+    }
+    
+    /* 花瓣 */
+    .magic-petal {
+      position: absolute;
+      bottom: -40px;
+      animation: petal-fall linear infinite;
+    }
+
+    /* 云絮飘浮 */
+    @keyframes cloudpuff-drift {
+      0% {
+        transform: translateX(0) translateY(0) scale(0.3);
+        opacity: 0;
+      }
+      8% {
+        opacity: 0.45;
+        transform: scale(1);
+      }
+      85% {
+        opacity: 0.3;
+      }
+      100% {
+        transform: translateX(var(--drift-x, 80px)) translateY(var(--drift-y, -120px)) scale(0.7);
+        opacity: 0;
+      }
+    }
+
+    .magic-cloudpuff {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.75) 0%, rgba(220, 238, 255, 0.35) 35%, rgba(180, 215, 250, 0.08) 65%, transparent 80%);
+      filter: blur(6px);
+      animation: cloudpuff-drift var(--dur, 18s) ease-out forwards;
+    }
+
+    /* 光点飘浮 */
+    @keyframes speck-float {
+      0%, 100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.35; }
+      33% { transform: translateY(var(--sy1, -15px)) translateX(var(--sx1, 10px)) scale(0.8); opacity: 0.55; }
+      66% { transform: translateY(var(--sy2, -25px)) translateX(var(--sx2, -8px)) scale(1.2); opacity: 0.25; }
+    }
+
+    .magic-speck {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 6px rgba(180, 215, 250, 0.5);
+      animation: speck-float var(--dur, 8s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+
+    /* ========================================
+       Cloud Glider - 滑板云动画
+       ======================================== */
+
+    /* 整体飘浮 */
+    @keyframes cg-float {
+      0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+      30% { transform: translateY(-20px) rotate(1deg); }
+      60% { transform: translateY(-10px) rotate(-0.5deg); }
+    }
+
+    /* 眨眼 */
+    @keyframes cg-blink {
+      0%, 42%, 46%, 100% { transform: scaleY(1); }
+      44% { transform: scaleY(0.08); }
+    }
+
+    /* 彩虹尾迹飘动 */
+    @keyframes cg-trail-wave {
+      0%, 100% { transform: scaleX(1) rotate(0deg); opacity: 0.85; }
+      50% { transform: scaleX(1.08) rotate(1deg); opacity: 1; }
+    }
+
+    /* 尾迹星星闪烁 */
+    @keyframes cg-sparkle {
+      0%, 100% { opacity: 0.2; transform: scale(0.6) rotate(0deg); }
+      50% { opacity: 1; transform: scale(1.3) rotate(180deg); }
+    }
+
+    /* 风线 */
+    @keyframes cg-wind {
+      0% { transform: translateX(0) scaleX(0.3); opacity: 0; }
+      20% { opacity: 0.7; }
+      100% { transform: translateX(-120px) scaleX(1.2); opacity: 0; }
+    }
+
+    /* 背景云层漂移 */
+    @keyframes cg-cloud-drift {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* 伴飞元素 */
+    @keyframes cg-companion-fly {
+      from { left: 105%; }
+      to { left: -15%; }
+    }
+    @keyframes cg-companion-bob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-18px) rotate(8deg); }
+      75% { transform: translateY(-18px) rotate(-8deg); }
+    }
+
+    /* 地面波浪 */
+    @keyframes cg-ground {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
+    /* 光晕呼吸 */
+    @keyframes cg-glow {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.55; transform: scale(1.1); }
+    }
+
+    /* 进入动画 */
+    @keyframes cg-enter {
+      0% { opacity: 0; transform: translateX(80px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes hero-cloud-drift {
+      0% { transform: translateX(-18vw) translateY(0) scale(var(--scale, 1)); opacity: 0; }
+      12% { opacity: var(--opacity, 0.55); }
+      88% { opacity: var(--opacity, 0.55); }
+      100% { transform: translateX(78vw) translateY(var(--rise, -18px)) scale(var(--scale, 1)); opacity: 0; }
+    }
+
+    @keyframes hero-float-pop {
+      0%, 100% { transform: translateY(0) rotate(-6deg) scale(var(--scale, 1)); }
+      50% { transform: translateY(-16px) rotate(7deg) scale(var(--scale, 1)); }
+    }
+
+    .cloud-hero-section {
+      isolation: isolate;
+    }
+
+    .hero-btn-primary:hover {
+      background: #2a4578 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(49,80,141,0.35) !important;
+    }
+
+    .hero-btn-outline:hover {
+      background: rgba(255,255,255,0.95) !important;
+      transform: translateY(-2px);
+      border-color: #31508d !important;
+    }
+
+    /* 导航栏统一样式 - 移除自定义，交给JS匹配原版 */
+
+    /* 隐藏GSAP ScrollTrigger调试指示器（绿色/红色滚动标记） */
+    [class*="ScrollTrigger"],
+    [class*="scroll-trigger"],
+    [class*="gsap"],
+    div[style*="green"],
+    div[style*="background-color: green"],
+    div[style*="background: green"],
+    div[style*="background-color:green"],
+    div[style*="background:green"] {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    /* 隐藏右下角/左下角浮动组件 */
+    #root .fixed.bottom-4,
+    #root .fixed.bottom-0,
+    #root .fixed.right-4,
+    #root .fixed.right-0,
+    #root .fixed.right-6,
+    #root .fixed.right-3,
+    #root .fixed.bottom-6,
+    #root .fixed.bottom-16,
+    #root .fixed.bottom-20,
+    #root .fixed.bottom-24,
+    #root [class*="fixed"][class*="bottom"][class*="right"],
+    #root [class*="bottom-4"][class*="right"],
+    #root [class*="bottom-6"][class*="right"],
+    #root [class*="right-4"][class*="bottom"],
+    #root [class*="right-6"][class*="bottom"],
+    #root button[class*="fixed"],
+    #root a[class*="fixed"] {
+      display: none !important;
+    }
+
+    .cloud-hero-section > .relative.grid {
+      z-index: 3;
+    }
+
+    .hero-float-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+      border-radius: 40px;
+    }
+
+    .hero-float-cloud {
+      position: absolute;
+      top: var(--top);
+      left: var(--left);
+      width: var(--w);
+      height: calc(var(--w) * 0.42);
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 28% 34%, rgba(255,255,255,0.82), rgba(255,255,255,0.54) 38%, rgba(255,255,255,0) 70%),
+        radial-gradient(circle at 58% 22%, rgba(255,255,255,0.72), rgba(255,255,255,0.5) 36%, rgba(255,255,255,0) 68%),
+        radial-gradient(circle at 78% 48%, rgba(255,255,255,0.66), rgba(255,255,255,0.38) 34%, rgba(255,255,255,0) 70%);
+      box-shadow:
+        0 18px 42px rgba(128,179,230,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.8);
+      filter: blur(8px);
+      animation: hero-cloud-drift var(--dur) linear infinite;
+      animation-delay: var(--delay);
+    }
+
+    .hero-float-cloud::before,
+    .hero-float-cloud::after {
+      content: none;
+    }
+
+    .hero-float-heart {
+      position: absolute;
+      top: var(--top);
+      left: var(--left);
+      width: var(--size);
+      height: var(--size);
+      transform: rotate(-45deg);
+      background: rgba(244,112,180,0.64);
+      border-radius: 30% 30% 12% 30%;
+      box-shadow: 0 10px 24px rgba(235,109,170,0.18);
+      animation: hero-float-pop var(--dur) ease-in-out infinite;
+      animation-delay: var(--delay);
+    }
+
+    .hero-float-heart::before,
+    .hero-float-heart::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: inherit;
+    }
+
+    .hero-float-heart::before { top: -50%; left: 0; }
+    .hero-float-heart::after { top: 0; left: 50%; }
+
+    /* 停掉React hero自身的动画效果 */
+    .cloud-hero-section .hero-float-cloud,
+    .cloud-hero-section .hero-float-heart,
+    .cloud-hero-section .hero-float-star {
+      display: none !important;
+    }
+
+    .hero-float-star {
+      position: absolute;
+      top: var(--top);
+      left: var(--left);
+      width: var(--size);
+      height: var(--size);
+      opacity: var(--opacity, 0.68);
+      animation: hero-float-pop var(--dur) ease-in-out infinite;
+      animation-delay: var(--delay);
+    }
+
+    .hero-float-star::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(255,221,86,0.82);
+      clip-path: polygon(50% 0%, 61% 36%, 98% 50%, 61% 64%, 50% 100%, 39% 64%, 2% 50%, 39% 36%);
+      filter: drop-shadow(0 8px 12px rgba(245,190,70,0.16));
+    }
+
+    .hero-float-star.is-white::before {
+      background: rgba(255,255,255,0.86);
+      filter: drop-shadow(0 8px 12px rgba(119,172,228,0.14));
+    }
+
+    /* ========================================
+       容器
+       ======================================== */
+    #cloud-glider {
+      position: absolute;
+      top: 120px;
+      right: 6vw;
+      width: min(42vw, 620px);
+      height: 440px;
+      z-index: 2;
+      pointer-events: none;
+      overflow: visible;
+      animation: cg-enter 1s ease-out;
+    }
+
+    #cloud-glider.cg-home-glider {
+      position: relative;
+      width: min(100%, 640px);
+      height: clamp(260px, 28vw, 400px);
+      z-index: 12;
+    }
+
+    /* 隐藏滑板云背景粒子 */
+    #cg-bg1, #cg-bg2, #cg-mid1, #cg-mid2, #cg-fg1, #cg-fg2,
+    #cg-companions, .cg-trail-sparkle, .cg-wind-lines, .cg-deco-wind,
+    .cg-deco-line, .cg-companion { display: none !important; }
+    .cg-hero-host {
+      align-items: center;
+      justify-content: center;
+      overflow: visible !important;
+      position: relative;
+    }
+    /* Lottie 动画已替换为云朵家族角色网格 */
+
+    /* ========================================
+       云朵家族 Hero 区 Lottie 动画
+       ======================================== */
+    @keyframes cf-hero-name-in {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #cloud-family-hero-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      z-index: 10;
+      padding: 6px;
+    }
+
+    .cf-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .cf-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      animation: cf-float 3s ease-in-out infinite;
+    }
+    .cf-card:nth-child(1) { animation-delay: 0s; }
+    .cf-card:nth-child(2) { animation-delay: 0.7s; }
+    .cf-card:nth-child(3) { animation-delay: 1.4s; }
+    .cf-card:nth-child(4) { animation-delay: 2.1s; }
+
+    .cf-card img {
+      width: 100%;
+      max-height: 130px;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 4px 12px rgba(91, 155, 213, 0.25));
+      transition: transform 0.3s ease;
+    }
+    .cf-card:hover img { transform: scale(1.05); }
+
+    .cf-label {
+      margin-top: 4px;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .cf-label:hover { transform: scale(1.08); }
+
+    .cf-label-name {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #31508d;
+      letter-spacing: 0.04em;
+      text-shadow: 0 1px 4px rgba(255,255,255,0.8);
+      animation: cf-hero-name-in 0.5s ease-out both;
+    }
+
+    .cf-label-tag {
+      display: inline-block;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--card-accent, #5b9bd5);
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border-radius: 999px;
+      padding: 1px 6px;
+      margin-top: 2px;
+      border: 1px solid rgba(255,255,255,0.5);
+      animation: cf-hero-name-in 0.5s ease-out 0.1s both;
+    }
+
+    @keyframes cf-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    /* 响应式适配 */
+    @media (max-width: 768px) {
+      #cloud-family-hero-wrap { max-width: 280px; padding: 5px; }
+      .cf-grid { gap: 8px; }
+      .cf-label-name { font-size: 0.65rem; }
+      .cf-label-tag { font-size: 0.48rem; padding: 1px 6px; }
+    }
+    @media (max-width: 480px) {
+      #cloud-family-hero-wrap { max-width: 220px; padding: 4px; }
+      .cf-grid { gap: 6px; }
+      .cf-label-name { font-size: 0.55rem; }
+      .cf-label-tag { font-size: 0.42rem; padding: 1px 5px; }
+    }
+
+    .cg-sky {
+      position: absolute;
+      inset: 0;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      overflow: visible;
+    }
+
+    /* ========================================
+       背景云层
+       ======================================== */
+    .cg-cloud-layer {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .cg-cloud-track {
+      display: flex;
+      height: 100%;
+      width: 200%;
+      animation: cg-cloud-drift var(--speed) linear infinite;
+    }
+    .cg-cloud-group {
+      display: flex;
+      width: 100%;
+      justify-content: space-around;
+      align-items: flex-end;
+      padding-bottom: 60px;
+    }
+    .cg-cloud-item {
+      opacity: var(--opacity);
+      filter: blur(2px);
+      transform: scale(var(--scale));
+    }
+
+    /* ========================================
+       滑板云角色
+       ======================================== */
+    .cg-skater-wrap {
+      position: absolute;
+      left: 50%;
+      top: 43%;
+      margin-left: -110px;
+      transform: translateY(-50%);
+      z-index: 30;
+      animation: cg-float 3.5s ease-in-out infinite;
+    }
+
+    /* 光晕 */
+    .cg-skater-glow {
+      position: absolute;
+      inset: -50px;
+      background: radial-gradient(ellipse at center, rgba(135,206,250,0.22) 0%, rgba(255,255,255,0.08) 45%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(18px);
+      animation: cg-glow 4s ease-in-out infinite;
+    }
+
+    /* 角色主体（含白色贴纸边框） */
+    .cg-character {
+      position: relative;
+      filter: drop-shadow(0 8px 24px rgba(100,150,200,0.3));
+    }
+
+    .cg-character > svg {
+      display: none;
+    }
+
+    .cg-new-cloud {
+      width: clamp(470px, 52vw, 760px);
+      max-width: none;
+      transform: translate(-206px, -190px);
+      filter: drop-shadow(0 22px 30px rgba(90, 145, 205, 0.18));
+    }
+
+    /* 眨眼控制 */
+    .cg-eye-pair {
+      animation: cg-blink 4.5s ease-in-out infinite;
+    }
+
+    /* 彩虹尾迹 */
+    .cg-rainbow-trail {
+      position: absolute;
+      left: -90px;
+      top: 35%;
+      transform-origin: right center;
+      animation: cg-trail-wave 2s ease-in-out infinite;
+    }
+
+    /* 尾迹星星 */
+    .cg-trail-sparkle {
+      position: absolute;
+      animation: cg-sparkle 2s ease-in-out infinite;
+    }
+
+    /* 风线 */
+    .cg-wind-lines {
+      position: absolute;
+      left: -150px;
+      top: 34%;
+      pointer-events: none;
+    }
+    .cg-wind-line {
+      position: absolute;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.84), rgba(121,169,226,0.28), transparent);
+      border-radius: 999px;
+      animation: cg-wind 1.8s ease-out infinite;
+      filter: blur(0.2px);
+    }
+
+    /* ========================================
+       伴飞元素
+       ======================================== */
+    .cg-companion {
+      position: absolute;
+      z-index: 20;
+      pointer-events: none;
+      animation: cg-companion-fly var(--dur) linear forwards,
+                 cg-companion-bob 3s ease-in-out infinite;
+    }
+
+    /* ========================================
+       地面
+       ======================================== */
+    .cg-ground-blur {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 96px;
+      background: rgba(255,255,255,0.12);
+      filter: blur(22px);
+      z-index: 10;
+    }
+    .cg-ground-wave {
+      position: absolute;
+      bottom: -92px; left: -10%;
+      width: 120%; height: 188px;
+      background: rgba(255,255,255,0.42);
+      border-radius: 100% 100% 0 0;
+      z-index: 20;
+      animation: cg-ground 4s ease-in-out infinite;
+    }
+
+    .cg-ground-blur,
+    .cg-ground-wave {
+      display: none;
+    }
+
+    /* ========================================
+       装饰风线
+       ======================================== */
+    .cg-deco-wind {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 40;
+    }
+    .cg-deco-line {
+      position: absolute;
+      height: 1px;
+      background: rgba(255,255,255,0.18);
+      animation: cg-cloud-drift var(--dur) linear infinite;
+      animation-delay: var(--delay);
+    }
+
+    /* ========================================
+       标题
+       ======================================== */
+    .cg-title {
+      position: absolute;
+      top: 24px; left: 24px;
+      z-index: 50;
+      pointer-events: none;
+      display: none;
+    }
+    .cg-title h1 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 1.8rem;
+      color: rgba(47, 79, 141, 0.72);
+      text-shadow: 0 2px 16px rgba(255,255,255,0.42);
+      letter-spacing: -0.02em;
+      margin: 0;
+      line-height: 1.1;
+    }
+    .cg-title p {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: rgba(91, 121, 170, 0.68);
+      margin-top: 4px;
+    }
+
+    .cg-title::after {
+      content: "playful motion study";
+      display: inline-flex;
+      margin-top: 12px;
+      border: 1px solid rgba(166,205,255,0.62);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.26);
+      padding: 6px 10px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      color: rgba(89,119,169,0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    /* ========================================
+       响应式
+       ======================================== */
+    @media (max-width: 1280px) {
+      #cloud-glider { width: min(44vw, 560px); }
+    }
+    @media (max-width: 1024px) {
+      #cloud-glider { width: min(48vw, 500px); height: 380px; }
+    }
+    @media (max-width: 768px) {
+      #cloud-glider {
+        width: 100%;
+        height: 300px;
+      }
+      #cloud-glider.cg-home-glider { height: 260px; margin-top: -28px; }
+      .cg-sky { border-radius: 0; }
+      .cg-title h1 { font-size: 1.3rem; }
+      .cg-title p { font-size: 0.65rem; }
+      .cg-skater-wrap {
+        top: 45%;
+        transform: translateY(-50%) scale(0.86);
+      }
+      .cg-new-cloud {
+        width: 500px;
+        transform: translate(-146px, -146px);
+      }
+      @keyframes cg-enter {
+        0% { opacity: 0; transform: translateY(60px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      
+      /* 移动端隐藏复杂动画 */
+      .magic-star,
+      .magic-bubble,
+      .magic-petal {
+        display: none;
+      }
+    }
+/* ========================================
+       云朵家族轮播
+       ======================================== */
+    @keyframes cf-bob {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50% { transform: translateY(-12px) rotate(1deg); }
+    }
+
+    .cloud-family-carousel {
+      position: relative;
+      max-width: 480px;
+      margin: 0 auto 20px;
+      padding: 16px 16px 8px;
+      text-align: center;
+    }
+
+    .cf-carousel-viewport {
+      position: relative;
+      overflow: hidden;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 32px rgba(91, 155, 213, 0.1);
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      padding: 8px;
+    }
+
+    .cf-slides-track {
+      display: flex;
+      transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    .cf-slide {
+      min-width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 12px 8px;
+    }
+
+    .cf-slide-img {
+      width: 100%;
+      height: 200px;
+      max-width: 80%;
+      margin: 0 auto;
+      filter: drop-shadow(0 10px 24px rgba(91, 155, 213, 0.15));
+      animation: cf-bob 3.5s ease-in-out infinite;
+    }
+
+    .cf-slide-info { margin-top: 8px; text-align: center; }
+
+    .cf-slide-name {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #31508d;
+      letter-spacing: 0.02em;
+    }
+
+    .cf-slide-tag {
+      display: inline-block;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: #5b9bd5;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 999px;
+      padding: 3px 12px;
+      margin: 4px 0;
+      border: 1px solid rgba(180, 215, 255, 0.5);
+    }
+
+    .cf-slide-desc {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: #6a85b0;
+      line-height: 1.5;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+
+    .cf-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .cf-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(91, 155, 213, 0.3);
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .cf-dot.active {
+      background: #5b9bd5;
+      transform: scale(1.3);
+      box-shadow: 0 2px 8px rgba(91, 155, 213, 0.4);
+    }
+
+    .cf-arrow {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      z-index: 10;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1.5px solid rgba(180, 215, 255, 0.5);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      color: #5b9bd5;
+      transition: all 0.2s;
+      backdrop-filter: blur(6px);
+    }
+    .cf-arrow:hover {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 12px rgba(91, 155, 213, 0.2);
+    }
+    .cf-arrow.left { left: -14px; }
+    .cf-arrow.right { right: -14px; }
+
+    /* 头像放大 - 覆盖 Tailwind h-16 w-16 */
+    img[alt="小康云"] {
+      width: 118px !important;
+      height: 118px !important;
+    }
+
+    header img[alt="小康云"] {
+      max-width: none !important;
+    }
+
+    header img[alt="小康云"] + * {
+      margin-left: 10px;
+    }
+
+    header div:has(> img[alt="小康云"]) {
+      width: 132px !important;
+      height: 118px !important;
+      flex: 0 0 132px !important;
+    }
+
+    /* Footer 图标优化 - 云朵角色替换蓝色占位 */
+    footer img[alt=""] {
+      width: 52px !important;
+      height: 52px !important;
+      border-radius: 12px;
+    }
+    
+  </style>
+</head>
+<body>
+
+  <style>
+  /* 永久隐藏React导航中的日常链接 */
+  #root a[href*="daily"], #root a[href*="Daily"] { display: none !important; }
+  </style>
+  <script>
+    (function hideDuplicateDailyHero() {
+      function hide() {
+        var iframe = document.querySelector('iframe[src*="daily.html"]');
+        if (!iframe) return;
+        var iframeSection = iframe.closest('section');
+        var dailyWrap = iframeSection && iframeSection.parentElement;
+        var sections = dailyWrap ? Array.from(dailyWrap.children).filter(function(el) {
+          return el.tagName === 'SECTION';
+        }) : [];
+        if (sections.length > 1 && sections[0].textContent.indexOf('我的日常') !== -1) {
+          sections[0].style.display = 'none';
+        }
+      }
+
+      setInterval(hide, 500);
+      new MutationObserver(hide).observe(document.documentElement, { childList: true, subtree: true });
+      document.addEventListener('DOMContentLoaded', hide);
+    })();
+  </script>
+
+
+  <div id="root"></div>
+
+  <!-- Hero 文字 -->
+
+
+
+  
+
+  
+  
+
+
+  
+  
+
+  <script type="text/plain" disabled>
+  (function(){
+    L();R();setTm();
+    function L(){var s=localStorage.getItem(K);if(s)try{P=JSON.parse(s)}catch(e){P=[]}}
+    function S(){localStorage.setItem(K,JSON.stringify(P))}
+    function E(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+    function fd(iso){var d=new Date(iso);return (d.getMonth()+1)+'/'+d.getDate()}
+    function fl(iso){var d=new Date(iso);return (d.getMonth()+1)+'月'+d.getDate()+'日 · 星期'+['日','一','二','三','四','五','六'][d.getDay()]}
+    function ft(iso){var d=new Date(iso),n=new Date(),m=Math.floor((n-d)/60000);if(m<1)return'刚刚';if(m<60)return m+'分钟前';var h=Math.floor(m/60);if(h<24)return h+'小时前';if(Math.floor(m/1440)<7)return Math.floor(m/1440)+'天前';return fl(iso)}
+
+    function R(){
+      var sp=[].concat(P).sort(function(a,b){if(a.pin&&!b.pin)return -1;if(!a.pin&&b.pin)return 1;return new Date(b.tm)-new Date(a.tm)});
+      var c=document.getElementById('dt-list');
+      return}
+      c.innerHTML=sp.map(function(p,i,arr){
+        var sd=i===0||fd(p.tm)!==fd((arr[i-1]||{}).tm);
+        var imgsHtml='';
+        if(p.imgs&&p.imgs.length){var n=Math.min(p.imgs.length,9),cols=n===1?'1fr':n===2?'1fr 1fr':'1fr 1fr 1fr';imgsHtml='<div style="display:grid;gap:4px;margin-top:8px;grid-template-columns:'+cols+';">'+p.imgs.map(function(img){return'<img src="'+img+'" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px;cursor:pointer;" " loading="lazy">'}).join('')+'</div>'}
+        return (sd?'<div style="position:relative;margin:24px 0 12px -36px;display:flex;align-items:center;gap:10px;"><div style="width:10px;height:10px;border-radius:50%;background:#5b9bd5;border:3px solid #E8F4FD;margin-left:11px;"></div><span style="font-size:10px;font-weight:700;color:#6a85b0;letter-spacing:0.05em;">'+fl(p.tm)+'</span></div>':'')+
+          '<div style="background:rgba(255,255,255,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.9);border-radius:16px;padding:18px 20px;margin-bottom:12px;box-shadow:0 4px 16px rgba(100,170,230,0.08);'+(p.pin?'border-left:3px solid #5b9bd5;':'')+'">'+
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'+
+              '<span style="font-size:18px;">'+p.mood+'</span><span style="font-size:10px;color:#94A3B8;">'+ft(p.tm)+'</span>'+(p.loc?'<span style="font-size:10px;color:#94A3B8;">📍 '+E(p.loc)+'</span>':'')+(p.pin?'<span style="margin-left:auto;font-size:9px;color:#31508d;background:rgba(49,80,141,0.08);padding:2px 8px;border-radius:999px;font-weight:700;">📌 置顶</span>':'')+
+            '</div>'+
+            '<div style="font-size:13px;line-height:1.7;color:#475569;white-space:pre-wrap;">'+E(p.msg)+'</div>'+imgsHtml+
+            '<div style="display:flex;gap:4px;justify-content:flex-end;margin-top:10px;padding-top:10px;border-top:1px solid rgba(200,225,245,0.2);">'+
+            '</div>'+
+          '</div>';
+      }).join('');
+    }
+
+    function setTm(){var d=new Date();document.getElementById('dt-time').value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16)}
+    function ri(){document.getElementById('dt-imgs').innerHTML=imgs.map(function(img,i){return'<div style="width:44px;height:44px;border-radius:6px;background:url('+img+') center/cover;position:relative;border:2px solid rgba(200,225,245,0.5);"><button onclick="imgs.splice('+i+',1);ri()" style="position:absolute;top:-5px;right:-5px;width:15px;height:15px;border-radius:50%;background:#e53e3e;color:#fff;border:none;font-size:8px;cursor:pointer;">×</button></div>'}).join('')}
+
+    
+    );if(!p)return;eid=id;imgs=p.imgs?[].concat(p.imgs):[];document.getElementById('dt-text').value=p.msg;document.getElementById('dt-loc').value=p.loc||'';document.getElementById('dt-mood').value=p.mood||'😊';ri();document.getElementById('dt-editor').style.display='';if(p.tm){var d=new Date(p.tm);document.getElementById('dt-time').value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16)}else setTm();document.getElementById('dt-text').focus()}
+    
+    );if(p){p.msg=t;p.mood=mood;p.loc=loc;p.imgs=[].concat(imgs);p.tm=tm}}else{P.unshift({id:Date.now().toString(),msg:t,mood:mood,loc:loc,imgs:[].concat(imgs),tm:tm,pin:false})}S();R();dtCancel()}
+    );if(p){p.pin=!p.pin;S();R()}}
+    );S();R()}
+    )};reader.readAsDataURL(f)});e.target.value=''}
+    function compress(u,w,q,cb){var img=new Image();img.onload=function(){var cv=document.createElement('canvas'),iw=img.width,ih=img.height;if(iw>w){ih=ih*w/iw;iw=w}cv.width=iw;cv.height=ih;cv.getContext('2d').drawImage(img,0,0,iw,ih);cb(cv.toDataURL('image/jpeg',q))};img.src=u}
+    
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')dtCancel()});
+  
+
+  })();
+  </script>
+
+<!-- 增强版梦幻粒子容器 -->
+
+  
+  <div class="magical-particles" id="magicalParticles"></div>
+
+  
+
+
+  <script type="text/plain" disabled>
+    (function() {
+      var linksAdded = false;
+
+      function addNavLinks() {
+        if (linksAdded) return;
+        
+        var container = document.querySelector('nav') || document.querySelector('header');
+        if (!container) return;
+
+        // 找到"联系我"或最后的链接作为插入锚点
+        var afterEl = null;
+        container.querySelectorAll('a').forEach(function(a) {
+          var t = (a.textContent||'').trim();
+          if (t === '联系我' || t === '作品集') afterEl = a;
+        });
+        if (!afterEl) { var all = container.querySelectorAll('a'); afterEl = all[all.length-1]; }
+        if (!afterEl) return;
+
+        function addLink(id, text, href) {
+          var a = document.createElement('a');
+          a.id = id; a.textContent = text;
+          a.setAttribute('href', href);
+          a.style.cssText = 'cursor:pointer;text-decoration:none;';
+          // Capture phase - 优先于React
+          a.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            window.location.href = href;
+          }, true);
+          // 也复制样式
+          setTimeout(function() {
+            var tpl = container.querySelector('a:not([id])');
+            if (tpl) {
+              var cs = getComputedStyle(tpl);
+              a.style.fontFamily = cs.fontFamily;
+              a.style.fontSize = cs.fontSize;
+              a.style.padding = cs.padding;
+              a.style.borderRadius = cs.borderRadius;
+              a.style.color = cs.color;
+              a.style.fontWeight = cs.fontWeight;
+              a.style.background = 'transparent';
+            }
+          }, 200);
+          return a;
+        }
+
+        
+        var cf = addLink('cloudFamilyNavLink', '云朵家族', './cloudfamily.html');
+
+        afterEl.parentNode.insertBefore(cf, afterEl.nextSibling);
+        
+        linksAdded = true;
+  // 删除导航"日常" - 直接用textContent匹配
+  (function(){
+    function kill(){
+      var all = document.querySelectorAll('#root *, header *, nav *');
+      for (var i=0;i<all.length;i++){
+        var el = all[i];
+        if (el.children.length > 0) continue; // 有子元素的跳过
+        if ((el.textContent||'').trim() === '日常'){
+          // 往上找到可点击的容器
+          var p = el.closest('a, button, li, [role="button"], [class*="nav"], [class*="Nav"]') || el.parentElement;
+          if (p) { p.style.display = 'none'; p.remove(); }
+        }
+      }
+    }
+    kill();
+    setInterval(kill, 50);
+    new MutationObserver(kill).observe(document.body, {childList:true,subtree:true});
+  })();
+
+  // 删除首页"我的日常"预览卡片（App.tsx:217 那个带链接的简版卡片）
+  (function(){
+    function hideDailyPreviewCard(){
+      var h3s = document.querySelectorAll('#root h3');
+      for (var i = 0; i < h3s.length; i++) {
+        if ((h3s[i].textContent||'').trim() === '我的日常') {
+          var section = h3s[i].closest('section');
+          if (section && section.querySelector('a[href*="daily.html"]')) {
+            section.style.display = 'none';
+          }
+        }
+      }
+    }
+    hideDailyPreviewCard();
+    setInterval(hideDailyPreviewCard, 200);
+    new MutationObserver(hideDailyPreviewCard).observe(document.body, {childList:true,subtree:true});
+  })();
+
+
+
+      }
+
+      setTimeout(addNavLinks, 500);
+      setTimeout(addNavLinks, 1500);
+
+      function injectFortuneAndTools() {
+        // 找到视频区域下方
+        var videoArea = null;
+        document.querySelectorAll('#root video, #root [class*="video"], #root [class*="Video"]').forEach(function(el) {
+          videoArea = el.closest('section') || el.closest('div[class*="flex"]') || el.parentElement;
+        });
+        // 或者找作品集区域
+        var portfolio = null;
+        document.querySelectorAll('#root section, #root > div > div > div').forEach(function(el) {
+          var h = el.querySelector && el.querySelector('h2, h3');
+          if (h && (h.textContent.includes('作品') || h.textContent.includes('Portfolio') || h.textContent.includes('精选'))) {
+            if (el.offsetHeight > 100) portfolio = el;
+          }
+        });
+        var target = videoArea || portfolio;
+        if (!target || document.getElementById('cpi')) return;
+        
+        var wrap = document.createElement('div'); wrap.id = 'cpi'; wrap.style.cssText = 'margin-top:40px;';
+
+        // === 算命铺 (完整聊天UI) ===
+        wrap.innerHTML = 
+          '<div id="fortune-app" style="background:rgba(255,255,255,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.9);border-radius:24px;padding:28px;box-shadow:0 12px 40px rgba(100,170,230,0.12);margin-bottom:20px;">'+
+            '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">'+
+              '<div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#31508d,#5b9bd5);display:flex;align-items:center;justify-content:center;font-size:24px;">\u{1F52E}</div>'+
+              '<div style="flex:1;">'+
+                '<h4 style="font-family:Space Mono,monospace;font-size:0.9rem;font-weight:700;color:#1E293B;margin:0;">小康算命铺</h4>'+
+                '<span style="font-size:10px;color:#94A3B8;">✨ 接入大模型 API · 云朵大师在线占卜</span>'+
+              '</div>'+
+              '<div style="display:flex;align-items:center;gap:8px;">'+
+                '<span id="fortune-status" style="font-size:10px;padding:3px 10px;border-radius:999px;background:rgba(245,158,11,0.1);color:#F59E0B;">⚠ 未配置API</span>'+
+                '<button id="fortune-config-btn" onclick="toggleFortuneConfig()" style="background:none;border:1px solid rgba(200,225,245,0.5);border-radius:999px;padding:5px 12px;font-family:Space Mono,monospace;font-size:10px;color:#6a85b0;cursor:pointer;">⚙ 设置</button>'+
+              '</div>'+
+            '</div>'+
+
+            // API配置面板
+            '<div id="fortune-config" style="display:none;background:#F0F4FF;border-radius:12px;padding:16px;margin-bottom:16px;">'+
+              '<p style="font-family:Space Mono,monospace;font-size:11px;font-weight:700;color:#31508d;margin:0 0 8px;">⚙ API 配置（OpenAI 兼容格式）</p>'+
+              '<div style="display:flex;flex-direction:column;gap:8px;">'+
+                '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+
+                  '<select id="fortune-provider" onchange="onProviderChange()" style="padding:8px 12px;border:1.5px solid rgba(200,225,245,0.5);border-radius:8px;font-family:Space Mono,monospace;font-size:11px;outline:none;background:#fff;min-width:180px;">'+
+                    '<option value="custom">🔧 自定义</option>'+
+                    '<option value="https://api.openai.com/v1">OpenAI</option>'+
+                    '<option value="https://api.deepseek.com/v1">DeepSeek</option>'+
+                    '<option value="https://api.moonshot.cn/v1">Moonshot</option>'+
+                    '<option value="https://dashscope.aliyuncs.com/compatible-mode/v1">通义千问</option>'+
+                  '</select>'+
+                  '<input id="fortune-model" placeholder="模型名称" style="flex:1;min-width:150px;padding:8px 12px;border:1.5px solid rgba(200,225,245,0.5);border-radius:8px;font-family:Space Mono,monospace;font-size:11px;outline:none;background:#fff;">'+
+                '</div>'+
+                '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+
+                  '<input id="fortune-api-endpoint" placeholder="API Endpoint URL" style="flex:2;min-width:250px;padding:8px 12px;border:1.5px solid rgba(200,225,245,0.5);border-radius:8px;font-family:Space Mono,monospace;font-size:11px;outline:none;background:#fff;">'+
+                  '<input id="fortune-api-key" type="password" placeholder="API Key" style="flex:2;min-width:200px;padding:8px 12px;border:1.5px solid rgba(200,225,245,0.5);border-radius:8px;font-family:Space Mono,monospace;font-size:11px;outline:none;background:#fff;">'+
+                  '<button onclick="saveFortuneConfig()" style="background:#31508d;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-family:Space Mono,monospace;font-size:11px;font-weight:700;cursor:pointer;">💾 保存</button>'+
+                '</div>'+
+              '</div>'+
+              '<p style="font-family:Space Mono,monospace;font-size:9px;color:#94A3B8;margin:8px 0 0;">支持所有 OpenAI 兼容 API。API Key 使用 AES-GCM 加密存储在本地浏览器。</p>'+
+            '</div>'+
+
+            // 对话区
+            '<div id="fortune-messages" style="background:#FAFBFF;border-radius:16px;padding:16px;min-height:180px;max-height:360px;overflow-y:auto;margin-bottom:16px;font-family:Space Mono,monospace;font-size:11px;line-height:1.8;">'+
+              '<div style="text-align:center;padding:20px;color:#94A3B8;">'+
+                '<p style="font-size:40px;margin:0 0 12px;">\u{1F52E}</p>'+
+                '<p style="margin:0 0 4px;font-weight:700;color:#6a85b0;">欢迎来到小康算命铺</p>'+
+                '<p style="font-size:10px;margin:0;">云朵大师通晓星象、塔罗、八字与彩虹运势</p>'+
+                '<p style="font-size:10px;margin:8px 0 0;">✨ 在下方输入你的问题开始占卜 ✨</p>'+
+              '</div>'+
+            '</div>'+
+
+            // 快捷提问
+            '<p style="font-family:Space Mono,monospace;font-size:10px;color:#94A3B8;margin-bottom:8px;">\u{1F4AC} 试试这样问</p>'+
+            '<div id="fortune-quick-qs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;"></div>'+
+
+            // 输入区
+            '<div style="display:flex;gap:8px;">'+
+              '<input id="fortune-input" type="text" placeholder="输入你的问题..." style="flex:1;padding:12px 16px;border:2px solid rgba(200,225,245,0.5);border-radius:14px;font-family:Space Mono,monospace;font-size:12px;outline:none;background:#fff;transition:border-color 0.2s;" onfocus="this.style.borderColor=\'#31508d\'" onblur="this.style.borderColor=\'rgba(200,225,245,0.5)\'" onkeydown="if(event.key===\'Enter\')sendFortune()">'+
+              '<button onclick="sendFortune()" style="background:linear-gradient(135deg,#31508d,#5b9bd5);color:#fff;border:none;padding:12px 20px;border-radius:14px;font-family:Space Mono,monospace;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(49,80,141,0.25);transition:all 0.2s;" onmouseenter="this.style.transform=\'scale(1.02)\'" onmouseleave="this.style.transform=\'scale(1)\'">\u{1F52E} 占卜</button>'+
+            '</div>'+
+          '</div>';
+
+        // 填充快捷提问
+        setTimeout(function(){
+          var qs = ["✨ 今天运势怎么样？","\u{1F496} 最近的爱情运？","\u{1F308} 适合穿什么颜色的衣服？","\u{1F4AC} 给句今天的忠告吧！","\u{1F3C3} 我适合做什么运动？"];
+          var container = document.getElementById('fortune-quick-qs');
+          if (container) {
+            qs.forEach(function(q) {
+              var span = document.createElement('span');
+              span.textContent = q;
+              span.style.cssText = 'padding:6px 14px;background:rgba(255,255,255,0.7);border-radius:999px;font-size:10px;color:#6a85b0;font-family:Space Mono,monospace;border:1px solid rgba(200,225,245,0.5);cursor:pointer;transition:all 0.15s;';
+              span.onmouseenter = function(){ this.style.background='#31508d'; this.style.color='#fff'; this.style.borderColor='#31508d'; };
+              span.onmouseleave = function(){ this.style.background='rgba(255,255,255,0.7)'; this.style.color='#6a85b0'; this.style.borderColor='rgba(200,225,245,0.5)'; };
+              span.onclick = function(){ document.getElementById('fortune-input').value = q.replace(/[^一-龥a-zA-Z\?\!]/g,'').trim(); sendFortune(); };
+              container.appendChild(span);
+            });
+          }
+          // 恢复配置
+          var saved = localStorage.getItem('fortune_config');
+          if (saved) {
+            try { var cfg = JSON.parse(saved);
+              document.getElementById('fortune-api-endpoint').value = cfg.endpoint || '';
+              document.getElementById('fortune-model').value = cfg.model || '';
+              if (cfg.k) {
+                decryptKey(cfg.k).then(function(decrypted) {
+                  document.getElementById('fortune-api-key').value = decrypted || '';
+                  updateFortuneStatus(!!decrypted);
+                });
+              } else if (cfg.key) {
+                document.getElementById('fortune-api-key').value = cfg.key;
+                updateFortuneStatus(true);
+              }
+            } catch(e) {}
+          }
+        }, 100);
+
+        // === 可折叠项目区 ===
+        var projects = [
+          { emoji:'\u{1F4DD}', title:'VocabMaster', sub:'智能生词提取工坊', id:'vocab',
+            body:'<div style="border:2px dashed rgba(200,225,245,0.6);border-radius:12px;padding:16px;text-align:center;margin-bottom:12px;cursor:pointer;"><p style="font-family:Space Mono,monospace;font-size:11px;color:#94A3B8;margin:0;">\u{1F4C1} 上传素材 · 支持 .txt / .srt / .docx</p></div><textarea placeholder="粘贴文本内容..." style="width:100%;min-height:50px;padding:10px;border:1.5px solid rgba(200,225,245,0.5);border-radius:10px;font-family:Space Mono,monospace;font-size:11px;resize:vertical;background:rgba(255,255,255,0.7);margin-bottom:8px;"></textarea><div style="font-size:10px;color:#94A3B8;font-family:Space Mono,monospace;margin-bottom:8px;">按出现顺序 · 已过滤中高考词 · 词库 <b style="color:#31508d;">4,325</b> 词</div><button onclick="alert(\'\u{1F4DD} 生词提取功能已就绪\')" style="background:linear-gradient(135deg,#31508d,#5b9bd5);color:#fff;border:none;padding:10px 24px;border-radius:999px;font-family:Space Mono,monospace;font-size:12px;font-weight:700;cursor:pointer;width:100%;">开始提取</button>' },
+          { emoji:'\u{1F3AE}', title:'小游戏 & 工具', sub:'云端酷跑 · 合成 · 守望者 · 番茄钟 · 密码 · 二维码', id:'tools',
+            body:'<div style="display:flex;gap:6px;flex-wrap:wrap;">'+
+              '<a href="./game.html" style="padding:8px 14px;background:rgba(255,255,255,0.7);border-radius:999px;text-decoration:none;font-size:11px;color:#475569;font-family:Space Mono,monospace;border:1px solid rgba(200,225,245,0.5);">☁ 云端酷跑</a>'+
+              '<a href="./cloudmerge.html" style="padding:8px 14px;background:rgba(255,255,255,0.7);border-radius:999px;text-decoration:none;font-size:11px;color:#475569;font-family:Space Mono,monospace;border:1px solid rgba(200,225,245,0.5);">\u{1F3AE} 云端合成</a>'+
+              '<a href="./survivor.html" style="padding:8px 14px;background:rgba(255,255,255,0.7);border-radius:999px;text-decoration:none;font-size:11px;color:#475569;font-family:Space Mono,monospace;border:1px solid rgba(200,225,245,0.5);">⚔ 云境守望者</a>'+
+              '<a href="./pomodoro.html" style="padding:8px 14px;background:rgba(255,255,255,0.7);border-radius:999px;text-decoration:none;font-size:11px;color:#475569;font-family:Space Mono,monospace;border:1px solid rgba(200,225,245,0.5);">\u{1F345} 番茄钟</a>'+
+              '<a href="./password.html" style="padding:8px 14px;background:rgba(255,255,255,0.7);border-radius:999px;text-decoration:none;font-size:11px;color:#475569;font-family:Space Mono,monospace;border:1px solid rgba(200,225,245,0.5);">\u{1F510} 密码</a>'+
+              '<a href="./qrcode.html" style="padding:8px 14px;background:rgba(255,255,255,0.7);border-radius:999px;text-decoration:none;font-size:11px;color:#475569;font-family:Space Mono,monospace;border:1px solid rgba(200,225,245,0.5);">\u{1F4F1} 二维码</a>'+
+            '</div>' }
+        ];
+
+        projects.forEach(function(p) {
+          var card = document.createElement('div');
+          card.style.cssText = 'background:rgba(255,255,255,0.7);border:1px solid rgba(200,225,245,0.5);border-radius:16px;margin-bottom:10px;overflow:hidden;';
+          card.innerHTML = 
+            '<div onclick="var b=this.nextElementSibling;var a=this.querySelector(\'span\');b.style.display=b.style.display===\'none\'?\'\':\'none\';a.textContent=b.style.display===\'none\'?\'▶\':\'▼\';" style="display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;font-family:Space Mono,monospace;user-select:none;">'+
+              '<span style="font-size:22px;">'+p.emoji+'</span>'+
+              '<div style="flex:1;"><div style="font-size:12px;font-weight:700;color:#1E293B;">'+p.title+'</div>'+
+              '<div style="font-size:10px;color:#94A3B8;">'+p.sub+'</div></div>'+
+              '<span style="color:#94A3B8;font-size:12px;">▶</span>'+
+            '</div>'+
+            '<div style="display:none;padding:0 18px 18px;">'+p.body+'</div>';
+          wrap.appendChild(card);
+        });
+
+        // 社交链接
+        var socialDiv = document.createElement('div');
+        socialDiv.style.cssText = 'display:flex;gap:8px;justify-content:center;margin-top:20px;';
+        socialDiv.innerHTML = '<a href="https://github.com/2924205056" target="_blank" style="padding:8px 18px;background:rgba(255,255,255,0.7);border-radius:999px;text-decoration:none;font-size:11px;color:#475569;font-family:Space Mono,monospace;border:1px solid rgba(200,225,245,0.5);">GitHub</a><a href="#" style="padding:8px 18px;background:rgba(255,255,255,0.7);border-radius:999px;text-decoration:none;font-size:11px;color:#475569;font-family:Space Mono,monospace;border:1px solid rgba(200,225,245,0.5);">Dribbble</a><a href="#" style="padding:8px 18px;background:rgba(255,255,255,0.7);border-radius:999px;text-decoration:none;font-size:11px;color:#475569;font-family:Space Mono,monospace;border:1px solid rgba(200,225,245,0.5);">Twitter</a>';
+        wrap.appendChild(socialDiv);
+
+        target.appendChild(wrap);
+      }
+
+      // === 算命铺全局函数 ===
+      window.toggleFortuneConfig = function() {
+        var el = document.getElementById('fortune-config');
+        if (el) el.style.display = el.style.display === 'none' ? '' : 'none';
+      };
+      window.onProviderChange = function() {
+        var sel = document.getElementById('fortune-provider');
+        var ep = document.getElementById('fortune-api-endpoint');
+        var md = document.getElementById('fortune-model');
+        if (sel.value !== 'custom') {
+          ep.value = sel.value;
+          ep.style.opacity = '0.6';
+        } else { ep.style.opacity = '1'; }
+        // 自动填模型名
+        var models = {'https://api.openai.com/v1':'gpt-4o-mini','https://api.deepseek.com/v1':'deepseek-chat','https://api.moonshot.cn/v1':'moonshot-v1-8k','https://dashscope.aliyuncs.com/compatible-mode/v1':'qwen-plus'};
+        if (models[sel.value]) md.value = models[sel.value];
+      };
+      window.saveFortuneConfig = async function() {
+        var key = document.getElementById('fortune-api-key').value.trim();
+        var endpoint = document.getElementById('fortune-api-endpoint').value.trim();
+        var model = document.getElementById('fortune-model').value.trim();
+        if (!key || !endpoint || !model) { alert('请填写 API Endpoint、Key 和模型名称'); return; }
+        // 使用 Web Crypto 加密存储
+        var encKey = await deriveKey('fortune-salt-2024');
+        var iv = crypto.getRandomValues(new Uint8Array(12));
+        var encoded = new TextEncoder().encode(key);
+        var encrypted = await crypto.subtle.encrypt({name:'AES-GCM',iv:iv}, encKey, encoded);
+        var combined = new Uint8Array(iv.length + new Uint8Array(encrypted).length);
+        combined.set(iv); combined.set(new Uint8Array(encrypted), iv.length);
+        var b64 = btoa(String.fromCharCode.apply(null, combined));
+        localStorage.setItem('fortune_config', JSON.stringify({k:b64, endpoint:endpoint, model:model}));
+        updateFortuneStatus(true);
+        alert('✅ API Key 已加密保存（仅存于本机浏览器）');
+      };
+
+      async function deriveKey(salt) {
+        var keyMaterial = await crypto.subtle.importKey('raw', new TextEncoder().encode('cloud-fortune-key-2024'), 'PBKDF2', false, ['deriveKey']);
+        return crypto.subtle.deriveKey({name:'PBKDF2', salt:new TextEncoder().encode(salt), iterations:100000, hash:'SHA-256'}, keyMaterial, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']);
+      }
+
+      async function decryptKey(encryptedB64) {
+        try {
+          var combined = new Uint8Array(atob(encryptedB64).split('').map(function(c){return c.charCodeAt(0)}));
+          var iv = combined.slice(0,12);
+          var data = combined.slice(12);
+          var encKey = await deriveKey('fortune-salt-2024');
+          var decrypted = await crypto.subtle.decrypt({name:'AES-GCM',iv:iv}, encKey, data);
+          return new TextDecoder().decode(decrypted);
+        } catch(e) { return null; }
+      }
+      window.updateFortuneStatus = function(configured) {
+        var s = document.getElementById('fortune-status');
+        if (s) {
+          s.textContent = configured ? '✅ 已配置' : '⚠ 未配置API';
+          s.style.background = configured ? 'rgba(74,222,128,0.1)' : 'rgba(245,158,11,0.1)';
+          s.style.color = configured ? '#16a34a' : '#F59E0B';
+        }
+      };
+      window.sendFortune = function() {
+        var input = document.getElementById('fortune-input');
+        var msg = input.value.trim();
+        if (!msg) return;
+        var msgs = document.getElementById('fortune-messages');
+        // 添加用户消息
+        var userDiv = document.createElement('div');
+        userDiv.style.cssText = 'text-align:right;margin-bottom:10px;';
+        userDiv.innerHTML = '<span style="display:inline-block;background:rgba(49,80,141,0.1);color:#31508d;padding:8px 14px;border-radius:14px 14px 4px 14px;max-width:80%;font-size:11px;">'+msg.replace(/</g,'&lt;')+'</span>';
+        msgs.appendChild(userDiv);
+        input.value = '';
+        
+        // 检查API配置
+        var cfgRaw = localStorage.getItem('fortune_config');
+        if (!cfgRaw) { /* handled below */ }
+        var sendWithKey = function(apiKey) {
+        if (!cfg) {
+          var errDiv = document.createElement('div');
+          errDiv.style.cssText = 'text-align:left;margin-bottom:10px;';
+          errDiv.innerHTML = '<span style="display:inline-block;background:rgba(245,158,11,0.1);color:#92400e;padding:8px 14px;border-radius:14px 14px 14px 4px;max-width:80%;font-size:11px;">\u{1F52E} 云朵大师说：先配置 Coze API 才能占卜哦～<br>点击右上角⚙设置按钮配置 API Key 和 Bot ID</span>';
+          msgs.appendChild(errDiv);
+          msgs.scrollTop = msgs.scrollHeight;
+          return;
+        }
+        
+        // 打字中...
+        var typingDiv = document.createElement('div');
+        typingDiv.id = 'fortune-typing';
+        typingDiv.style.cssText = 'text-align:left;margin-bottom:10px;';
+        typingDiv.innerHTML = '<span style="display:inline-block;background:#F0F4FF;color:#6a85b0;padding:8px 14px;border-radius:14px 14px 14px 4px;font-size:11px;">\u{1F52E} 云朵大师正在占卜中<span id="typing-dots">.</span></span>';
+        msgs.appendChild(typingDiv);
+        msgs.scrollTop = msgs.scrollHeight;
+        
+        // 打字动画
+        var dots = 0;
+        var typingTimer = setInterval(function() {
+          dots = (dots+1)%4;
+          var d = document.getElementById('typing-dots');
+          if (d) d.textContent = '.'.repeat(dots);
+        }, 400);
+        
+        // 调用API
+        try {
+          var config = JSON.parse(cfgRaw);
+          var apiKey = config.key;
+          if (config.k) {
+            decryptKey(config.k).then(function(dk) { apiKey = dk; doFetch(apiKey); });
+          } else {
+            doFetch(apiKey);
+          }
+          function doFetch(apikey) {
+          var systemPrompt = '你是小康算命铺的云朵大师，通晓星象、塔罗、八字与彩虹运势。用幽默温暖的口吻回答，每次回复以"☁️ 云朵大师说："开头，150字以内。';
+          fetch(config.endpoint + '/chat/completions', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json','Authorization':'Bearer '+apikey},
+            body: JSON.stringify({model:config.model,messages:[{role:'system',content:systemPrompt},{role:'user',content:msg}],temperature:0.9,max_tokens:500})
+          }).then(function(r){ return r.json(); }).then(function(data){
+            clearInterval(typingTimer);
+            var td = document.getElementById('fortune-typing'); if(td) td.remove();
+            var botDiv = document.createElement('div');
+            botDiv.style.cssText = 'text-align:left;margin-bottom:10px;';
+            var reply = (data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content) || data.error&&data.error.message || '\u{1F52E} 云朵大师说：今天的星象有点混乱，稍后再试试吧～';
+            botDiv.innerHTML = '<span style="display:inline-block;background:#F0F4FF;color:#475569;padding:8px 14px;border-radius:14px 14px 14px 4px;max-width:80%;font-size:11px;line-height:1.7;">'+reply.replace(/</g,'&lt;')+'</span>';
+            msgs.appendChild(botDiv);
+            msgs.scrollTop = msgs.scrollHeight;
+          }).catch(function(){
+            clearInterval(typingTimer);
+            var td = document.getElementById('fortune-typing'); if(td) td.remove();
+            var errDiv = document.createElement('div');
+            errDiv.style.cssText = 'text-align:left;margin-bottom:10px;';
+            errDiv.innerHTML = '<span style="display:inline-block;background:rgba(239,68,68,0.1);color:#dc2626;padding:8px 14px;border-radius:14px 14px 14px 4px;max-width:80%;font-size:11px;">\u{1F52E} 连接失败，检查 API 配置是否正确</span>';
+            msgs.appendChild(errDiv);
+            msgs.scrollTop = msgs.scrollHeight;
+          });
+          }
+        } catch(e) {
+          clearInterval(typingTimer);
+          var td = document.getElementById('fortune-typing'); if(td) td.remove();
+        }
+        msgs.scrollTop = msgs.scrollHeight;
+      };
+
+      setTimeout(injectFortuneAndTools, 3500);
+      setTimeout(injectFortuneAndTools, 7000);
+
+      
+      
+    })();
+  </script>
+
+  <!-- 以下为旧代码（已隐藏） -->
+  <div style="display:none;">
+  <!-- 旧滑板云：隐藏 -->
+  <div id="cloud-glider" style="display:none;">
+    <div class="cg-sky">
+
+      <!-- 背景云层 -->
+      <div class="cg-cloud-layer" style="z-index:5;">
+        <div class="cg-cloud-track" style="--speed:55s;">
+          <div class="cg-cloud-group" id="cg-bg1"></div>
+          <div class="cg-cloud-group" id="cg-bg2"></div>
+        </div>
+      </div>
+      <div class="cg-cloud-layer" style="z-index:10;">
+        <div class="cg-cloud-track" style="--speed:28s;">
+          <div class="cg-cloud-group" id="cg-mid1"></div>
+          <div class="cg-cloud-group" id="cg-mid2"></div>
+        </div>
+      </div>
+      <div class="cg-cloud-layer" style="z-index:15;">
+        <div class="cg-cloud-track" style="--speed:14s;">
+          <div class="cg-cloud-group" id="cg-fg1"></div>
+          <div class="cg-cloud-group" id="cg-fg2"></div>
+        </div>
+      </div>
+
+      <!-- 伴飞元素容器 -->
+      <div id="cg-companions" style="position:absolute;inset:0;z-index:20;pointer-events:none;overflow:hidden;"></div>
+
+      <!-- 滑板云角色 -->
+      <div class="cg-skater-wrap">
+        <div class="cg-skater-glow"></div>
+        <div class="cg-character">
+          <img class="cg-new-cloud" src="/images/cloud-glider-final-clean.png" alt="滑板云向前滑行">
+          <!-- 主角色 SVG（滑板云贴纸 v2） -->
+          <svg width="220" height="210" viewBox="0 0 220 210">
+            <defs>
+              <!-- 云体径向渐变（高光偏左上） -->
+              <radialGradient id="cg-body-grad" cx="35%" cy="30%" r="65%">
+                <stop offset="0%" stop-color="#E0F6FF"/>
+                <stop offset="35%" stop-color="#87CEEB"/>
+                <stop offset="75%" stop-color="#6BB8D9"/>
+                <stop offset="100%" stop-color="#5B9BD5"/>
+              </radialGradient>
+              <!-- 云体阴影 -->
+              <filter id="cg-body-shadow">
+                <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#3a7ca5" flood-opacity="0.25"/>
+              </filter>
+              <!-- 滑板彩虹渐变 -->
+              <linearGradient id="cg-board-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#FF6B6B"/>
+                <stop offset="17%" stop-color="#FFA500"/>
+                <stop offset="33%" stop-color="#FFD93D"/>
+                <stop offset="50%" stop-color="#6BCB77"/>
+                <stop offset="67%" stop-color="#4D96FF"/>
+                <stop offset="83%" stop-color="#9B59B6"/>
+                <stop offset="100%" stop-color="#FF6B9D"/>
+              </linearGradient>
+              <!-- 腮红渐变 -->
+              <radialGradient id="cg-blush-grad">
+                <stop offset="0%" stop-color="#FF69B4" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#FFB6C1" stop-opacity="0"/>
+              </radialGradient>
+              <!-- 嘴巴内部渐变 -->
+              <linearGradient id="cg-mouth-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#FF4757"/>
+                <stop offset="100%" stop-color="#DC143C"/>
+              </linearGradient>
+              <!-- 彩虹尾迹渐变 -->
+              <linearGradient id="cg-rainbow" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#FF6B9D" stop-opacity="0.9"/>
+                <stop offset="17%" stop-color="#FFA500" stop-opacity="0.85"/>
+                <stop offset="33%" stop-color="#FFD93D" stop-opacity="0.8"/>
+                <stop offset="50%" stop-color="#6BCB77" stop-opacity="0.75"/>
+                <stop offset="67%" stop-color="#4D96FF" stop-opacity="0.7"/>
+                <stop offset="83%" stop-color="#9B59B6" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#FF6B9D" stop-opacity="0.4"/>
+              </linearGradient>
+              <!-- 尾迹模糊 -->
+              <filter id="cg-trail-blur">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
+              </filter>
+            </defs>
+
+            <!-- 白色贴纸边框（统一轮廓） -->
+            <rect x="3" y="3" width="214" height="204" rx="22" ry="22" fill="transparent"/>
+
+            <!-- ===== 彩虹尾迹（在角色后面） ===== -->
+            <g opacity="0.9">
+              <!-- 尾迹光晕 -->
+              <path d="M-36,103 Q5,72 48,90 Q82,106 114,95" 
+                    fill="none" stroke="url(#cg-rainbow)" stroke-width="28" stroke-linecap="round" opacity="0.42" filter="url(#cg-trail-blur)"/>
+              <!-- 尾迹主体 -->
+              <path d="M-32,102 Q7,72 50,90 Q84,106 114,96" 
+                    fill="none" stroke="url(#cg-rainbow)" stroke-width="16" stroke-linecap="round" opacity="0.86"/>
+              <!-- 尾迹高光 -->
+              <path d="M-22,98 Q18,76 55,91 Q85,105 108,96" 
+                    fill="none" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.25"/>
+              <!-- 尾迹星星 -->
+              <g class="cg-trail-sparkle" style="animation-delay:0s;">
+                <path d="M22,78 L24,84 L30,86 L24,88 L22,94 L20,88 L14,86 L20,84Z" fill="#FFD93D"/>
+              </g>
+              <g class="cg-trail-sparkle" style="animation-delay:0.5s;">
+                <path d="M48,74 L49.5,78 L54,79.5 L49.5,81 L48,85 L46.5,81 L42,79.5 L46.5,78Z" fill="white"/>
+              </g>
+              <g class="cg-trail-sparkle" style="animation-delay:1.1s;">
+                <path d="M75,88 L76.5,92 L81,93.5 L76.5,95 L75,99 L73.5,95 L69,93.5 L73.5,92Z" fill="#FF6B9D"/>
+              </g>
+              <g class="cg-trail-sparkle" style="animation-delay:0.3s;">
+                <path d="M35,96 L36,99 L39,100 L36,101 L35,104 L34,101 L31,100 L34,99Z" fill="#4D96FF"/>
+              </g>
+              <g class="cg-trail-sparkle" style="animation-delay:0.8s;">
+                <path d="M60,100 L61,103 L64,104 L61,105 L60,108 L59,105 L56,104 L59,103Z" fill="#6BCB77"/>
+              </g>
+            </g>
+
+            <!-- ===== 轮子运动线 ===== -->
+            <g stroke="#555" stroke-width="1.2" stroke-linecap="round" opacity="0.45">
+              <line x1="68" y1="178" x2="60" y2="184"/>
+              <line x1="70" y1="181" x2="62" y2="187"/>
+              <line x1="72" y1="184" x2="64" y2="190"/>
+              <line x1="155" y1="178" x2="163" y2="184"/>
+              <line x1="153" y1="181" x2="161" y2="187"/>
+              <line x1="151" y1="184" x2="159" y2="190"/>
+            </g>
+
+            <!-- ===== 滑板 ===== -->
+            <g transform="translate(48, 162)">
+              <!-- 板面阴影 -->
+              <path d="M2,10 Q7,2 18,4 L82,4 Q93,2 98,10 Q93,18 82,16 L18,16 Q7,18 2,10 Z" 
+                    fill="rgba(0,0,0,0.1)" transform="translate(0,3)"/>
+              <!-- 板面主体 -->
+              <path d="M0,8 Q5,0 16,2 L80,2 Q91,0 96,8 Q91,16 80,14 L16,14 Q5,16 0,8 Z" 
+                    fill="url(#cg-board-grad)" stroke="#2C3E50" stroke-width="1.8"/>
+              <!-- 板面涂鸦图案 -->
+              <path d="M20,5 Q25,10 30,5 Q35,10 40,5 Q45,10 50,5" fill="none" stroke="rgba(0,0,0,0.18)" stroke-width="1.5"/>
+              <path d="M55,5 Q60,10 65,5 Q70,10 75,5" fill="none" stroke="rgba(0,0,0,0.18)" stroke-width="1.5"/>
+              <!-- 涂鸦飞溅点 -->
+              <circle cx="25" cy="10" r="1.2" fill="rgba(0,0,0,0.12)"/>
+              <circle cx="42" cy="11" r="0.8" fill="rgba(0,0,0,0.12)"/>
+              <circle cx="58" cy="9" r="1" fill="rgba(0,0,0,0.12)"/>
+              <circle cx="72" cy="10" r="0.7" fill="rgba(0,0,0,0.12)"/>
+              <!-- 板面高光 -->
+              <path d="M12,4 L78,4" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
+              <!-- 轮子 -->
+              <circle cx="22" cy="20" r="7" fill="#F5F5DC" stroke="#555" stroke-width="1.5"/>
+              <circle cx="22" cy="20" r="2.5" fill="#999"/>
+              <circle cx="74" cy="20" r="7" fill="#F5F5DC" stroke="#555" stroke-width="1.5"/>
+              <circle cx="74" cy="20" r="2.5" fill="#999"/>
+            </g>
+
+            <!-- ===== 腿 ===== -->
+            <g stroke="#1A1A1A" stroke-width="4" stroke-linecap="round">
+              <line x1="88" y1="130" x2="80" y2="158"/>
+              <line x1="132" y1="130" x2="140" y2="158"/>
+            </g>
+            <!-- 鞋子 -->
+            <g>
+              <rect x="68" y="155" width="22" height="10" rx="5" fill="#1A1A1A"/>
+              <rect x="70" y="162" width="18" height="3.5" rx="1.8" fill="white" opacity="0.55"/>
+              <rect x="130" y="155" width="22" height="10" rx="5" fill="#1A1A1A"/>
+              <rect x="132" y="162" width="18" height="3.5" rx="1.8" fill="white" opacity="0.55"/>
+            </g>
+
+            <!-- ===== 云体 ===== -->
+            <g filter="url(#cg-body-shadow)">
+              <!-- 五瓣云体 -->
+              <path d="M45,118 
+                       Q20,118 20,92 
+                       Q20,68 45,68 
+                       Q45,38 78,38 
+                       Q105,38 115,55 
+                       Q140,28 170,52 
+                       Q198,65 195,92 
+                       Q198,118 170,118
+                       Q170,138 142,132
+                       Q118,145 95,132
+                       Q70,145 45,118 Z" 
+                    fill="url(#cg-body-grad)"
+                    stroke="#2C3E50" stroke-width="2"/>
+              <!-- 云体高光弧线 -->
+              <path d="M55,68 Q62,48 82,45 Q98,42 108,55" 
+                    fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="3.5" stroke-linecap="round"/>
+              <path d="M125,48 Q142,32 165,50" 
+                    fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="3" stroke-linecap="round"/>
+              <path d="M38,95 Q35,85 42,78" 
+                    fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round"/>
+            </g>
+
+            <!-- ===== 脸部 ===== -->
+            <!-- 眼睛 -->
+            <g class="cg-eye-pair">
+              <!-- 左眼 -->
+              <circle cx="82" cy="85" r="18" fill="white" stroke="#2C3E50" stroke-width="1.5"/>
+              <circle cx="84" cy="87" r="12" fill="#1A1A1A"/>
+              <ellipse cx="88" cy="82" rx="4" ry="3.5" fill="white"/>
+              <circle cx="80" cy="90" r="2" fill="white" opacity="0.55"/>
+              <!-- 右眼 -->
+              <circle cx="138" cy="85" r="18" fill="white" stroke="#2C3E50" stroke-width="1.5"/>
+              <circle cx="140" cy="87" r="12" fill="#1A1A1A"/>
+              <ellipse cx="144" cy="82" rx="4" ry="3.5" fill="white"/>
+              <circle cx="136" cy="90" r="2" fill="white" opacity="0.55"/>
+            </g>
+
+            <!-- 腮红 -->
+            <ellipse cx="60" cy="102" rx="12" ry="7" fill="url(#cg-blush-grad)"/>
+            <ellipse cx="160" cy="102" rx="12" ry="7" fill="url(#cg-blush-grad)"/>
+
+            <!-- 嘴巴（D型开心笑） -->
+            <path d="M98,108 Q110,122 122,108" fill="url(#cg-mouth-grad)" stroke="#2C3E50" stroke-width="2" stroke-linejoin="round"/>
+            <!-- 舌头高光 -->
+            <ellipse cx="110" cy="115" rx="4" ry="2" fill="white" opacity="0.4"/>
+          </svg>
+
+          <!-- 风线 -->
+          <div class="cg-wind-lines">
+            <div class="cg-wind-line" style="width:130px;top:0;animation-delay:0s;"></div>
+            <div class="cg-wind-line" style="width:92px;top:22px;animation-delay:0.45s;"></div>
+            <div class="cg-wind-line" style="width:150px;top:46px;animation-delay:0.9s;"></div>
+            <div class="cg-wind-line" style="width:76px;top:70px;animation-delay:1.25s;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 地面 -->
+      <div class="cg-ground-blur"></div>
+      <div class="cg-ground-wave"></div>
+
+      <!-- 装饰风线 -->
+      <div class="cg-deco-wind" id="cg-deco-wind"></div>
+
+      <!-- 标题 -->
+      <div class="cg-title">
+        <h1>Cloud Glider</h1>
+        <p>Infinite sky adventure</p>
+      </div>
+    </div>
+  </div>
+  </div><!-- 旧代码 END -->
+
+  <!-- Hero 区域 -->
+  <script>
+  (function() {
+    /* 生成云朵 SVG */
+    function cloudSVG(size) {
+      const s = document.createElementNS('http://www.w3.org/2000/svg','svg');
+      s.setAttribute('width', size);
+      s.setAttribute('height', size * 0.55);
+      s.setAttribute('viewBox','0 0 120 66');
+      s.innerHTML = '<path d="M25,50 Q5,50 5,36 Q5,22 25,22 Q25,6 50,6 Q75,6 75,22 Q100,6 115,22 Q130,36 115,50 Q115,62 90,62 Q65,62 58,50 Q40,62 25,50Z" fill="white"/>';
+      return s;
+    }
+
+    /* 填充云层 */
+    function fillClouds(id, n, opacity, sMin, sMax) {
+      const c = document.getElementById(id);
+      if (!c) return;
+      for (let i = 0; i < n; i++) {
+        const w = document.createElement('div');
+        w.className = 'cg-cloud-item';
+        const sc = sMin + Math.random()*(sMax-sMin);
+        const sz = 90 + Math.random()*70;
+        w.style.cssText = '--opacity:'+opacity+';--scale:'+sc+';';
+        w.appendChild(cloudSVG(sz));
+        c.appendChild(w);
+      }
+    }
+    fillClouds('cg-bg1',4,0.25,0.7,1.2);
+    fillClouds('cg-bg2',4,0.25,0.7,1.2);
+    fillClouds('cg-mid1',5,0.45,0.8,1.3);
+    fillClouds('cg-mid2',5,0.45,0.8,1.3);
+    fillClouds('cg-fg1',4,0.7,0.8,1.2);
+    fillClouds('cg-fg2',4,0.7,0.8,1.2);
+
+    const glider = document.getElementById('cloud-glider');
+    function mountHeroFloatLayer(section) {
+      if (!section || section.querySelector('.hero-float-layer')) return;
+      section.classList.add('cloud-hero-section');
+
+      const layer = document.createElement('div');
+      layer.className = 'hero-float-layer';
+      layer.innerHTML = `
+        <span class="hero-float-cloud" style="--top:3%;--left:-18%;--w:230px;--dur:34s;--delay:-18s;--scale:1;--opacity:.62;--rise:-10px;"></span>
+        <span class="hero-float-cloud" style="--top:9%;--left:20%;--w:165px;--dur:42s;--delay:-8s;--scale:.86;--opacity:.46;--rise:-24px;"></span>
+        <span class="hero-float-cloud" style="--top:17%;--left:-8%;--w:120px;--dur:29s;--delay:-4s;--scale:.72;--opacity:.38;--rise:-16px;"></span>
+        <span class="hero-float-cloud" style="--top:6%;--left:58%;--w:205px;--dur:38s;--delay:-25s;--scale:.94;--opacity:.48;--rise:-20px;"></span>
+        <span class="hero-float-heart" style="--top:26%;--left:70%;--size:24px;--dur:4.8s;--delay:-1s;--scale:1;"></span>
+        <span class="hero-float-heart" style="--top:14%;--left:84%;--size:15px;--dur:5.6s;--delay:-3s;--scale:.78;"></span>
+        <span class="hero-float-heart" style="--top:43%;--left:57%;--size:13px;--dur:4.2s;--delay:-2s;--scale:.68;"></span>
+      `;
+      section.insertBefore(layer, section.firstChild);
+    }
+
+    function mountHomeGlider() {
+      const heroImage = document.querySelector('img[alt="小康云滑板形象"]');
+      if (!heroImage || !heroImage.parentElement) return;
+
+      heroImage.style.display = 'none';
+      var heroParent = heroImage.parentElement;
+      heroParent.classList.add('cg-hero-host');
+      // 调整为顶部对齐布局，最大化可视区域
+      heroParent.style.display = 'flex';
+      heroParent.style.alignItems = 'flex-start';
+      heroParent.style.justifyContent = 'center';
+      heroParent.style.paddingRight = '0';
+      heroParent.style.paddingTop = '0';
+      heroParent.style.position = 'relative';
+
+      // 注入云朵家族到 Hero 右侧栏
+      if (!document.getElementById('cloud-family-hero-wrap')) {
+        var wrap = document.createElement('div');
+        wrap.id = 'cloud-family-hero-wrap';
+
+        var grid = document.createElement('div');
+        grid.className = 'cf-grid';
+
+        var chars = [
+          { name: '云奔奔', tag: '🏃 冒险家', accent: '#FF8C42', img: '/images/cloud-char-1.png' },
+          { name: '云卷卷', tag: '📚 学霸', accent: '#6BCB77', img: '/images/cloud-char-0.png' },
+          { name: '云乐乐', tag: '🎵 开心果', accent: '#FF6B9D', img: '/images/cloud-char-2.png' },
+          { name: '云小白', tag: '🎮 游戏迷', accent: '#4D96FF', img: '/images/cloud-char-3.png' }
+        ];
+        chars.forEach(function(ch) {
+          var card = document.createElement('div');
+          card.className = 'cf-card';
+          card.innerHTML =
+            '<img src="' + ch.img + '" alt="' + ch.name + '" loading="eager" draggable="false">' +
+            '<div class="cf-label" style="--card-accent:' + ch.accent + ';">' +
+              '<div class="cf-label-name">' + ch.name + '</div>' +
+              '<span class="cf-label-tag">' + ch.tag + '</span>' +
+            '</div>';
+          grid.appendChild(card);
+        });
+        wrap.appendChild(grid);
+        heroParent.appendChild(wrap);
+      }
+
+      if (glider) {
+        glider.classList.add('cg-home-glider');
+        glider.style.marginTop = '-100px';
+      }
+
+      var heroSection = heroImage.closest('section');
+      if (heroSection) {
+        heroSection.style.border = '2px solid rgba(255,255,255,0.7)';
+        heroSection.style.borderRadius = '24px';
+        heroSection.style.overflow = 'hidden';
+        heroSection.style.isolation = 'isolate';
+        // 把粒子容器移进hero section
+        var particles = document.getElementById('magicalParticles');
+        if (particles && !heroSection.contains(particles)) {
+          heroSection.style.position = 'relative';
+          heroSection.appendChild(particles);
+        }
+        // 停掉React hero内部所有动画(除了我们的粒子和云朵家族Lottie动画)
+        heroSection.querySelectorAll('*').forEach(function(el) {
+          if (el.id === 'magicalParticles' || el.id === 'cloud-family-hero-wrap' || el.id === 'lottie-cloud-grid') return;
+          if (el.closest && (el.closest('#magicalParticles') || el.closest('#cloud-family-hero-wrap') || el.closest('#lottie-cloud-grid'))) return;
+          var s = getComputedStyle(el);
+          if (s.animationName && s.animationName !== 'none') {
+            el.style.animation = 'none';
+          }
+        });
+      }
+
+      if (glider && !heroParent.contains(glider)) {
+        heroParent.appendChild(glider);
+      }
+
+      // 放大左侧头像 (h-16→h-24, 64px→96px)
+      var avatarImg = document.querySelector('img[alt="小康云"]');
+      if (avatarImg) {
+        avatarImg.style.width = '96px';
+        avatarImg.style.height = '96px';
+        avatarImg.classList.remove('h-16', 'w-16');
+        avatarImg.classList.add('h-24', 'w-24');
+        var avatarParent = avatarImg.parentElement;
+        if (avatarParent) {
+          avatarParent.style.width = '112px';
+          avatarParent.style.height = '112px';
+          avatarParent.classList.remove('h-18', 'w-18');
+        }
+      }
+
+      // 优化 Footer 图标 (替换蓝色占位图为云朵角色，并适当放大)
+      var footerImg = document.querySelector('footer img[alt=""]');
+      if (footerImg && footerImg.src.indexOf('cloud-skater') !== -1) {
+        footerImg.style.width = '52px';
+        footerImg.style.height = '52px';
+        footerImg.classList.remove('h-10', 'w-10');
+        footerImg.classList.add('h-14', 'w-14');
+      }
+    }
+
+    let mountAttempts = 0;
+    const mountTimer = setInterval(() => {
+      mountHomeGlider();
+      mountAttempts += 1;
+      if (mountAttempts > 24) clearInterval(mountTimer);
+    }, 120);
+
+    const root = document.getElementById('root');
+    if (root) {
+      new MutationObserver(mountHomeGlider).observe(root, { childList: true, subtree: true });
+    }
+    window.addEventListener('load', mountHomeGlider);
+
+    /* 伴飞元素 */
+    const types = [
+      { svg: s=>`<svg width="${s}" height="${s}" viewBox="0 0 48 48"><circle cx="24" cy="24" r="11" fill="#facc15" stroke="#f59e0b" stroke-width="2"/><g stroke="#facc15" stroke-width="2.5" stroke-linecap="round">${[0,45,90,135,180,225,270,315].map(a=>`<line x1="24" y1="5" x2="24" y2="10" transform="rotate(${a} 24 24)"/>`).join('')}</g></svg>` },
+      { svg: s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32"><path d="M16 0L20 12L32 16L20 20L16 32L12 20L0 16L12 12Z" fill="#fde047" stroke="#eab308" stroke-width="1"/></svg>` },
+      { svg: s=>`<svg width="${s}" height="${s*0.6}" viewBox="0 0 36 22"><path d="M2,16 Q10,4 18,12 Q26,4 34,16" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round"/></svg>` },
+      { svg: s=>`<svg width="${s}" height="${s*0.85}" viewBox="0 0 24 20"><path d="M12 18L3 10C0 7 0 3 3 1.5C6 0 9 2 12 5C15 2 18 0 21 1.5C24 3 24 7 21 10Z" fill="#f472b6" stroke="#ec4899" stroke-width="1"/></svg>` },
+      { svg: s=>`<svg width="${s}" height="${s}" viewBox="0 0 20 20"><path d="M10 0L12 8L20 10L12 12L10 20L8 12L0 10L8 8Z" fill="white" opacity="0.9"/></svg>` },
+    ];
+    const box = document.getElementById('cg-companions');
+    let cnt = 0;
+    function spawn() {
+      if (cnt >= 10) return;
+      const t = types[Math.floor(Math.random()*types.length)];
+      const el = document.createElement('div');
+      el.className = 'cg-companion';
+      const y = 8+Math.random()*42, dur = 5+Math.random()*5, sc = 0.7+Math.random()*0.6;
+      const sz = [20,32,36,24,18][types.indexOf(t)] * sc;
+      el.style.cssText = 'top:'+y+'%;--dur:'+dur+'s;transform:scale('+sc+');';
+      el.innerHTML = t.svg(sz);
+      box.appendChild(el);
+      cnt++;
+      setTimeout(()=>{ el.remove(); cnt--; }, dur*1000);
+    }
+    setInterval(spawn, 2200);
+    setTimeout(spawn, 400);
+    setTimeout(spawn, 900);
+
+    /* 增强版梦幻粒子系统 */
+    const particlesContainer = document.getElementById('magicalParticles');
+    const heartColors = ['#f8c4d0', '#fcd5dd', '#fde0e5', '#f9b8c8', '#fce4ec', '#f5d0da'];
+    const starColors = ['#ffffff', '#f0f7ff', '#e8f2ff', '#fff', '#dceeff', '#f5f0ff'];
+    const petalColors = ['#fde4ea', '#fce8ef', '#fdf0f4', '#fff0f3'];
+
+    let activeParticles = {
+      hearts: 0,
+      stars: 0,
+      bubbles: 0,
+      petals: 0,
+      glows: 0,
+      cloudpuffs: 0,
+      specks: 0
+    };
+
+    const maxParticles = {
+      hearts: 5,
+      stars: 18,
+      bubbles: 8,
+      petals: 3,
+      glows: 4,
+      cloudpuffs: 6,
+      specks: 15
+    };
+
+    function createHeart() {
+      if (activeParticles.hearts >= maxParticles.hearts) return;
+      
+      const heart = document.createElement('div');
+      heart.className = 'magic-heart';
+      
+      const size = 12 + Math.random() * 18;
+      const left = 5 + Math.random() * 90;
+      const duration = 12 + Math.random() * 10;
+      const delay = Math.random() * 8;
+      const color = heartColors[Math.floor(Math.random() * heartColors.length)];
+      
+      heart.style.cssText = `
+        left: ${left}%;
+        width: ${size}px;
+        height: ${size}px;
+        animation-duration: ${duration}s;
+        animation-delay: ${delay}s;
+        color: ${color};
+      `;
+      
+      heart.innerHTML = `<svg viewBox="0 0 24 24" width="100%" height="100%">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="${color}"/>
+      </svg>`;
+      
+      particlesContainer.appendChild(heart);
+      activeParticles.hearts++;
+      
+      setTimeout(() => {
+        if (heart.parentNode) {
+          heart.remove();
+          activeParticles.hearts--;
+        }
+      }, (duration + delay) * 1000);
+    }
+
+    function createStar() {
+      if (activeParticles.stars >= maxParticles.stars) return;
+
+      const star = document.createElement('div');
+      star.className = 'magic-star';
+
+      const size = 6 + Math.random() * 14;
+      const left = Math.random() * 100;
+      // Spread stars across the full page: some near bottom, some in middle, some up high
+      const zone = Math.random();
+      let bottom;
+      if (zone < 0.35) {
+        bottom = -30 + Math.random() * 40; // bottom area
+      } else if (zone < 0.7) {
+        bottom = 40 + Math.random() * 50; // middle
+      } else {
+        bottom = 60 + Math.random() * 35; // upper area
+      }
+      const duration = 4 + Math.random() * 5;
+      const delay = Math.random() * 8;
+      const color = starColors[Math.floor(Math.random() * starColors.length)];
+
+      star.style.cssText = `
+        left: ${left}%;
+        bottom: ${bottom}%;
+        width: ${size}px;
+        height: ${size}px;
+        animation-duration: ${duration}s, ${3 + Math.random() * 3}s;
+        animation-delay: ${delay}s, ${delay}s;
+      `;
+
+      star.innerHTML = `<svg viewBox="0 0 24 24" width="100%" height="100%">
+        <path d="M12 2L14 9L22 12L14 15L12 22L10 15L2 12L10 9Z" fill="${color}"/>
+      </svg>`;
+
+      particlesContainer.appendChild(star);
+      activeParticles.stars++;
+
+      setTimeout(() => {
+        if (star.parentNode) {
+          star.remove();
+          activeParticles.stars--;
+        }
+      }, (duration + delay) * 1000);
+    }
+
+    function createBubble() {
+      if (activeParticles.bubbles >= maxParticles.bubbles) return;
+
+      const bubble = document.createElement('div');
+      bubble.className = 'magic-bubble';
+
+      const size = 18 + Math.random() * 35;
+      const left = Math.random() * 100;
+      // Spread bubbles from various vertical positions
+      const zone = Math.random();
+      let bottomVal;
+      if (zone < 0.4) {
+        bottomVal = -80 + Math.random() * 40; // from below
+      } else if (zone < 0.75) {
+        bottomVal = 30 + Math.random() * 50; // middle
+      } else {
+        bottomVal = 55 + Math.random() * 40; // upper
+      }
+      const duration = 15 + Math.random() * 15;
+      const delay = Math.random() * 12;
+
+      bubble.style.cssText = `
+        left: ${left}%;
+        bottom: ${bottomVal}%;
+        width: ${size}px;
+        height: ${size}px;
+        animation-duration: ${duration}s;
+        animation-delay: ${delay}s;
+      `;
+
+      particlesContainer.appendChild(bubble);
+      activeParticles.bubbles++;
+
+      setTimeout(() => {
+        if (bubble.parentNode) {
+          bubble.remove();
+          activeParticles.bubbles--;
+        }
+      }, (duration + delay) * 1000);
+    }
+
+    function createPetal() {
+      if (activeParticles.petals >= maxParticles.petals) return;
+      
+      const petal = document.createElement('div');
+      petal.className = 'magic-petal';
+      
+      const size = 8 + Math.random() * 12;
+      const left = Math.random() * 100;
+      const duration = 10 + Math.random() * 10;
+      const delay = Math.random() * 8;
+      const color = petalColors[Math.floor(Math.random() * petalColors.length)];
+      
+      petal.style.cssText = `
+        left: ${left}%;
+        width: ${size}px;
+        height: ${size * 0.7}px;
+        animation-duration: ${duration}s;
+        animation-delay: ${delay}s;
+        background: ${color};
+        border-radius: 50% 0 50% 0;
+        opacity: 0.6;
+      `;
+      
+      particlesContainer.appendChild(petal);
+      activeParticles.petals++;
+      
+      setTimeout(() => {
+        if (petal.parentNode) {
+          petal.remove();
+          activeParticles.petals--;
+        }
+      }, (duration + delay) * 1000);
+    }
+
+    function createGlow() {
+      if (activeParticles.glows >= maxParticles.glows) return;
+      
+      const glow = document.createElement('div');
+      glow.className = 'magic-glow';
+      
+      const size = 100 + Math.random() * 200;
+      const left = Math.random() * 80;
+      const duration = 20 + Math.random() * 20;
+      const delay = Math.random() * 15;
+      
+      glow.style.cssText = `
+        left: ${left}%;
+        bottom: -${size/2}px;
+        width: ${size}px;
+        height: ${size}px;
+        animation-duration: ${duration}s;
+        animation-delay: ${delay}s;
+      `;
+      
+      particlesContainer.appendChild(glow);
+      activeParticles.glows++;
+      
+      setTimeout(() => {
+        if (glow.parentNode) {
+          glow.remove();
+          activeParticles.glows--;
+        }
+      }, (duration + delay) * 1000);
+    }
+
+    function createCloudPuff() {
+      if (activeParticles.cloudpuffs >= maxParticles.cloudpuffs) return;
+
+      const puff = document.createElement('div');
+      puff.className = 'magic-cloudpuff';
+
+      const size = 30 + Math.random() * 80;
+      // Spawn from various positions across the full page
+      const startSide = Math.random();
+      let top, left;
+      if (startSide < 0.3) {
+        // from top area
+        top = -size + Math.random() * 25 + '%';
+        left = Math.random() * 100 + '%';
+      } else if (startSide < 0.6) {
+        // from left/right sides, middle area
+        top = 10 + Math.random() * 70 + '%';
+        left = Math.random() < 0.5 ? -size + 'px' : 'calc(100% + ' + size + 'px)';
+      } else {
+        // from bottom area
+        top = 70 + Math.random() * 30 + '%';
+        left = Math.random() * 100 + '%';
+      }
+
+      const driftX = (Math.random() - 0.5) * 200;
+      const driftY = -(40 + Math.random() * 160);
+      const duration = 16 + Math.random() * 20;
+      const delay = Math.random() * 12;
+
+      puff.style.cssText = `
+        top: ${typeof top === 'string' ? top : top + '%'};
+        left: ${typeof left === 'string' ? left : left + '%'};
+        width: ${size}px;
+        height: ${size * 0.55}px;
+        --drift-x: ${driftX}px;
+        --drift-y: ${driftY}px;
+        --dur: ${duration}s;
+        animation-delay: ${delay}s;
+      `;
+
+      particlesContainer.appendChild(puff);
+      activeParticles.cloudpuffs++;
+
+      setTimeout(() => {
+        if (puff.parentNode) {
+          puff.remove();
+          activeParticles.cloudpuffs--;
+        }
+      }, (duration + delay) * 1000);
+    }
+
+    function createSpeck() {
+      if (activeParticles.specks >= maxParticles.specks) return;
+
+      const speck = document.createElement('div');
+      speck.className = 'magic-speck';
+
+      const size = 2 + Math.random() * 5;
+      // Spread across the full page, including middle and upper areas
+      const top = Math.random() * 95;
+      const left = Math.random() * 95;
+      const duration = 6 + Math.random() * 10;
+      const delay = Math.random() * 6;
+      const sx1 = (Math.random() - 0.5) * 30;
+      const sx2 = (Math.random() - 0.5) * 20;
+      const sy1 = -(Math.random() * 25);
+      const sy2 = -(Math.random() * 35);
+
+      speck.style.cssText = `
+        top: ${top}%;
+        left: ${left}%;
+        width: ${size}px;
+        height: ${size}px;
+        --sx1: ${sx1}px;
+        --sx2: ${sx2}px;
+        --sy1: ${sy1}px;
+        --sy2: ${sy2}px;
+        --dur: ${duration}s;
+        --delay: ${delay}s;
+      `;
+
+      particlesContainer.appendChild(speck);
+      activeParticles.specks++;
+
+      setTimeout(() => {
+        if (speck.parentNode) {
+          speck.remove();
+          activeParticles.specks--;
+        }
+      }, (duration + delay) * 1000 * 2);
+    }
+
+    for (let i = 0; i < 3; i++) setTimeout(createHeart, i * 3000);
+    for (let i = 0; i < 10; i++) setTimeout(createStar, i * 1200);
+    for (let i = 0; i < 4; i++) setTimeout(createBubble, i * 2500);
+    for (let i = 0; i < 2; i++) setTimeout(createPetal, i * 5000);
+    for (let i = 0; i < 4; i++) setTimeout(createCloudPuff, i * 2000);
+    for (let i = 0; i < 8; i++) setTimeout(createSpeck, i * 800);
+    createGlow();
+
+    setInterval(createHeart, 6000);
+    setInterval(createStar, 1800);
+    setInterval(createBubble, 4500);
+    setInterval(createPetal, 10000);
+    setInterval(createGlow, 15000);
+    setInterval(createCloudPuff, 3500);
+    setInterval(createSpeck, 2500);
+
+    /* 移除左下角/右下角浮动组件 */
+    (function removeCornerWidgets() {
+      function sweep() {
+        var all = document.querySelectorAll('*');
+        var removed = [];
+        for (var i = 0; i < all.length; i++) {
+          var el = all[i];
+          if (removed.indexOf(el) !== -1) continue;
+          // 跳过我们的关键元素
+          if (el.id === 'root' || !el.parentNode) continue;
+          if (el.closest && (el.closest('#magicalParticles') ||
+              el.closest('#cloud-glider'))) continue;
+          if (el.closest && el.closest('.about-glass-surface')) continue;
+          // 保护 cloud-family-hero-wrap (云朵家族Lottie动画)
+          if (el.id === 'glider-wrapper' || el.closest('#glider-wrapper')) continue; // glider已移至日常页，保留防止报错
+          if (el.id === 'cloud-family-hero-wrap' || (el.closest && el.closest('#cloud-family-hero-wrap'))) continue;
+
+          var style = window.getComputedStyle(el);
+          var bg = style.backgroundColor;
+          var pos = style.position;
+
+          // 检测绿色背景（GSAP ScrollTrigger 标记 - 覆盖各种绿色值）
+          if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+            var m = bg.match(/rgb[a]?\((\d+),\s*(\d+),\s*(\d+)/);
+            if (m) {
+              var r = parseInt(m[1]), g = parseInt(m[2]), b = parseInt(m[3]);
+              // 绿色分量明显高于红蓝
+              if (g > 100 && g > r * 2 && g > b * 1.5) {
+                removed.push(el); el.remove(); continue;
+              }
+            }
+          }
+
+          // 检测角标浮动元素
+          if (pos === 'fixed' || pos === 'absolute') {
+            var bottom = parseFloat(style.bottom);
+            var right = parseFloat(style.right);
+            var left = parseFloat(style.left);
+            if (!isNaN(bottom) && bottom < 150 && !isNaN(right) && right < 150) {
+              removed.push(el); el.remove(); continue;
+            }
+            if (!isNaN(bottom) && bottom < 150 && !isNaN(left) && left < 150) {
+              removed.push(el); el.remove(); continue;
+            }
+          }
+        }
+      }
+      setTimeout(sweep, 500);
+      setTimeout(sweep, 1500);
+      setTimeout(sweep, 3000);
+      setTimeout(sweep, 5000);
+      setTimeout(sweep, 8000);
+      setTimeout(sweep, 12000);
+      // 持续观察DOM变化
+      var obs = new MutationObserver(function() { setTimeout(sweep, 200); });
+      obs.observe(document.body, { childList: true, subtree: true });
+      setTimeout(function() { obs.disconnect(); }, 20000);
+    })();
+
+    /* 装饰风线 */
+    const dw = document.getElementById('cg-deco-wind');
+    for (let i = 0; i < 5; i++) {
+      const l = document.createElement('div');
+      l.className = 'cg-deco-line';
+      l.style.cssText = 'top:'+(18+i*14)+'%;width:'+(80+Math.random()*180)+'px;left:-200px;--dur:'+(2+Math.random()*2)+'s;--delay:'+(i*0.5)+'s;';
+      dw.appendChild(l);
+    }
+  })();
+  </script>
+
+  <!-- GSAP + Hero 动画（统一在底部加载） -->
+
+  <!-- ===== 可视化编辑器 ===== -->
+  <script type="text/plain" disabled>
+  (function() {
+    var EDIT_KEY = 'site_editor_data';
+    var editing = false;
+    var data = {};
+    try { data = JSON.parse(localStorage.getItem(EDIT_KEY)) || {}; } catch(e) { data = {}; }
+
+    // ===== 创建 UI 元素（动态append到body，确保在最上层） =====
+    var styleEl = document.createElement('style');
+    styleEl.id = 'editor-styles';
+    document.head.appendChild(styleEl);
+
+    var toolbar = document.createElement('div');
+    toolbar.id = 'editor-toolbar';
+    toolbar.innerHTML = '<span style="color:#fff;font-size:12px;font-weight:700;">✏️ 编辑模式</span>' +
+      '<button id="editor-save" style="background:#4ADE80;color:#000;border:none;padding:6px 14px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;font-family:Space Mono,monospace;">💾 保存</button>' +
+      '<button id="editor-export" style="background:#FACC15;color:#000;border:none;padding:6px 14px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;font-family:Space Mono,monospace;">📥 导出</button>' +
+      '<button id="editor-exit" style="background:rgba(255,255,255,0.2);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:6px 14px;border-radius:999px;font-size:11px;cursor:pointer;font-family:Space Mono,monospace;">✕ 退出</button>';
+    toolbar.style.cssText = 'display:none;position:fixed;top:0;left:0;right:0;z-index:2147483647;background:rgba(49,80,141,0.95);backdrop-filter:blur(10px);padding:10px 16px;align-items:center;gap:10px;';
+
+    var toggleBtn = document.createElement('button');
+    toggleBtn.id = 'editor-toggle';
+    toggleBtn.textContent = '✏️';
+    toggleBtn.title = '编辑页面';
+    toggleBtn.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:2147483646;width:48px;height:48px;border-radius:50%;background:#31508d;color:#fff;border:2px solid rgba(255,255,255,0.3);font-size:22px;cursor:pointer;box-shadow:0 4px 20px rgba(49,80,141,0.5);';
+
+    document.body.appendChild(toolbar);
+    document.body.appendChild(toggleBtn);
+
+    // ===== 辅助函数 =====
+    function showToast(msg) {
+      var t = document.createElement('div');
+      t.textContent = msg;
+      t.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 24px;border-radius:999px;font-size:13px;z-index:2147483647;font-family:Space Mono,monospace;';
+      document.body.appendChild(t);
+      setTimeout(function(){ t.remove(); }, 2000);
+    }
+
+    function updateCSS() {
+      styleEl.textContent = editing ? `
+        [data-edit] { outline: 2px dashed rgba(49,80,141,0.6) !important; outline-offset: 3px; cursor: text; }
+        [data-edit]:hover { outline-color: #31508d !important; background: rgba(49,80,141,0.05) !important; }
+        [data-edit]:focus { outline: 2px solid #31508d !important; background: rgba(49,80,141,0.08) !important; }
+        /* glider-wrapper 已移至日常页 */
+      ` : '';
+    }
+
+    function markEditable() {
+
+    function restoreData() {
+    }
+
+    // ===== 进入/退出编辑 =====
+    function enterEdit() {
+      editing = true;
+      toolbar.style.display = 'flex';
+      toggleBtn.style.display = 'none';
+      markEditable();
+      updateCSS();
+      document.querySelectorAll('[data-edit]').forEach(function(el) { el.contentEditable = 'true'; });
+      // glider-wrapper 已移至日常页，跳过拖动逻辑
+      showToast('编辑模式已开启 - 点击文字编辑，拖动滑板云调整位置');
+    }
+
+    function exitEdit() {
+      editing = false;
+      toolbar.style.display = 'none';
+      toggleBtn.style.display = '';
+      document.querySelectorAll('[data-edit]').forEach(function(el) { el.contentEditable = 'false'; });
+      // glider-wrapper 已移至日常页
+      updateCSS();
+    }
+
+    function save() {
+      document.querySelectorAll('[data-edit]').forEach(function(el) {
+        data[el.getAttribute('data-edit')] = el.textContent.trim();
+      });
+      // glider-wrapper 已移至日常页
+      localStorage.setItem(EDIT_KEY, JSON.stringify(data));
+      showToast('✅ 已保存！刷新页面可恢复');
+    }
+
+    function exportHTML() {
+      save();
+      exitEdit();
+      var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      var blob = new Blob([html], {type:'text/html'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'index-edited.html';
+      a.click();
+      showToast('📥 HTML已下载');
+    }
+
+    // ===== 拖动 =====
+    function makeDraggable(el) {
+      var startX, startY, startLeft, startTop;
+      el.addEventListener('pointerdown', function(e) {
+        if (!editing) return;
+        e.preventDefault();
+        var rect = el.getBoundingClientRect();
+        startX = e.clientX; startY = e.clientY;
+        startLeft = rect.left; startTop = rect.top;
+        el.setPointerCapture(e.pointerId);
+        el.style.transition = 'none';
+      });
+      el.addEventListener('pointermove', function(e) {
+        if (!startX) return;
+        var dx = e.clientX - startX, dy = e.clientY - startY;
+        el.style.position = 'fixed';
+        el.style.left = (startLeft + dx) + 'px';
+        el.style.top = (startTop + dy) + 'px';
+        el.style.right = 'auto';
+        el.style.zIndex = '9999';
+      });
+      el.addEventListener('pointerup', function() {
+        startX = null;
+        data['glider-top'] = el.style.top;
+        data['glider-left'] = el.style.left;
+        data['glider-right'] = 'auto';
+      });
+    }
+
+    // ===== 事件 =====
+    toggleBtn.addEventListener('click', enterEdit);
+    document.getElementById('editor-exit').addEventListener('click', exitEdit);
+    document.getElementById('editor-save').addEventListener('click', save);
+    document.getElementById('editor-export').addEventListener('click', exportHTML);
+
+    // 初始恢复（等React渲染完）
+    setTimeout(restoreData, 2500);
+    setTimeout(restoreData, 5000);
+  })();
+  </script>
+  <!-- iframe 自动高度调整 -->
+  <script>
+    window.addEventListener('message', function(e) {
+      if (e.data && e.data.type === 'resizeIframe' && e.data.page === 'daily') {
+        var iframes = document.querySelectorAll('iframe[src*="daily.html"]');
+        iframes.forEach(function(iframe) {
+          var newHeight = Math.max(e.data.height, 600);
+          iframe.style.height = newHeight + 'px';
+        });
+      }
+    });
+  </script>
+  <!-- GSAP 动画库 -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script defer src="./gsap-animations.js"></script>
+  <!-- 替换项目卡片：创意网页→ResuMe，彩色应用设计→毕业祝福墙，云朵电商感→飞书Bitable教程 -->
+  <script>
+    function tuneProjectCardImage(img, src, alt) {
+      if (!img) return;
+      img.src = src;
+      img.alt = alt;
+      img.style.objectFit = 'cover';
+      img.style.objectPosition = 'center top';
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.display = 'block';
+    }
+
+    function updateProjectCards() {
+      var cards = document.querySelectorAll('.work-card-wrapper');
+      if (cards.length < 2) return;
+      // Card 1: 创意网页 → ResuMe 简历编辑器
+      var card1 = cards[0];
+      if (card1 && card1.innerText.indexOf('创意网页') !== -1) {
+        var h4 = card1.querySelector('h4');
+        if (h4) h4.innerText = 'ResuMe 简历编辑器';
+        var ps = card1.querySelectorAll('p');
+        for (var i = 0; i < ps.length; i++) {
+          if (ps[i].innerText.indexOf('云朵世界') !== -1) {
+            ps[i].innerText = '在线简历编辑器，支持模板切换、模块自由组合、实时预览和 PDF 导出。点开即可开始制作。';
+            break;
+          }
+        }
+        var img = card1.querySelector('img');
+        tuneProjectCardImage(img, '/images/resume-editor-preview.png', 'ResuMe 简历编辑器预览');
+        card1.style.cursor = 'pointer';
+        card1.setAttribute('data-href', 'https://resume.yangbaibai.cn/');
+      }
+      // Card 2: 彩色应用设计 → 毕业祝福墙
+      var card2 = cards[1];
+      if (card2 && card2.innerText.indexOf('彩色应用设计') !== -1) {
+        var h4 = card2.querySelector('h4');
+        if (h4) h4.innerText = '毕业祝福墙';
+        var ps = card2.querySelectorAll('p');
+        for (var i = 0; i < ps.length; i++) {
+          if (ps[i].innerText.indexOf('活泼的产品') !== -1) {
+            ps[i].innerText = '给毕业季准备的互动祝福页面，支持扫码写祝福、照片上传、大屏展示和烟花动效。';
+            break;
+          }
+        }
+        var img = card2.querySelector('img');
+        tuneProjectCardImage(img, '/images/blessing-wall-preview.png', '毕业祝福墙预览');
+        card2.style.cursor = 'pointer';
+        card2.setAttribute('data-href', 'https://yangbaibai.cn/');
+      }
+      // Card 3: 云朵电商感 → 飞书多维表格 v2 插件教程
+      if (cards.length >= 3) {
+      var card3 = cards[2];
+      if (card3 && card3.innerText.indexOf('云朵电商感') !== -1) {
+        var h4 = card3.querySelector('h4');
+        if (h4) h4.innerText = '飞书多维表格插件';
+        var ps = card3.querySelectorAll('p');
+        for (var i = 0; i < ps.length; i++) {
+          if (ps[i].innerText.indexOf('角色形象') !== -1 || ps[i].innerText.indexOf('品牌氛围') !== -1) {
+            ps[i].innerText = '飞书多维表格 v2 插件使用教程。接入大模型、对话式数据录入、多模型结果对比。';
+            break;
+          }
+        }
+        var img = card3.querySelector('img');
+        tuneProjectCardImage(img, '/images/work-3.jpg', '飞书多维表格插件教程预览');
+        card3.style.cursor = 'pointer';
+        card3.setAttribute('data-href', '/feishu-bitable-v2.html');
+      }
+      }
+    }
+    // 全局点击代理：打开 data-href 链接
+    document.addEventListener('click', function(e) {
+      var card = e.target.closest('.work-card-wrapper');
+      if (card && card.getAttribute('data-href')) {
+        var href = card.getAttribute('data-href');
+        if (href.startsWith('/')) {
+          window.location.href = href;
+        } else {
+          window.open(href, '_blank');
+        }
+      }
+    });
+    // 等待 React 渲染完成后执行，并监听后续渲染
+    var obs = new MutationObserver(function() { updateProjectCards(); });
+    var root = document.getElementById('root');
+    if (root) obs.observe(root, { childList: true, subtree: true });
+    updateProjectCards();
+  </script>
+  <!-- Ferrofluid 铁磁流体背景动效 -->
+
+
+
+
+
+
+
+  <style>
+    header nav + button {
+      display: none !important;
+    }
+  </style>
+
+  <script>
+    (function moveContactIntoPortfolio() {
+      if (new URLSearchParams(window.location.search).has('contactEmbed')) return;
+
+      function hideContactButtons() {
+        document.querySelectorAll('header button, nav button, #root button').forEach(function(btn) {
+          if ((btn.textContent || '').trim() === '联系我') {
+            btn.style.display = 'none';
+            btn.setAttribute('aria-hidden', 'true');
+          }
+        });
+      }
+
+      function makeToolFrame(src, title, height) {
+        return '' +
+          '<div class="contact-tool-frame" style="overflow:hidden;border:0;border-radius:0;background:transparent;">' +
+            '<iframe id="contact-original-frame" src="' + src + '" title="' + title + '" loading="lazy" style="display:block;width:100%;height:' + height + 'px;border:0;background:#dff2ff;"></iframe>' +
+          '</div>';
+      }
+
+      function injectContactTools() {
+        if (document.getElementById('portfolio-contact-tools')) return;
+
+        var headings = Array.from(document.querySelectorAll('#root h2, #root h3'));
+        var portfolioHeading = headings.find(function(el) {
+          var text = (el.textContent || '').trim();
+          return text === '个人作品集' || text === '实用工具';
+        });
+        if (!portfolioHeading) return;
+
+        var container = portfolioHeading.closest('section');
+        var pageWrap = container && container.parentElement;
+        if (!pageWrap) return;
+
+        var section = document.createElement('section');
+        section.id = 'portfolio-contact-tools';
+        section.className = 'reveal-section';
+        section.innerHTML =
+          makeToolFrame('/?contactEmbed=1', '联系我', 2400);
+
+        pageWrap.appendChild(section);
+      }
+
+      function run() {
+        hideContactButtons();
+        injectContactTools();
+      }
+
+      run();
+      setInterval(run, 500);
+      new MutationObserver(run).observe(document.documentElement, { childList: true, subtree: true });
+      document.addEventListener('DOMContentLoaded', run);
+    })();
+
+    (function contactEmbedMode() {
+      if (!new URLSearchParams(window.location.search).has('contactEmbed')) return;
+
+      document.documentElement.style.background = 'transparent';
+      document.body.style.background = 'transparent';
+      document.body.style.overflow = 'hidden';
+
+      function sendHeight() {
+        var root = document.getElementById('root');
+        var height = Math.max(
+          root ? root.scrollHeight : 0,
+          document.documentElement.scrollHeight,
+          document.body.scrollHeight
+        );
+        window.parent.postMessage({ type: 'contactEmbedHeight', height: height }, '*');
+      }
+
+      function activateContact() {
+        var buttons = Array.from(document.querySelectorAll('button'));
+        var contactButton = buttons.find(function(btn) {
+          return (btn.textContent || '').trim() === '联系我';
+        });
+        if (contactButton && !document.body.dataset.contactClicked) {
+          document.body.dataset.contactClicked = 'true';
+          contactButton.click();
+        }
+
+        document.querySelectorAll('header, footer').forEach(function(el) {
+          el.style.display = 'none';
+        });
+
+        var introHeading = Array.from(document.querySelectorAll('h1, h2, h3')).find(function(el) {
+          return (el.textContent || '').trim() === '一起做点轻盈又有趣的东西吧。';
+        });
+        var introCard = introHeading && introHeading.closest('div');
+        var contactGrid = introCard && introCard.parentElement;
+        if (introCard) introCard.style.display = 'none';
+        if (contactGrid) {
+          contactGrid.style.gridTemplateColumns = '1fr';
+          contactGrid.style.gap = '0';
+          contactGrid.style.display = 'block';
+          contactGrid.style.background = '#dff2ff';
+          contactGrid.style.padding = '10px 0 0';
+          contactGrid.style.borderRadius = '0';
+          contactGrid.style.overflow = 'visible';
+        }
+
+        var toolCard = contactGrid && Array.from(contactGrid.children).find(function(el) {
+          return el !== introCard && (el.textContent || '').indexOf('小康算命铺') >= 0;
+        });
+        if (toolCard) {
+          toolCard.style.background = 'transparent';
+          toolCard.style.border = '0';
+          toolCard.style.boxShadow = 'none';
+          toolCard.style.borderRadius = '0';
+          toolCard.style.padding = '0';
+        }
+
+        var shell = document.querySelector('#root > div > div');
+        if (shell) {
+          shell.style.paddingTop = '0';
+          shell.style.paddingLeft = '0';
+          shell.style.paddingRight = '0';
+          shell.style.paddingBottom = '0';
+          shell.style.maxWidth = 'none';
+        }
+
+        sendHeight();
+      }
+
+      setInterval(activateContact, 400);
+      window.addEventListener('load', activateContact);
+      window.addEventListener('resize', sendHeight);
+      new MutationObserver(activateContact).observe(document.documentElement, { childList: true, subtree: true });
+    })();
+
+    window.addEventListener('message', function(e) {
+      if (!e.data || e.data.type !== 'contactEmbedHeight') return;
+      var frame = document.getElementById('contact-original-frame');
+      if (frame) frame.style.height = Math.max(900, e.data.height) + 'px';
+    });
+  </script>
+
+  <script defer src="./photo-wall-stable-v2.js?v=20260615-bouncecards"></script>
+  <script defer src="./portfolio-layout-polish.js?v=20260615-layout2"></script>
+  <script defer src="./about-glass-surface.js?v=20260616-cloud-flat1"></script>
+  <script defer src="./target-cursor.js?v=portfolio-target-fallback-v3"></script>
+
+
+</body>
+</html>

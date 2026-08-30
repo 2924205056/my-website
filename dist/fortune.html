@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生辰算命 - 小康云</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+:root {
+  --bg-primary: #E8F4FD;
+  --bg-secondary: #F0F7FF;
+  --text-primary: #1E293B;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --card-bg: rgba(255,255,255,0.85);
+  --card-border: rgba(255,255,255,0.9);
+  --accent-pink: #F472B6;
+  --accent-coral: #FB923C;
+  --accent-purple: #A78BFA;
+  --accent-blue: #60A5FA;
+  --shadow-soft: 0 8px 32px rgba(100,170,230,0.12);
+  --shadow-hover: 0 20px 48px rgba(100,170,230,0.18);
+  --radius-lg: 28px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Nunito',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:linear-gradient(170deg,#D6EEFF 0%,var(--bg-primary) 30%,var(--bg-secondary) 60%,#F5F0FF 100%);
+  background-attachment:fixed;
+  min-height:100vh;
+  color:var(--text-secondary);
+  line-height:1.6;
+  overflow-x:hidden;
+}
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:rgba(232,244,252,0.3);border-radius:4px}
+::-webkit-scrollbar-thumb{background:rgba(150,200,240,0.4);border-radius:4px}
+
+.cloud{position:fixed;border-radius:999px;pointer-events:none;z-index:0}
+.cloud-1{width:180px;height:60px;background:rgba(255,255,255,0.25);top:8%;left:-5%;animation:drift 35s linear infinite}
+.cloud-2{width:120px;height:40px;background:rgba(255,255,255,0.2);top:20%;right:-3%;animation:drift 28s linear infinite reverse}
+.cloud-3{width:200px;height:70px;background:rgba(255,255,255,0.18);top:45%;left:10%;animation:drift 40s linear infinite;animation-delay:-10s}
+.cloud-4{width:100px;height:35px;background:rgba(255,255,255,0.22);top:65%;right:5%;animation:drift 32s linear infinite reverse;animation-delay:-5s}
+.cloud-5{width:150px;height:50px;background:rgba(255,255,255,0.15);top:80%;left:30%;animation:drift 38s linear infinite;animation-delay:-15s}
+.cloud-6{width:90px;height:30px;background:rgba(255,255,255,0.2);top:35%;right:20%;animation:drift 25s linear infinite;animation-delay:-8s}
+@keyframes drift{0%{transform:translateX(-120%)}100%{transform:translateX(120vw)}}
+
+.container{max-width:640px;margin:0 auto;padding:24px 16px;position:relative;z-index:1}
+
+.header{text-align:center;margin-bottom:32px}
+.header-icon{font-size:48px;margin-bottom:8px;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.header h1{font-size:28px;font-weight:800;color:#2f4e8d;margin-bottom:4px}
+.header p{font-size:13px;color:#6a84b0;font-family:monospace}
+
+.card{
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-lg);
+  padding:28px;
+  box-shadow:var(--shadow-soft);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  margin-bottom:20px;
+  transition:box-shadow .3s;
+}
+.card:hover{box-shadow:var(--shadow-hover)}
+
+.config-toggle{
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;padding:12px 16px;border-radius:var(--radius-md);
+  background:rgba(147,197,253,0.1);margin-bottom:16px;
+  transition:background .2s;
+}
+.config-toggle:hover{background:rgba(147,197,253,0.2)}
+.config-toggle span{font-size:13px;color:#475569;font-weight:600}
+.config-toggle .arrow{transition:transform .3s;color:#94a3b8}
+.config-toggle .arrow.open{transform:rotate(180deg)}
+
+.config-panel{overflow:hidden;max-height:0;transition:max-height .4s ease,opacity .3s;opacity:0}
+.config-panel.open{max-height:500px;opacity:1}
+
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;color:#64748b;margin-bottom:6px;font-weight:600}
+.form-group input{
+  width:100%;padding:10px 14px;border-radius:var(--radius-sm);
+  border:2px solid rgba(147,197,253,0.3);background:rgba(240,247,255,0.5);
+  font-family:monospace;font-size:13px;color:var(--text-primary);
+  transition:border-color .2s;outline:none;
+}
+.form-group input:focus{border-color:var(--accent-pink)}
+.form-group input::placeholder{color:#94a3b8}
+
+.save-btn{
+  width:100%;padding:12px;border:none;border-radius:var(--radius-sm);
+  background:linear-gradient(135deg,var(--accent-pink),var(--accent-purple));
+  color:white;font-weight:700;font-size:14px;cursor:pointer;
+  transition:opacity .2s,transform .2s;
+}
+.save-btn:hover{opacity:.9;transform:translateY(-1px)}
+.save-btn:active{transform:translateY(0)}
+
+.api-status{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-family:monospace;padding:4px 10px;
+  border-radius:999px;margin-bottom:16px;
+}
+.api-status.connected{background:rgba(74,222,128,0.15);color:#16a34a;border:1px solid rgba(74,222,128,0.3)}
+.api-status.disconnected{background:rgba(251,146,60,0.15);color:#ea580c;border:1px solid rgba(251,146,60,0.3)}
+.api-status .dot{width:6px;height:6px;border-radius:50%}
+.api-status.connected .dot{background:#16a34a}
+.api-status.disconnected .dot{background:#ea580c}
+
+.birth-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.birth-form .full-width{grid-column:1/-1}
+
+.birth-input{
+  width:100%;padding:12px 14px;border-radius:var(--radius-sm);
+  border:2px solid rgba(147,197,253,0.3);background:rgba(240,247,255,0.5);
+  font-family:'Nunito',sans-serif;font-size:14px;color:var(--text-primary);
+  transition:border-color .2s;outline:none;
+}
+.birth-input:focus{border-color:var(--accent-purple)}
+.birth-input::placeholder{color:#94a3b8}
+select.birth-input{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+
+.gender-group{display:flex;gap:8px}
+.gender-btn{
+  flex:1;padding:12px;border:2px solid rgba(147,197,253,0.3);
+  border-radius:var(--radius-sm);background:rgba(240,247,255,0.5);
+  cursor:pointer;text-align:center;font-size:14px;font-weight:600;
+  color:#64748b;transition:all .2s;
+}
+.gender-btn:hover{border-color:var(--accent-purple);color:#7c3aed}
+.gender-btn.active{border-color:var(--accent-purple);background:rgba(167,139,250,0.1);color:#7c3aed}
+
+.divine-btn{
+  width:100%;padding:16px;border:none;border-radius:var(--radius-md);
+  background:linear-gradient(135deg,#a78bfa,#f472b6,#fb923c);
+  background-size:200% 200%;animation:gradientShift 3s ease infinite;
+  color:white;font-weight:800;font-size:16px;cursor:pointer;
+  box-shadow:0 12px 28px rgba(167,139,250,0.3);
+  transition:transform .2s,box-shadow .2s;
+}
+.divine-btn:hover{transform:translateY(-2px);box-shadow:0 16px 36px rgba(167,139,250,0.4)}
+.divine-btn:active{transform:translateY(0)}
+.divine-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+.result-area{margin-top:24px;display:none}
+.result-area.visible{display:block;animation:fadeInUp .6s ease}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.result-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.result-avatar{
+  width:48px;height:48px;border-radius:16px;
+  background:linear-gradient(135deg,var(--accent-purple),var(--accent-pink));
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;box-shadow:0 8px 20px rgba(167,139,250,0.25);
+}
+.result-header h3{font-size:18px;color:#2f4e8d;font-weight:800}
+.result-header p{font-size:11px;color:#94a3b8;font-family:monospace}
+
+.result-content{
+  padding:20px;border-radius:var(--radius-md);
+  background:linear-gradient(135deg,rgba(238,247,255,0.6),rgba(245,240,255,0.6));
+  border:1px solid rgba(167,139,250,0.15);
+  font-size:14px;line-height:1.8;color:var(--text-secondary);
+  word-break:break-word;
+}
+.result-content h3{font-size:18px;font-weight:800;color:#2f4e8d;margin:20px 0 8px;padding-bottom:6px;border-bottom:2px solid rgba(167,139,250,0.15)}
+.result-content h3:first-child{margin-top:0}
+.result-content h2{font-size:20px;font-weight:800;color:#2f4e8d;margin:24px 0 10px}
+.result-content h1{font-size:22px;font-weight:800;color:#2f4e8d;margin:24px 0 10px}
+.result-content p{margin:8px 0}
+.result-content ul,.result-content ol{margin:8px 0;padding-left:20px}
+.result-content li{margin:4px 0}
+.result-content strong{color:#2f4e8d;font-weight:700}
+.result-content em{color:#7c3aed;font-style:italic}
+.result-content code{background:rgba(167,139,250,0.1);padding:2px 6px;border-radius:4px;font-size:12px;font-family:monospace}
+.result-content pre{background:rgba(238,247,255,0.8);padding:12px;border-radius:8px;overflow-x:auto;margin:8px 0}
+.result-content pre code{background:none;padding:0}
+.result-content img{max-width:100%;border-radius:12px;margin:12px auto;display:block;box-shadow:0 8px 24px rgba(100,170,230,0.15)}
+.result-content blockquote{border-left:3px solid var(--accent-purple);padding:8px 16px;margin:12px 0;background:rgba(167,139,250,0.05);border-radius:0 8px 8px 0}
+.result-content hr{border:none;border-top:1px solid rgba(167,139,250,0.15);margin:16px 0}
+.result-content a{color:var(--accent-purple);text-decoration:underline}
+
+.loading{display:none;text-align:center;padding:32px}
+.loading.visible{display:block}
+.loading-spinner{
+  width:48px;height:48px;border-radius:50%;
+  border:3px solid rgba(167,139,250,0.2);
+  border-top-color:var(--accent-purple);
+  animation:spin 1s linear infinite;
+  margin:0 auto 16px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{font-size:13px;color:#94a3b8;font-family:monospace}
+
+.toast{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);
+  background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);
+  padding:12px 24px;border-radius:999px;box-shadow:0 8px 32px rgba(0,0,0,0.1);
+  font-size:13px;font-weight:600;color:#2f4e8d;z-index:1000;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+.history{margin-top:24px}
+.history h4{font-size:14px;color:#64748b;margin-bottom:12px;font-weight:700}
+.history-item{
+  padding:12px 16px;border-radius:var(--radius-sm);
+  background:rgba(240,247,255,0.4);margin-bottom:8px;
+  cursor:pointer;transition:background .2s;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.history-item:hover{background:rgba(240,247,255,0.7)}
+.history-item .info{font-size:12px;color:#64748b}
+.history-item .name{font-weight:700;color:#2f4e8d;font-size:13px}
+.history-item .date{font-size:11px;color:#94a3b8;font-family:monospace}
+.history-item .del{color:#f87171;cursor:pointer;font-size:16px;padding:4px;opacity:.6;transition:opacity .2s}
+.history-item .del:hover{opacity:1}
+
+.zodiac-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;
+  margin-top:8px;
+}
+
+.tips{
+  margin-top:16px;padding:12px 16px;border-radius:var(--radius-sm);
+  background:rgba(251,146,60,0.08);border:1px solid rgba(251,146,60,0.2);
+  font-size:11px;color:#9a6459;font-family:monospace;line-height:1.6;
+}
+
+@media(max-width:480px){
+  .container{padding:16px 12px}
+  .card{padding:20px}
+  .header h1{font-size:24px}
+  .birth-form{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="cloud cloud-1"></div>
+<div class="cloud cloud-2"></div>
+<div class="cloud cloud-3"></div>
+<div class="cloud cloud-4"></div>
+<div class="cloud cloud-5"></div>
+<div class="cloud cloud-6"></div>
+
+<div class="toast" id="toast"></div>
+
+<div class="container">
+  <div class="header">
+    <div class="header-icon">🔮</div>
+    <h1>生辰算命</h1>
+    <p>Powered by Coze AI · 输入生辰八字，云端为你解读</p>
+  </div>
+
+  <div class="card">
+    <div class="config-toggle" id="configToggle">
+      <span>⚙️ API 配置</span>
+      <span class="arrow" id="configArrow">▼</span>
+    </div>
+    <div class="config-panel" id="configPanel">
+      <div class="form-group">
+        <label>Bot ID</label>
+        <input type="text" id="botId" placeholder="在 Coze 发布页找到 Bot ID">
+      </div>
+      <div class="form-group">
+        <label>Personal Access Token</label>
+        <input type="password" id="token" placeholder="在个人设置 → 访问令牌中生成">
+      </div>
+      <div class="form-group">
+        <label>API Endpoint</label>
+        <input type="text" id="endpoint" value="https://api.coze.cn/open_api/v2/chat">
+      </div>
+      <button class="save-btn" id="saveConfig">保存配置</button>
+      <div class="tips" style="margin-top:12px">
+        💡 如何获取？<br>
+        1. 打开 <a href="https://www.coze.cn" target="_blank" style="color:#7c3aed">coze.cn</a>，进入你的算命 Bot<br>
+        2. Bot ID：在「发布」→「API」页面找到<br>
+        3. Token：在「个人设置」→「访问令牌」中生成<br>
+        4. 确保 Bot 已发布到 API 渠道
+      </div>
+    </div>
+
+    <div class="api-status disconnected" id="apiStatus">
+      <span class="dot"></span>
+      <span id="apiStatusText">未配置 API</span>
+    </div>
+
+    <div class="birth-form">
+      <div>
+        <label style="font-size:12px;color:#64748b;margin-bottom:6px;display:block;font-weight:600">出生年份</label>
+        <select class="birth-input" id="birthYear"></select>
+      </div>
+      <div>
+        <label style="font-size:12px;color:#64748b;margin-bottom:6px;display:block;font-weight:600">出生月份</label>
+        <select class="birth-input" id="birthMonth"></select>
+      </div>
+      <div>
+        <label style="font-size:12px;color:#64748b;margin-bottom:6px;display:block;font-weight:600">出生日期</label>
+        <select class="birth-input" id="birthDay"></select>
+      </div>
+      <div>
+        <label style="font-size:12px;color:#64748b;margin-bottom:6px;display:block;font-weight:600">出生时辰</label>
+        <select class="birth-input" id="birthHour">
+          <option value="">不确定</option>
+          <option value="子时(23:00-01:00)">子时 (23:00-01:00)</option>
+          <option value="丑时(01:00-03:00)">丑时 (01:00-03:00)</option>
+          <option value="寅时(03:00-05:00)">寅时 (03:00-05:00)</option>
+          <option value="卯时(05:00-07:00)">卯时 (05:00-07:00)</option>
+          <option value="辰时(07:00-09:00)">辰时 (07:00-09:00)</option>
+          <option value="巳时(09:00-11:00)">巳时 (09:00-11:00)</option>
+          <option value="午时(11:00-13:00)">午时 (11:00-13:00)</option>
+          <option value="未时(13:00-15:00)">未时 (13:00-15:00)</option>
+          <option value="申时(15:00-17:00)">申时 (15:00-17:00)</option>
+          <option value="酉时(17:00-19:00)">酉时 (17:00-19:00)</option>
+          <option value="戌时(19:00-21:00)">戌时 (19:00-21:00)</option>
+          <option value="亥时(21:00-23:00)">亥时 (21:00-23:00)</option>
+        </select>
+      </div>
+      <div class="full-width">
+        <label style="font-size:12px;color:#64748b;margin-bottom:6px;display:block;font-weight:600">性别</label>
+        <div class="gender-group">
+          <div class="gender-btn" data-gender="男" id="genderMale">👦 男</div>
+          <div class="gender-btn" data-gender="女" id="genderFemale">👧 女</div>
+        </div>
+      </div>
+      <div class="full-width">
+        <label style="font-size:12px;color:#64748b;margin-bottom:6px;display:block;font-weight:600">想问什么？（可选）</label>
+        <input class="birth-input" type="text" id="question" placeholder="例如：我的事业运势如何？">
+      </div>
+    </div>
+
+    <button class="divine-btn" id="divineBtn">🔮 开始算命</button>
+
+    <div class="loading" id="loading">
+      <div class="loading-spinner"></div>
+      <p>云朵正在解读你的生辰...</p>
+    </div>
+
+    <div class="result-area" id="resultArea">
+      <div class="result-header">
+        <div class="result-avatar">🔮</div>
+        <div>
+          <h3>算命结果</h3>
+          <p id="resultMeta"></p>
+        </div>
+      </div>
+      <div class="result-content" id="resultContent"></div>
+    </div>
+
+    <div class="history" id="historySection" style="display:none">
+      <h4>📜 算命记录</h4>
+      <div id="historyList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+marked.setOptions({
+  breaks: true,
+  gfm: true
+});
+
+const STORAGE_KEY = 'xiaokang_fortune_config';
+const HISTORY_KEY = 'xiaokang_fortune_history';
+const defaultConfig = { botId: '7601792909159596070', token: 'pat_jIIRfYuZhnDqhcPxaPUcRVuQj6Aempl7yeC7nIkTutNwMLyYE73jfqbSO3e2UR2J', endpoint: 'https://api.coze.cn/open_api/v2/chat' };
+
+function loadConfig() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? { ...defaultConfig, ...JSON.parse(saved) } : { ...defaultConfig };
+  } catch { return { ...defaultConfig }; }
+}
+
+function saveConfig(config) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+}
+
+function loadHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+  } catch { return []; }
+}
+
+function saveHistory(history) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 10)));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function cleanCozeContent(text) {
+  let cleaned = text;
+  cleaned = cleaned.replace(/!`([^`]+)`/g, '![]($1)');
+  cleaned = cleaned.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function(match, alt, url) {
+    if (url.startsWith('http')) return match;
+    return '';
+  });
+  cleaned = cleaned.replace(/`(https?:\/\/[^\s`]+\.(png|jpg|jpeg|gif|webp|svg))`/g, '![]($1)');
+  cleaned = cleaned.replace(/(https?:\/\/[^\s)]+\.(png|jpg|jpeg|gif|webp|svg))\s*$/gm, '![]($1)');
+  cleaned = cleaned.replace(/(https?:\/\/lf-bot-studio-plugin-resource[^\s)]+)/g, '![]($1)');
+  return cleaned;
+}
+
+function updateApiStatus() {
+  const config = loadConfig();
+  const status = document.getElementById('apiStatus');
+  const text = document.getElementById('apiStatusText');
+  if (config.botId && config.token) {
+    status.className = 'api-status connected';
+    text.textContent = '✅ API 已配置';
+  } else {
+    status.className = 'api-status disconnected';
+    text.textContent = '⚠️ 未配置 API';
+  }
+}
+
+const zodiacAnimals = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+const zodiacEmojis = ['🐀','🐂','🐅','🐇','🐉','🐍','🐴','🐏','🐵','🐔','🐶','🐷'];
+function getZodiac(year) {
+  const idx = (year - 4) % 12;
+  return { name: zodiacAnimals[idx], emoji: zodiacEmojis[idx] };
+}
+
+const constellationNames = ['摩羯座','水瓶座','双鱼座','白羊座','金牛座','双子座','巨蟹座','狮子座','处女座','天秤座','天蝎座','射手座','摩羯座'];
+const constellationDates = [120,219,321,420,521,622,723,823,923,1024,1123,1222,1231];
+function getConstellation(month, day) {
+  const val = month * 100 + day;
+  for (let i = 0; i < constellationDates.length; i++) {
+    if (val <= constellationDates[i]) return constellationNames[i];
+  }
+  return '摩羯座';
+}
+
+async function callCozeAPI(query, config) {
+  if (!config.botId || !config.token) throw new Error('请先配置 Coze API');
+  const res = await fetch(config.endpoint, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${config.token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      bot_id: config.botId,
+      conversation_id: undefined,
+      user: 'xiaokang_fortune_user',
+      query: query,
+      stream: false
+    })
+  });
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '');
+    throw new Error(`API 错误 (${res.status}): ${errText}`);
+  }
+  const data = await res.json();
+  if (data.messages && Array.isArray(data.messages)) {
+    const answer = data.messages.find(m => m.type === 'answer' || m.role === 'assistant');
+    if (answer) return answer.content || '云朵收到了神秘的信号...';
+  }
+  if (typeof data.content === 'string') return data.content;
+  if (typeof data.answer === 'string') return data.answer;
+  return JSON.stringify(data).slice(0, 200);
+}
+
+function initForm() {
+  const yearSel = document.getElementById('birthYear');
+  const monthSel = document.getElementById('birthMonth');
+  const daySel = document.getElementById('birthDay');
+  const now = new Date();
+  for (let y = now.getFullYear(); y >= 1940; y--) {
+    const opt = document.createElement('option');
+    opt.value = y; opt.textContent = y + '年';
+    if (y === 2000) opt.selected = true;
+    yearSel.appendChild(opt);
+  }
+  for (let m = 1; m <= 12; m++) {
+    const opt = document.createElement('option');
+    opt.value = m; opt.textContent = m + '月';
+    monthSel.appendChild(opt);
+  }
+  for (let d = 1; d <= 31; d++) {
+    const opt = document.createElement('option');
+    opt.value = d; opt.textContent = d + '日';
+    daySel.appendChild(opt);
+  }
+}
+
+let selectedGender = '';
+document.getElementById('genderMale').addEventListener('click', function() {
+  selectedGender = '男';
+  this.classList.add('active');
+  document.getElementById('genderFemale').classList.remove('active');
+});
+document.getElementById('genderFemale').addEventListener('click', function() {
+  selectedGender = '女';
+  this.classList.add('active');
+  document.getElementById('genderMale').classList.remove('active');
+});
+
+document.getElementById('configToggle').addEventListener('click', function() {
+  const panel = document.getElementById('configPanel');
+  const arrow = document.getElementById('configArrow');
+  panel.classList.toggle('open');
+  arrow.classList.toggle('open');
+});
+
+document.getElementById('saveConfig').addEventListener('click', function() {
+  const config = {
+    botId: document.getElementById('botId').value.trim(),
+    token: document.getElementById('token').value.trim(),
+    endpoint: document.getElementById('endpoint').value.trim() || defaultConfig.endpoint
+  };
+  saveConfig(config);
+  updateApiStatus();
+  showToast('✅ 配置已保存');
+});
+
+const config = loadConfig();
+if (!config.botId || !config.token) {
+  saveConfig(defaultConfig);
+}
+const finalConfig = loadConfig();
+document.getElementById('botId').value = finalConfig.botId;
+document.getElementById('token').value = finalConfig.token;
+document.getElementById('endpoint').value = finalConfig.endpoint;
+updateApiStatus();
+
+document.getElementById('divineBtn').addEventListener('click', async function() {
+  const year = document.getElementById('birthYear').value;
+  const month = document.getElementById('birthMonth').value;
+  const day = document.getElementById('birthDay').value;
+  const hour = document.getElementById('birthHour').value;
+  const question = document.getElementById('question').value.trim();
+
+  if (!year || !month || !day) { showToast('⚠️ 请选择出生日期'); return; }
+  if (!selectedGender) { showToast('⚠️ 请选择性别'); return; }
+
+  const cfg = loadConfig();
+  if (!cfg.botId || !cfg.token) {
+    showToast('⚠️ 请先配置 Coze API');
+    document.getElementById('configPanel').classList.add('open');
+    document.getElementById('configArrow').classList.add('open');
+    return;
+  }
+
+  const zodiac = getZodiac(parseInt(year));
+  const constellation = getConstellation(parseInt(month), parseInt(day));
+
+  let prompt = `请为以下生辰信息进行算命分析：\n\n出生日期：${year}年${month}月${day}日\n时辰：${hour || '不确定'}\n性别：${selectedGender}\n生肖：${zodiac.emoji}${zodiac.name}\n星座：${constellation}\n`;
+  if (question) prompt += `\n特别想了解：${question}\n`;
+  prompt += '\n请从以下几个方面进行详细分析：\n1. 性格特点\n2. 事业运势\n3. 感情运势\n4. 财运分析\n5. 健康提醒\n6. 幸运数字和颜色\n7. 综合建议';
+
+  const btn = this;
+  const loading = document.getElementById('loading');
+  const resultArea = document.getElementById('resultArea');
+
+  btn.disabled = true;
+  btn.textContent = '🔮 算命中...';
+  loading.classList.add('visible');
+  resultArea.classList.remove('visible');
+
+  try {
+    const result = await callCozeAPI(prompt, cfg);
+    loading.classList.remove('visible');
+
+    document.getElementById('resultMeta').textContent = `${zodiac.emoji}${zodiac.name} · ${constellation} · ${year}.${month}.${day}`;
+    const resultHtml = marked.parse(cleanCozeContent(result));
+    document.getElementById('resultContent').innerHTML = resultHtml;
+    resultArea.classList.add('visible');
+
+    const history = loadHistory();
+    history.unshift({
+      date: new Date().toLocaleString('zh-CN'),
+      birth: `${year}年${month}月${day}日`,
+      gender: selectedGender,
+      zodiac: zodiac.name,
+      constellation: constellation,
+      result: result.slice(0, 100) + '...'
+    });
+    saveHistory(history);
+    renderHistory();
+  } catch (err) {
+    loading.classList.remove('visible');
+    showToast('❌ ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔮 开始算命';
+  }
+});
+
+function renderHistory() {
+  const history = loadHistory();
+  const section = document.getElementById('historySection');
+  const list = document.getElementById('historyList');
+  if (history.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  list.innerHTML = history.map((h, i) => `
+    <div class="history-item">
+      <div>
+        <div class="name">${h.zodiac} · ${h.constellation} · ${h.gender}</div>
+        <div class="info">${h.birth}</div>
+        <div class="date">${h.date}</div>
+      </div>
+      <span class="del" data-idx="${i}">✕</span>
+    </div>
+  `).join('');
+  list.querySelectorAll('.del').forEach(el => {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const idx = parseInt(this.dataset.idx);
+      const h = loadHistory();
+      h.splice(idx, 1);
+      saveHistory(h);
+      renderHistory();
+    });
+  });
+}
+
+initForm();
+renderHistory();
+</script>
+</body>
+</html>

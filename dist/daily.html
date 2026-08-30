@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的日常 - 宁小包</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ===== CSS Variables ===== */
+    :root {
+      --bg-primary: #E8F4FD;
+      --bg-secondary: #F0F7FF;
+      --text-primary: #1E293B;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+      --card-bg: rgba(255,255,255,0.88);
+      --card-border: rgba(148,197,235,0.3);
+      --accent-pink: #F472B6;
+      --accent-coral: #FB923C;
+      --accent-yellow: #FACC15;
+      --accent-green: #4ADE80;
+      --accent-blue: #60A5FA;
+      --accent-purple: #A78BFA;
+      --shadow-soft: 0 4px 20px rgba(100,170,230,0.10);
+      --shadow-hover: 0 12px 36px rgba(100,170,230,0.15);
+      --radius-lg: 22px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(170deg, #D6EEFF 0%, var(--bg-primary) 30%, var(--bg-secondary) 60%, #F5F0FF 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      height: auto;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    html, body {
+      min-height: auto !important;
+      height: auto !important;
+    }
+
+    /* ===== 修复嵌套显示：确保内容完整展示 ===== */
+    .container {
+      min-height: 100vh;
+      height: auto;
+      overflow: visible;
+    }
+
+    #postsArea {
+      min-height: 200px;
+      overflow: visible;
+    }
+
+    .post-card {
+      overflow: visible;
+    }
+
+    /* ===== 修复 iframe/嵌套模式 ===== */
+    body.in-iframe {
+      min-height: auto;
+      height: auto;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* 嵌套模式下隐藏自己的 header，避免重复 */
+    body.in-iframe .daily-header {
+      display: none !important;
+    }
+
+    /* 嵌套模式下调整容器 */
+    body.in-iframe .container {
+      padding: 16px 20px 40px;
+      max-width: 100%;
+      min-height: auto;
+    }
+
+    body.in-iframe #postsArea {
+      min-height: auto;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(232,244,252,0.3); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--accent-blue), var(--accent-purple)); border-radius: 3px; }
+
+    /* ===== Header ===== */
+    .daily-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--card-bg);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid rgba(148,197,235,0.25);
+      box-shadow: 0 2px 16px rgba(100,170,230,0.06);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px; height: 38px;
+      background: rgba(232,244,252,0.7);
+      border: 1.5px solid rgba(200,225,245,0.5);
+      border-radius: 50%;
+      font-size: 18px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+    .back-btn:hover { background: rgba(200,225,245,0.9); transform: scale(1.05); }
+    .daily-header h1 {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--text-primary), var(--accent-blue), var(--accent-pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(200,225,245,0.5);
+      background: rgba(255,255,255,0.7);
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.3s;
+      color: var(--text-muted);
+    }
+    .icon-btn:hover { background: rgba(232,244,252,0.9); color: var(--text-secondary); }
+    .icon-btn.admin-active {
+      background: rgba(244,114,182,0.12);
+      border-color: var(--accent-pink);
+      color: var(--accent-pink);
+    }
+
+    /* ===== Container ===== */
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 20px 16px 100px;
+    }
+
+    /* ===== Daily Hero ===== */
+    .daily-hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,247,255,0.95));
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(200,225,245,0.5);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-soft);
+    }
+    .daily-hero-text {
+      flex: 1;
+      min-width: 0;
+    }
+    .daily-hero-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    .daily-hero-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .daily-hero-desc {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .daily-hero-gif {
+      flex-shrink: 0;
+      width: 110px;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .daily-hero-gif img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 4px 12px rgba(59,130,246,0.12));
+    }
+
+    /* 嵌套模式下缩小 hero */
+    body.in-iframe .daily-hero {
+      padding: 16px 20px;
+    }
+    body.in-iframe .daily-hero-gif {
+      width: 80px;
+      height: 130px;
+    }
+
+    @media (max-width: 480px) {
+      .daily-hero { padding: 18px 20px; gap: 12px; }
+      .daily-hero-title { font-size: 20px; }
+      .daily-hero-gif { width: 90px; height: 150px; }
+    }
+
+    /* ===== Toolbar ===== */
+    .toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .search-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .search-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(200,225,245,0.5);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .search-box:focus-within {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(96,165,250,0.1);
+    }
+    .search-box input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      outline: none;
+    }
+    .search-box input::placeholder { color: var(--text-muted); }
+    .search-icon { font-size: 18px; color: var(--text-muted); flex-shrink: 0; }
+    .search-clear {
+      display: none;
+      background: rgba(200,225,245,0.4);
+      border: none;
+      border-radius: 50%;
+      width: 24px; height: 24px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-muted);
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .search-clear.visible { display: inline-flex; }
+
+    .mood-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .mood-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1.5px solid rgba(200,225,245,0.5);
+      background: rgba(255,255,255,0.7);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.25s;
+      white-space: nowrap;
+    }
+    .mood-chip:hover { border-color: var(--accent-blue); color: var(--text-secondary); }
+    .mood-chip.active {
+      background: rgba(96,165,250,0.1);
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+    }
+
+    /* ===== Section Header ===== */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 28px 0 14px;
+      padding: 0 4px;
+    }
+    .section-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(148,197,235,0.3), transparent);
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .section-label .count {
+      font-weight: 600;
+      color: var(--accent-blue);
+    }
+
+    /* ===== Post Card ===== */
+    .post-card {
+      position: relative;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 20px;
+      margin-bottom: 14px;
+      transition: transform 0.3s, box-shadow 0.3s;
+      animation: fadeIn 0.35s ease;
+    }
+    .post-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+    }
+    .post-card.pinned {
+      border-color: rgba(250,204,21,0.3);
+      background: rgba(255,253,245,0.9);
+    }
+    .post-card.pinned::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-pink), var(--accent-coral), var(--accent-yellow), var(--accent-green), var(--accent-blue), var(--accent-purple));
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Post Header */
+    .post-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .post-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .post-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(200,225,245,0.5);
+      object-fit: cover;
+    }
+    .post-user-info .post-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .post-user-info .post-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .post-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-muted); }
+    .post-pin-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #d97706;
+      background: rgba(250,204,21,0.12);
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
+    /* Post Actions Menu */
+    .post-menu-wrap { position: relative; }
+    .post-menu-btn {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .post-menu-btn:hover { background: rgba(200,225,245,0.3); }
+    .post-menu-dropdown {
+      display: none;
+      position: absolute;
+      right: 0; top: 36px;
+      background: white;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      min-width: 140px;
+      z-index: 50;
+      overflow: hidden;
+    }
+    .post-menu-dropdown.active { display: block; }
+    .post-menu-item {
+      display: block;
+      width: 100%;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: background 0.2s;
+    }
+    .post-menu-item:hover { background: rgba(232,244,252,0.6); }
+    .post-menu-item.danger { color: #dc2626; }
+    .post-menu-item.danger:hover { background: rgba(239,68,68,0.08); }
+
+    /* Post Content */
+    .post-content {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.75;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .post-mood-line {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .post-images {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .post-images.grid-1 { grid-template-columns: 1fr; }
+    .post-images.grid-2 { grid-template-columns: 1fr 1fr; }
+    .post-images.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .post-images img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .post-images img:hover { transform: scale(1.03); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+
+    .post-location {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* ===== Empty State ===== */
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--text-muted);
+      animation: fadeIn 0.5s ease;
+    }
+    .empty-state .empty-emoji { font-size: 56px; margin-bottom: 12px; }
+    .empty-state .empty-title { font-size: 16px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; }
+    .empty-state .empty-desc { font-size: 13px; font-weight: 600; }
+    .empty-state .empty-filter-desc { font-size: 13px; font-weight: 600; margin-top: 12px; }
+
+    /* ===== FAB ===== */
+    .fab {
+      display: none;
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      box-shadow: 0 8px 28px rgba(96,165,250,0.35);
+      border: none;
+      cursor: pointer;
+      font-size: 28px;
+      color: white;
+      z-index: 90;
+      transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fab:hover { transform: scale(1.1); box-shadow: 0 12px 36px rgba(96,165,250,0.45); }
+    .fab:active { transform: scale(0.95); }
+
+    /* ===== Modal Overlay ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.5);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-sheet {
+      background: white;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      width: 100%;
+      max-width: 600px;
+      padding: 24px 20px 40px;
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.15);
+      animation: slideUp 0.35s cubic-bezier(0.4,0,0.2,1);
+      margin-top: auto;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-handle {
+      width: 36px; height: 4px;
+      background: rgba(200,225,245,0.6);
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+    .modal-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .form-group textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px 16px;
+      border: 1.5px solid rgba(200,225,245,0.6);
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: rgba(248,252,255,0.8);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .form-group textarea:focus { border-color: var(--accent-pink); }
+    .form-group input[type="text"],
+    .form-group input[type="datetime-local"] {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid rgba(200,225,245,0.6);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: rgba(248,252,255,0.8);
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .form-group input:focus { border-color: var(--accent-pink); }
+
+    .mood-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .mood-option {
+      width: 48px; height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      border-radius: var(--radius-sm);
+      border: 2px solid transparent;
+      background: rgba(248,252,255,0.8);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mood-option:hover { transform: scale(1.12); }
+    .mood-option.selected {
+      border-color: var(--accent-pink);
+      background: rgba(244,114,182,0.06);
+      box-shadow: 0 2px 8px rgba(244,114,182,0.15);
+    }
+
+    .image-upload-area {
+      border: 2px dashed rgba(200,225,245,0.6);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: rgba(248,252,255,0.5);
+    }
+    .image-upload-area:hover { border-color: var(--accent-pink); background: rgba(244,114,182,0.03); }
+    .image-upload-area .upload-icon { font-size: 30px; margin-bottom: 4px; }
+    .image-upload-area .upload-text { font-size: 13px; font-weight: 700; color: var(--text-secondary); }
+    .image-upload-area .upload-hint { font-size: 11px; color: var(--text-muted); }
+
+    .image-previews {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .image-preview-item {
+      position: relative;
+      width: 80px; height: 80px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid rgba(200,225,245,0.5);
+    }
+    .image-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .image-preview-item .remove-img {
+      position: absolute;
+      top: 4px; right: 4px;
+      width: 20px; height: 20px;
+      background: rgba(239,68,68,0.85);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 12px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    /* ===== Buttons ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 22px;
+      border-radius: 24px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      color: white;
+      box-shadow: 0 4px 14px rgba(96,165,250,0.3);
+    }
+    .btn-primary:hover { box-shadow: 0 6px 20px rgba(96,165,250,0.45); transform: translateY(-1px); }
+    .btn-outline {
+      background: rgba(255,255,255,0.7);
+      border: 1.5px solid rgba(200,225,245,0.6);
+      color: var(--text-secondary);
+    }
+    .btn-outline:hover { background: rgba(232,244,252,0.9); }
+
+    /* ===== Lightbox ===== */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      cursor: zoom-out;
+    }
+    .lightbox.active { display: flex; }
+    .lightbox img {
+      max-width: 92vw;
+      max-height: 92vh;
+      border-radius: 12px;
+    }
+
+    /* ===== Toast ===== */
+    .toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 10px 24px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      box-shadow: var(--shadow-hover);
+      z-index: 300;
+      opacity: 0;
+      transition: all 0.35s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ===== Admin Dropdown ===== */
+    .admin-dropdown {
+      display: none;
+      position: absolute;
+      top: 52px;
+      right: 16px;
+      background: white;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      min-width: 180px;
+      z-index: 110;
+      overflow: hidden;
+    }
+    .admin-dropdown.active { display: block; }
+    .admin-dropdown .drop-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 11px 18px;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: background 0.2s;
+    }
+    .admin-dropdown .drop-item:hover { background: rgba(232,244,252,0.6); }
+    .admin-dropdown .drop-divider {
+      height: 1px;
+      background: rgba(200,225,245,0.3);
+      margin: 4px 0;
+    }
+
+    /* Public read-only mode. Localhost can enable admin tools. */
+    body:not(.local-admin-enabled) #gearBtn,
+    body:not(.local-admin-enabled) #adminDropdown,
+    body:not(.local-admin-enabled) #fabBtn,
+    body:not(.local-admin-enabled) #postModal,
+    body:not(.local-admin-enabled) .post-menu-btn,
+    body:not(.local-admin-enabled) .post-menu-dropdown {
+      display: none !important;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 480px) {
+      .container { padding: 16px 12px 80px; }
+      .daily-header { padding: 10px 14px; }
+      .daily-header h1 { font-size: 18px; }
+      .post-card { padding: 16px; }
+      .fab { bottom: 20px; right: 16px; width: 50px; height: 50px; font-size: 24px; }
+    }
+    
+    /* ===== 打印样式 ===== */
+    @media print {
+      .daily-header { position: relative; }
+      .fab { display: none; }
+      .post-card { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 嵌套检测脚本 - 立即执行 -->
+  <script>
+    (function() {
+      // 检测是否在 iframe 中
+      var inIframe = false;
+      try {
+        inIframe = window.self !== window.top;
+      } catch(e) {
+        inIframe = true;
+      }
+      
+      // 检测是否被注入到父页面 DOM 中（不是 iframe，而是直接 innerHTML 注入）
+      var isInjected = false;
+      try {
+        // 如果当前 body 不在顶层 document 中
+        if (!inIframe && document.body && document.body.parentElement) {
+          // 检查是否有多个 body 标签
+          var allBodies = document.querySelectorAll('body');
+          if (allBodies.length > 1) isInjected = true;
+          
+          // 检查 body 的父元素是否是 html
+          if (document.body.parentElement.tagName !== 'HTML') isInjected = true;
+          
+          // 检查当前 document 是否不是最顶层
+          if (document.defaultView !== window.top) isInjected = true;
+        }
+      } catch(e) {
+        isInjected = true;
+      }
+      
+      // 如果检测到嵌套，添加 class
+      if (inIframe || isInjected) {
+        document.body.classList.add('in-iframe');
+        console.log('[Daily] Detected nested mode, applied in-iframe styles');
+      }
+    })();
+  </script>
+
+  <!-- Header -->
+  <header class="daily-header">
+    <div class="header-left">
+      <a class="back-btn" href="javascript:goBack()" title="返回主页" aria-label="返回主页">&#8592;</a>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="gearBtn" title="管理" aria-label="管理菜单" onclick="toggleAdminDropdown()">&#9881;</button>
+      <div class="admin-dropdown" id="adminDropdown">
+        <div class="drop-item" onclick="toggleAdmin()">
+          <span id="adminStatusIcon">&#128273;</span>
+          <span id="adminStatusText">开启管理员模式</span>
+        </div>
+        <div class="drop-divider"></div>
+        <div class="drop-item" onclick="exportData()">&#128190; 导出数据</div>
+        <div class="drop-item" onclick="document.getElementById('importFile').click()">&#128194; 导入数据</div>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <div class="container">
+    <!-- Hero -->
+    <div class="daily-hero">
+      <div class="daily-hero-text">
+        <div class="daily-hero-label">MY DAILY</div>
+        <div class="daily-hero-title">我的日常</div>
+        <div class="daily-hero-desc">记录生活点滴，分享有趣瞬间。</div>
+      </div>
+      <div class="daily-hero-gif">
+        <img src="/images/cloud-daily.gif" alt="云朵角色" loading="lazy">
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-row">
+        <div class="search-box">
+          <span class="search-icon">&#128269;</span>
+          <input type="text" id="searchInput" placeholder="搜索动态..." oninput="handleSearch(this.value)">
+          <button class="search-clear" id="searchClear" onclick="clearSearch()">&#10005;</button>
+        </div>
+      </div>
+      <div class="mood-filters" id="moodFilters">
+        <span class="mood-chip active" data-mood="" onclick="filterByMood('', this)">全部</span>
+        <span class="mood-chip" data-mood="😊" onclick="filterByMood('😊', this)">😊 开心</span>
+        <span class="mood-chip" data-mood="🥰" onclick="filterByMood('🥰', this)">🥰 喜爱</span>
+        <span class="mood-chip" data-mood="🎉" onclick="filterByMood('🎉', this)">🎉 庆祝</span>
+        <span class="mood-chip" data-mood="😌" onclick="filterByMood('😌', this)">😌 平静</span>
+        <span class="mood-chip" data-mood="😢" onclick="filterByMood('😢', this)">😢 伤心</span>
+      </div>
+    </div>
+
+    <!-- Posts Area -->
+    <div id="postsArea"></div>
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" id="fabBtn" onclick="openPostModal()" title="发布动态" aria-label="发布动态">+</button>
+
+  <!-- Post Modal -->
+  <div class="modal-overlay" id="postModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="modalTitle">发布动态</div>
+
+      <div class="form-group">
+        <label for="postContent">想说点什么？</label>
+        <textarea id="postContent" placeholder="今天发生了什么有趣的事？"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>心情</label>
+        <div class="mood-selector" id="moodSelector">
+        </div>
+        <div class="mood-label" style="margin-top:4px;font-size:11px;color:var(--text-muted);">选填</div>
+      </div>
+
+      <div class="form-group">
+        <label for="postLocation">位置</label>
+        <input type="text" id="postLocation" placeholder="你在哪里？">
+      </div>
+
+      <div class="form-group" id="editTimeGroup" style="display:none">
+        <label for="postTime">发布时间</label>
+        <input type="datetime-local" id="postTime">
+      </div>
+
+      <div class="form-group">
+        <label>图片</label>
+        <div class="image-upload-area" id="imageUploadArea" tabindex="0" role="button" aria-label="上传图片" onclick="document.getElementById('imageInput').click()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('imageInput').click();}">
+          <div class="upload-icon">&#128247;</div>
+          <div class="upload-text">点击上传图片</div>
+          <div class="upload-hint">最多 9 张</div>
+        </div>
+        <input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="handleImageUpload(event)">
+        <div class="image-previews" id="imagePreviews"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closePostModal()">取消</button>
+        <button class="btn btn-primary" onclick="submitPost()">发布</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <img id="lightboxImg" alt="预览大图">
+  </div>
+
+  <!-- Confirm Modal -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-sheet" style="text-align:center;">
+      <div class="modal-handle"></div>
+      <h3 id="confirmTitle" style="font-size:17px;font-weight:800;color:var(--text-primary);margin-bottom:8px;"></h3>
+      <p id="confirmMessage" style="font-size:14px;color:var(--text-muted);margin-bottom:20px;line-height:1.6;"></p>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button class="btn btn-outline" onclick="closeConfirm()">取消</button>
+        <button class="btn btn-primary" style="background:linear-gradient(135deg,#ef4444,#dc2626);" onclick="confirmAction()">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ===== 检测是否在嵌套环境中（iframe 或被其他页面加载） =====
+    function isNested() {
+      try {
+        // 方法1: 检测是否在 iframe 中
+        if (window.parent !== window) return true;
+        // 方法2: 检测是否在 frame 中
+        if (window.self !== window.top) return true;
+        // 方法3: 检测是否被其他文档引用
+        if (window.frameElement) return true;
+        // 方法4: 检测是否有父级容器包裹（通过 URL 参数标记）
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('embed') === 'true' || urlParams.get('nested') === 'true') return true;
+        // 方法5: 检测页面是否在 shadow DOM 中
+        if (document.documentElement.getAttribute('data-embed') === 'true') return true;
+      } catch (e) {
+        // 跨域情况下，如果 parent !== window 会报错，但已经在上面判断了
+        return true;
+      }
+      return false;
+    }
+
+    // 方法6: 如果页面被隐藏（父容器设置 display:none），检测实际可见性
+    function checkVisibility() {
+      const rect = document.body.getBoundingClientRect();
+      const header = document.querySelector('.daily-header');
+      if (header) {
+        const headerRect = header.getBoundingClientRect();
+        // 如果 header 被压缩或不可见，说明在嵌套中
+        if (headerRect.height < 10 || rect.height < window.innerHeight * 0.5) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    if (isNested() || checkVisibility()) {
+      document.body.classList.add('in-iframe');
+      
+      // 通知父页面调整 iframe 高度
+      function updateIframeHeight() {
+        const height = document.documentElement.scrollHeight;
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({
+            type: 'resizeIframe',
+            height: height,
+            page: 'daily'
+          }, '*');
+        }
+      }
+      
+      // 初始调整
+      setTimeout(updateIframeHeight, 100);
+      setTimeout(updateIframeHeight, 500);
+      // DOM 变化时调整
+      const observer = new MutationObserver(updateIframeHeight);
+      observer.observe(document.body, { childList: true, subtree: true });
+      window.addEventListener('resize', updateIframeHeight);
+    }
+
+    // ===== State =====
+    let posts = [];
+    let isAdmin = false;
+    let editingPostId = null;
+    let selectedMood = '';
+    let uploadedImages = [];
+    let pendingConfirmCallback = null;
+    let searchQuery = '';
+    let activeMood = '';
+
+    const STORAGE_KEY = 'daily_posts';
+    const ADMIN_KEY = 'daily_admin_token';
+    const API_BASE = '/api/daily';
+
+    // ===== API helpers =====
+    function getAuthToken() { return localStorage.getItem(ADMIN_KEY); }
+    function authHeaders() {
+      const t = getAuthToken();
+      return t ? { 'Authorization': 'Bearer ' + t } : {};
+    }
+    async function api(method, path, body) {
+      const opts = { method, headers: { 'Content-Type': 'application/json', ...authHeaders() } };
+      if (body) opts.body = JSON.stringify(body);
+      const r = await fetch(API_BASE + path, opts);
+      if (r.status === 401) { isAdmin = false; updateAdminUI(); showToast('登录已过期，请重新登录'); }
+      return r;
+    }
+
+    // ===== Mood options =====
+    const MOODS = ['😊','🥰','🎉','😌','😢','🤔','😴','😡'];
+
+    function buildMoodSelector() {
+      const container = document.getElementById('moodSelector');
+      container.innerHTML = MOODS.map(m => `
+        <div class="mood-option" data-mood="${m}" tabindex="0" role="radio" aria-label="${m}" onclick="selectMood(this, '${m}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectMood(this,'${m}');}">${m}</div>
+      `).join('');
+    }
+
+    // ===== Navigation =====
+    function goBack() {
+      if (window.parent !== window) {
+        window.parent.postMessage('closeDailyOverlay', '*');
+      } else {
+        window.location.href = '/';
+      }
+    }
+
+    // ===== Init =====
+    function init() {
+      buildMoodSelector();
+      document.body.classList.add('local-admin-enabled');
+      // Check if we have a valid token
+      checkAuth();
+      loadPosts();
+    }
+
+    async function checkAuth() {
+      const token = getAuthToken();
+      if (!token) { isAdmin = false; updateAdminUI(); return; }
+      try {
+        const r = await api('GET', '/verify');
+        if (r.ok) { isAdmin = true; }
+        else { isAdmin = false; localStorage.removeItem(ADMIN_KEY); }
+      } catch(e) { isAdmin = false; }
+      updateAdminUI();
+    }
+
+    // ===== Data =====
+    function loadPosts() {
+      fetch(API_BASE + '/posts')
+        .then(r => r.json())
+        .then(data => { posts = data || []; renderPosts(); })
+        .catch(() => { posts = []; renderPosts(); });
+    }
+
+    // ===== Admin (password-based) =====
+    function toggleAdmin() {
+      if (isAdmin) {
+        // Log out
+        isAdmin = false;
+        localStorage.removeItem(ADMIN_KEY);
+        updateAdminUI();
+        document.getElementById('adminDropdown').classList.remove('active');
+        renderPosts();
+        showToast('已退出管理员模式');
+        return;
+      }
+      // Show login prompt
+      document.getElementById('adminDropdown').classList.remove('active');
+      showLoginModal();
+    }
+
+    function showLoginModal() {
+      const existing = document.getElementById('loginModal');
+      if (existing) existing.remove();
+      const modal = document.createElement('div');
+      modal.id = 'loginModal';
+      modal.className = 'modal-overlay active';
+      modal.innerHTML = `
+        <div class="modal-sheet" style="text-align:center;max-width:340px;">
+          <div class="modal-handle"></div>
+          <h3 style="font-size:17px;font-weight:800;color:var(--text-primary);margin-bottom:16px;">&#128274; 管理员登录</h3>
+          <div class="form-group" style="text-align:left;">
+            <input type="password" id="adminPassword" placeholder="请输入管理员密码"
+              style="width:100%;padding:12px 16px;border:2px solid var(--card-border);border-radius:var(--radius-sm);font-size:15px;outline:none;transition:border-color .2s;"
+              onfocus="this.style.borderColor='var(--accent-blue)'" onblur="this.style.borderColor='var(--card-border)'"
+              onkeydown="if(event.key==='Enter')doLogin()">
+          </div>
+          <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;">
+            <button class="btn btn-outline" onclick="closeLoginModal()">取消</button>
+            <button class="btn btn-primary" onclick="doLogin()">登录</button>
+          </div>
+          <div id="loginError" style="color:#ef4444;font-size:12px;margin-top:8px;min-height:18px;"></div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => document.getElementById('adminPassword')?.focus(), 100);
+    }
+
+    function closeLoginModal() {
+      const m = document.getElementById('loginModal');
+      if (m) m.remove();
+      document.body.style.overflow = '';
+    }
+
+    async function doLogin() {
+      const pw = document.getElementById('adminPassword')?.value;
+      if (!pw) { document.getElementById('loginError').textContent = '请输入密码'; return; }
+      try {
+        const r = await fetch(API_BASE + '/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pw })
+        });
+        if (r.ok) {
+          const data = await r.json();
+          localStorage.setItem(ADMIN_KEY, data.token);
+          isAdmin = true;
+          closeLoginModal();
+          updateAdminUI();
+          renderPosts();
+          showToast('登录成功 ✨');
+        } else {
+          document.getElementById('loginError').textContent = '密码错误';
+        }
+      } catch(e) {
+        document.getElementById('loginError').textContent = '网络错误';
+      }
+    }
+
+    function updateAdminUI() {
+      const btn = document.getElementById('gearBtn');
+      const statusIcon = document.getElementById('adminStatusIcon');
+      const statusText = document.getElementById('adminStatusText');
+      const fab = document.getElementById('fabBtn');
+
+      if (isAdmin) {
+        btn.classList.add('admin-active');
+        statusIcon.textContent = '\uD83D\uDD12';
+        statusText.textContent = '退出管理员模式';
+        fab.style.display = 'flex';
+      } else {
+        btn.classList.remove('admin-active');
+        statusIcon.textContent = '\uD83D\uDD11';
+        statusText.textContent = '管理员登录';
+        fab.style.display = 'none';
+        closePostModal();
+      }
+    }
+
+    function toggleAdminDropdown() {
+      const dd = document.getElementById('adminDropdown');
+      dd.classList.toggle('active');
+    }
+
+    // ===== Post Modal =====
+    function openPostModal(postId) {
+      if (!isAdmin) return false;
+      resetForm();
+      const modal = document.getElementById('postModal');
+      const title = document.getElementById('modalTitle');
+      const timeGroup = document.getElementById('editTimeGroup');
+
+      if (postId) {
+        const post = posts.find(p => p.id === postId);
+        if (!post) return;
+        editingPostId = postId;
+        title.textContent = '编辑动态';
+        document.getElementById('postContent').value = post.content;
+        document.getElementById('postLocation').value = post.location || '';
+        selectedMood = post.mood || '';
+        uploadedImages = post.images ? [...post.images] : [];
+        if (post.createdAt) {
+          const d = new Date(post.createdAt);
+          document.getElementById('postTime').value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        }
+        timeGroup.style.display = 'block';
+      } else {
+        editingPostId = null;
+        title.textContent = '发布动态';
+        timeGroup.style.display = 'none';
+        const now = new Date();
+        document.getElementById('postTime').value = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      }
+
+      updateMoodSelectorUI();
+      renderImagePreviews();
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePostModal() {
+      document.getElementById('postModal').classList.remove('active');
+      document.body.style.overflow = '';
+      resetForm();
+    }
+
+    function resetForm() {
+      document.getElementById('postContent').value = '';
+      document.getElementById('postLocation').value = '';
+      selectedMood = '';
+      uploadedImages = [];
+      editingPostId = null;
+      updateMoodSelectorUI();
+      document.getElementById('imagePreviews').innerHTML = '';
+    }
+
+    // ===== Mood =====
+    function selectMood(el, mood) {
+      if (selectedMood === mood) { selectedMood = ''; } else { selectedMood = mood; }
+      updateMoodSelectorUI();
+    }
+
+    function updateMoodSelectorUI() {
+      document.querySelectorAll('#moodSelector .mood-option').forEach(el => {
+        const s = el.dataset.mood === selectedMood;
+        el.classList.toggle('selected', s);
+        el.setAttribute('aria-checked', s);
+      });
+    }
+
+    // ===== Image Upload =====
+    function handleImageUpload(event) {
+      const files = Array.from(event.target.files);
+      const remaining = 9 - uploadedImages.length;
+      if (remaining <= 0) { showToast('最多上传 9 张图片'); return; }
+      files.slice(0, remaining).forEach(file => {
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          compressImage(e.target.result, 1200, 0.8, function(compressed) {
+            // Upload to server, store only URL path
+            uploadImage(compressed).then(url => {
+              if (url) {
+                uploadedImages.push(url);
+                renderImagePreviews();
+              }
+            });
+          });
+        };
+        reader.readAsDataURL(file);
+      });
+      event.target.value = '';
+    }
+
+    async function uploadImage(base64Data) {
+      try {
+        const r = await api('POST', '/upload', { image: base64Data });
+        if (r.ok) {
+          const data = await r.json();
+          return data.url;
+        }
+        showToast('图片上传失败');
+        return null;
+      } catch(e) {
+        showToast('图片上传出错');
+        return null;
+      }
+    }
+
+    function compressImage(dataUrl, maxW, quality, callback) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > maxW) { h = h * maxW / w; w = maxW; }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        callback(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = dataUrl;
+    }
+
+    function renderImagePreviews() {
+      document.getElementById('imagePreviews').innerHTML = uploadedImages.map((img, i) => `
+        <div class="image-preview-item">
+          <img src="${img}" alt="预览">
+          <button class="remove-img" aria-label="删除" onclick="removeUploadImage(${i})">&times;</button>
+        </div>
+      `).join('');
+    }
+
+    function removeUploadImage(i) { uploadedImages.splice(i, 1); renderImagePreviews(); }
+
+    // ===== Submit =====
+    async function submitPost() {
+      const content = document.getElementById('postContent').value.trim();
+      if (!content) { showToast('请输入内容'); return; }
+      const location = document.getElementById('postLocation').value.trim();
+      const timeVal = document.getElementById('postTime').value;
+      const createdAt = timeVal ? new Date(timeVal).toISOString() : new Date().toISOString();
+
+      try {
+        if (editingPostId) {
+          const r = await api('PUT', '/posts/' + editingPostId, {
+            content, mood: selectedMood, location, images: uploadedImages, createdAt
+          });
+          if (!r.ok) throw new Error('更新失败');
+          showToast('已更新');
+        } else {
+          const r = await api('POST', '/posts', {
+            content, images: uploadedImages, location,
+            mood: selectedMood, pinned: false, createdAt
+          });
+          if (!r.ok) throw new Error('发布失败');
+          showToast('发布成功 ✨');
+        }
+        loadPosts();
+        closePostModal();
+      } catch(e) {
+        showToast('操作失败: ' + e.message);
+      }
+    }
+
+    // ===== Post Actions =====
+    function editPost(id) {
+      document.getElementById('adminDropdown').classList.remove('active');
+      openPostModal(id);
+    }
+
+    function togglePin(id) {
+      const post = posts.find(p => p.id === id);
+      if (!post) return;
+      api('PUT', '/posts/' + id, { pinned: !post.pinned })
+        .then(r => { if (r.ok) { loadPosts(); showToast(!post.pinned ? '已置顶' : '已取消置顶'); } })
+        .catch(() => showToast('操作失败'));
+    }
+
+    function deletePost(id) {
+      document.getElementById('adminDropdown').classList.remove('active');
+      showConfirm('删除确认', '确定要删除这条动态吗？', function() {
+        api('DELETE', '/posts/' + id)
+          .then(r => { if (r.ok) { loadPosts(); showToast('已删除'); } })
+          .catch(() => showToast('删除失败'));
+      });
+    }
+
+    function togglePostMenu(id) {
+      const all = document.querySelectorAll('.post-menu-dropdown');
+      const current = document.getElementById('menu-' + id);
+      all.forEach(m => { if (m !== current) m.classList.remove('active'); });
+      current.classList.toggle('active');
+      if (current.classList.contains('active')) {
+        setTimeout(() => {
+          document.addEventListener('click', function closeMenu(e) {
+            if (!e.target.closest('.post-menu-wrap')) {
+              current.classList.remove('active');
+              document.removeEventListener('click', closeMenu);
+            }
+          });
+        }, 10);
+      }
+    }
+
+    // ===== Search / Filter =====
+    function handleSearch(val) {
+      searchQuery = val.trim().toLowerCase();
+      document.getElementById('searchClear').classList.toggle('visible', val.length > 0);
+      renderPosts();
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      searchQuery = '';
+      document.getElementById('searchClear').classList.remove('visible');
+      renderPosts();
+    }
+
+    function filterByMood(mood, el) {
+      activeMood = mood;
+      document.querySelectorAll('.mood-chip').forEach(c => c.classList.toggle('active', c.dataset.mood === mood));
+      renderPosts();
+    }
+
+    function getFilteredPosts() {
+      let filtered = [...posts];
+      if (searchQuery) {
+        filtered = filtered.filter(p => 
+          p.content.toLowerCase().includes(searchQuery) ||
+          (p.location && p.location.toLowerCase().includes(searchQuery))
+        );
+      }
+      if (activeMood) {
+        filtered = filtered.filter(p => p.mood === activeMood);
+      }
+      return filtered;
+    }
+
+    // ===== Date Grouping =====
+    function getDateGroup(dateStr) {
+      const d = new Date(dateStr);
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yesterday = new Date(today.getTime() - 86400000);
+      const weekAgo = new Date(today.getTime() - 7 * 86400000);
+      const dDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      if (dDay.getTime() >= today.getTime()) return '今天';
+      if (dDay.getTime() >= yesterday.getTime()) return '昨天';
+      if (dDay.getTime() >= weekAgo.getTime()) return '本周';
+      return '更早';
+    }
+
+    // ===== Render =====
+    function renderPosts() {
+      const container = document.getElementById('postsArea');
+      const filtered = getFilteredPosts();
+
+      if (filtered.length === 0) {
+        if (posts.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-emoji">&#128221;</div>
+              <div class="empty-title">还没有任何动态</div>
+              <div class="empty-desc">点击右下角的 + 按钮发布第一条动态吧</div>
+            </div>`;
+        } else {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-emoji">&#128270;</div>
+              <div class="empty-title">没有找到匹配的动态</div>
+              <div class="empty-filter-desc">
+                <button class="btn btn-outline" style="font-size:12px;padding:6px 16px;" onclick="clearSearch();filterByMood('', document.querySelector('.mood-chip[data-mood=\"\"]'))">清除筛选</button>
+              </div>
+            </div>`;
+        }
+        return;
+      }
+
+      const sorted = [...filtered].sort((a, b) => {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+
+      // Group by date
+      const groups = {};
+      sorted.forEach(post => {
+        const g = getDateGroup(post.createdAt);
+        if (!groups[g]) groups[g] = [];
+        groups[g].push(post);
+      });
+
+      const groupOrder = ['今天','昨天','本周','更早'];
+      let html = '';
+
+      groupOrder.forEach(g => {
+        if (!groups[g] || groups[g].length === 0) return;
+        html += `<div class="section-header"><span class="section-label">${g} <span class="count">· ${groups[g].length}</span></span></div>`;
+        groups[g].forEach(post => {
+          html += renderPostCard(post);
+        });
+      });
+
+      container.innerHTML = html;
+    }
+
+    function renderPostCard(post) {
+      const timeStr = formatTime(post.createdAt);
+      const imagesHtml = (post.images && post.images.length > 0)
+        ? `<div class="post-images grid-${Math.min(post.images.length, 3)}">
+            ${post.images.map(img => `<img src="${img}" alt="图片" loading="lazy" onclick="event.stopPropagation();openLightbox('${escapeQuote(img)}')">`).join('')}
+          </div>`
+        : '';
+      const moodHtml = post.mood ? `<div class="post-mood-line">心情 ${post.mood}</div>` : '';
+      const locationHtml = post.location ? `<div class="post-location">&#128205; ${escapeHtml(post.location)}</div>` : '';
+      const pinTag = post.pinned ? `<span class="post-pin-tag">&#128204; 置顶</span>` : '';
+      const menuBtn = isAdmin ? `
+        <div class="post-menu-wrap">
+          <button class="post-menu-btn" onclick="event.stopPropagation();togglePostMenu('${post.id}')">&#8943;</button>
+          <div class="post-menu-dropdown" id="menu-${post.id}">
+            <button class="post-menu-item" onclick="editPost('${post.id}')">&#9998; 编辑</button>
+            <button class="post-menu-item" onclick="togglePin('${post.id}')">${post.pinned ? '&#128373; 取消置顶' : '&#128204; 置顶'}</button>
+            <button class="post-menu-item danger" onclick="deletePost('${post.id}')">&#128465; 删除</button>
+          </div>
+        </div>
+      ` : '';
+
+      return `
+        <div class="post-card ${post.pinned ? 'pinned' : ''}">
+          <div class="post-top">
+            <div class="post-user">
+              <img class="post-avatar" src="/images/avatar.jpg" alt="头像" width="40" height="40" loading="lazy">
+              <div class="post-user-info">
+                <div class="post-name">宁小包</div>
+                <div class="post-meta-row">
+                  <span>${timeStr}</span>
+                  <span class="post-meta-dot"></span>
+                  ${pinTag}
+                </div>
+              </div>
+            </div>
+            ${menuBtn}
+          </div>
+          <div class="post-content">${escapeHtml(post.content)}</div>
+          ${moodHtml}
+          ${imagesHtml}
+          ${locationHtml}
+        </div>
+      `;
+    }
+
+    // ===== Lightbox =====
+    function openLightbox(src) {
+      document.getElementById('lightboxImg').src = src;
+      document.getElementById('lightbox').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // ===== Confirm =====
+    function showConfirm(title, msg, cb) {
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmMessage').textContent = msg;
+      pendingConfirmCallback = cb;
+      document.getElementById('confirmModal').classList.add('active');
+    }
+    function closeConfirm() {
+      document.getElementById('confirmModal').classList.remove('active');
+      pendingConfirmCallback = null;
+    }
+    function confirmAction() {
+      if (pendingConfirmCallback) pendingConfirmCallback();
+      closeConfirm();
+    }
+
+    // ===== Export / Import =====
+    function exportData() {
+      document.getElementById('adminDropdown').classList.remove('active');
+      const blob = new Blob([JSON.stringify(posts, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'daily-posts-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToast('数据已导出');
+    }
+
+    async function importData(event) {
+      document.getElementById('adminDropdown').classList.remove('active');
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!Array.isArray(data)) { showToast('数据格式错误'); return; }
+          showConfirm('导入数据', `将导入 ${data.length} 条动态。每条将作为新动态添加。确定继续？`, async function() {
+            let count = 0;
+            for (const post of data) {
+              try {
+                const r = await api('POST', '/posts', {
+                  content: post.content,
+                  images: post.images || [],
+                  location: post.location || '',
+                  mood: post.mood || '',
+                  pinned: post.pinned || false,
+                  createdAt: post.createdAt || new Date().toISOString()
+                });
+                if (r.ok) count++;
+              } catch(err) {}
+            }
+            loadPosts();
+            showToast(`成功导入 ${count} 条动态`);
+          });
+        } catch(err) { showToast('文件解析失败'); }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    // ===== Toast =====
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    // ===== Utilities =====
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+    function escapeQuote(str) { return str.replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+    function formatTime(isoStr) {
+      try {
+        const d = new Date(isoStr);
+        const now = new Date();
+        const diff = now - d;
+        const min = Math.floor(diff / 60000);
+        const hrs = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+        if (min < 1) return '刚刚';
+        if (min < 60) return `${min} 分钟前`;
+        if (hrs < 24) return `${hrs} 小时前`;
+        if (days < 7) return `${days} 天前`;
+        const y = d.getFullYear();
+        const mo = String(d.getMonth()+1).padStart(2,'0');
+        const da = String(d.getDate()).padStart(2,'0');
+        return `${y}-${mo}-${da}`;
+      } catch(e) { return isoStr; }
+    }
+
+    // ===== Keyboard =====
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeLightbox();
+        closeConfirm();
+        closePostModal();
+        document.getElementById('adminDropdown').classList.remove('active');
+        document.querySelectorAll('.post-menu-dropdown').forEach(m => m.classList.remove('active'));
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.header-actions')) {
+        document.getElementById('adminDropdown').classList.remove('active');
+      }
+      if (!e.target.closest('.post-menu-wrap')) {
+        document.querySelectorAll('.post-menu-dropdown').forEach(m => m.classList.remove('active'));
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>

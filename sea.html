@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海的声音 · 另一页</title>
+<style>
+:root{
+  --hand:"HanziPen SC","Hannotate SC","Kaiti SC","STKaiti","KaiTi",cursive;
+  --sans:"Helvetica Neue",Helvetica,"PingFang SC",Arial,sans-serif;
+  --neon:#aede21;
+  --sea-deep:#06182e;
+  --sea-mid:#0a2a4d;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:var(--hand);
+  color:#f2f6fa;
+  background:var(--sea-deep);
+  overflow-x:hidden;
+}
+::selection{background:var(--neon);color:#06182e}
+
+/* ---------- grain ---------- */
+.grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:90;opacity:.45;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.34'/%3E%3C/svg%3E");
+  animation:grain-shift 1.2s steps(4) infinite}
+@keyframes grain-shift{0%{transform:translate(0,0)}25%{transform:translate(-1.2%,.8%)}50%{transform:translate(.9%,-1.1%)}75%{transform:translate(-.6%,-.5%)}100%{transform:translate(0,0)}}
+
+section{position:relative;min-height:100vh;overflow:hidden}
+.bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0}
+.bg::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(4,14,28,.55) 0%,rgba(6,24,46,.18) 35%,rgba(6,24,46,.24) 70%,rgba(4,14,28,.72) 100%);}
+.wrap{position:relative;z-index:2;height:100%;min-height:100vh}
+
+/* neon small labels */
+.neon{font-family:var(--sans);font-weight:700;color:var(--neon);letter-spacing:.06em;line-height:1.5;text-shadow:0 1px 8px rgba(0,0,0,.55)}
+.neon.small{font-size:12px;font-weight:600;opacity:.95}
+
+/* ---------- Screen 1 : poster hero ---------- */
+#hero .bg{background-image:url("./images/sea/hero-h.jpg")}
+#hero .wrap{display:flex;flex-direction:column;justify-content:center;align-items:center}
+.hero-title{
+  position:relative;z-index:3;text-align:center;
+  font-size:clamp(64px,12vw,150px);line-height:1.08;font-weight:700;color:#fff;
+  letter-spacing:.04em;
+  text-shadow:0 0 24px rgba(2,10,24,.65),0 6px 30px rgba(2,10,24,.55);
+  animation:rise 1.6s ease both;
+}
+.hero-sub{
+  z-index:3;margin-top:22px;font-size:clamp(20px,3vw,32px);color:#eaf2fb;letter-spacing:.35em;
+  text-shadow:0 2px 14px rgba(2,10,24,.7);animation:rise 1.6s .25s ease both;
+}
+@keyframes rise{from{opacity:0;transform:translateY(34px)}to{opacity:1;transform:translateY(0)}}
+.corner{position:absolute;z-index:4}
+.c-tl{top:26px;left:28px}
+.c-tr{top:26px;right:28px;text-align:right}
+.c-bl{bottom:30px;left:28px}
+.c-br{bottom:30px;right:28px;text-align:right}
+.c-tr .big{font-size:clamp(18px,2.4vw,28px);line-height:1.15;letter-spacing:.02em}
+.hand-en{
+  position:absolute;z-index:3;top:11%;left:6%;transform:rotate(-6deg);
+  font-family:"Snell Roundhand","Savoye LET",var(--hand);
+  color:rgba(255,255,255,.92);font-size:clamp(18px,2.6vw,30px);line-height:1.7;
+  text-shadow:0 2px 10px rgba(2,10,24,.6);
+}
+.doodle-umbrella{
+  position:absolute;z-index:3;width:clamp(150px,22vw,300px);top:16%;right:9%;
+  transform:rotate(8deg);opacity:.95;filter:drop-shadow(0 4px 14px rgba(0,0,0,.4));
+  animation:sway 5s ease-in-out infinite;
+}
+@keyframes sway{0%,100%{transform:rotate(6deg)}50%{transform:rotate(11deg) translateY(-8px)}}
+.scroll-hint{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);z-index:4;
+  font-family:var(--sans);font-size:12px;color:rgba(255,255,255,.85);letter-spacing:.4em;
+  animation:hintfloat 2.4s ease-in-out infinite;text-align:center}
+.scroll-hint::after{content:"";display:block;width:1px;height:34px;margin:10px auto 0;
+  background:linear-gradient(180deg,rgba(255,255,255,.9),transparent)}
+@keyframes hintfloat{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+
+/* ---------- Screen 2 : poem ---------- */
+#poem .bg{background-image:url("./images/sea/mist.jpg")}
+#poem .bg::after{background:linear-gradient(180deg,rgba(4,14,28,.66) 0%,rgba(6,24,46,.3) 45%,rgba(4,14,28,.7) 100%)}
+#poem .wrap{display:flex;flex-direction:column;justify-content:center;padding:12vh 8vw}
+.poem-line{
+  font-size:clamp(34px,6vw,76px);font-weight:700;color:#fff;line-height:1.5;letter-spacing:.08em;
+  text-shadow:0 4px 22px rgba(2,10,24,.7);
+  opacity:0;transform:translateY(40px);transition:opacity 1s ease,transform 1s ease;
+}
+.poem-line.on{opacity:1;transform:translateY(0)}
+.poem-line em{font-style:normal;color:var(--neon);text-shadow:0 0 18px rgba(174,222,33,.35)}
+.poem-en{margin-top:5vh;max-width:420px;font-size:13px;line-height:1.9;
+  opacity:0;transform:translateY(30px);transition:opacity 1s .3s ease,transform 1s .3s ease}
+.poem-en.on{opacity:1;transform:translateY(0)}
+.doodle-gulls{position:absolute;z-index:3;width:clamp(120px,18vw,240px);top:12%;right:10%;opacity:.9;
+  animation:glide 7s ease-in-out infinite}
+@keyframes glide{0%,100%{transform:translate(0,0)}50%{transform:translate(-26px,14px)}}
+
+/* ---------- Screen 3 : interactive rain/ripple ---------- */
+#play .bg{background-image:url("./images/sea/reef.jpg")}
+#play .bg::after{background:linear-gradient(180deg,rgba(4,14,28,.6) 0%,rgba(6,24,46,.28) 45%,rgba(4,14,28,.78) 100%)}
+#play .wrap{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;cursor:crosshair}
+.play-title{font-size:clamp(30px,5vw,58px);color:#fff;letter-spacing:.14em;
+  text-shadow:0 4px 20px rgba(2,10,24,.75)}
+.play-tip{margin-top:16px;font-family:var(--sans);font-size:13px;color:var(--neon);letter-spacing:.2em;font-weight:600;
+  text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.doodle-boat{position:absolute;z-index:3;width:clamp(110px,16vw,210px);left:8%;bottom:14%;opacity:.92;
+  animation:bob 4.5s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(3deg)}}
+.ripple{position:absolute;z-index:5;border:2px solid rgba(255,255,255,.85);border-radius:50%;
+  pointer-events:none;transform:translate(-50%,-50%);animation:rip 1.4s ease-out forwards}
+.ripple.r2{border-color:rgba(174,222,33,.7);animation-duration:1.8s;animation-delay:.15s;opacity:0}
+@keyframes rip{0%{width:8px;height:8px;opacity:.95}100%{width:220px;height:220px;opacity:0}}
+.raindrop{position:absolute;z-index:5;top:-40px;width:1.5px;height:26px;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(255,255,255,.85));
+  animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(115vh)}}
+
+/* ---------- Screen 4 : back to clouds ---------- */
+#back{min-height:70vh;background:linear-gradient(180deg,var(--sea-deep) 0%,#0a2a4d 55%,#123a66 100%)}
+#back .wrap{min-height:70vh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:26px;text-align:center}
+.back-cn{font-size:clamp(24px,3.6vw,40px);letter-spacing:.2em;color:#dfe9f5}
+.back-link{
+  display:inline-block;font-family:var(--hand);font-size:clamp(20px,2.8vw,30px);color:#fff;
+  text-decoration:none;letter-spacing:.16em;padding:10px 26px;
+  border:1.5px dashed rgba(255,255,255,.55);border-radius:999px;
+  transition:all .35s ease;
+}
+.back-link:hover{color:#06182e;background:var(--neon);border-color:var(--neon);
+  box-shadow:0 0 32px rgba(174,222,33,.45);transform:translateY(-3px)}
+#back .neon.small{opacity:.8}
+
+@media (max-width:720px){
+  #hero .bg{background-image:url("./images/sea/hero-v.jpg")}
+  .hand-en{top:8%;left:5%;font-size:15px}
+  .doodle-umbrella{top:20%;right:4%}
+  .corner{max-width:44vw}
+  .c-tr .big{font-size:16px}
+  .neon.small{font-size:10px}
+  #poem .wrap{padding:14vh 9vw}
+  .doodle-gulls{top:7%;right:6%}
+  .scroll-hint{bottom:40px}
+}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<!-- 第一屏：海报 -->
+<section id="hero">
+  <div class="bg"></div>
+  <div class="hand-en">The sea is endless<br>Sea breeze can blow away<br>all trouble</div>
+  <img class="doodle-umbrella" src="./images/sea/doodle-umbrella-t.png" alt="" aria-hidden="true">
+  <div class="wrap">
+    <h1 class="hero-title">海的声音<br>另一页</h1>
+    <div class="hero-sub">从云端落下，站在海的面前</div>
+  </div>
+  <div class="corner c-tl neon big" style="font-size:clamp(16px,2vw,24px)">THE VOICE<br>OF THE SEA</div>
+  <div class="corner c-tr">
+    <div class="neon big">ANOTHER PAGE<br>BEGINS HERE</div>
+    <div class="neon small" style="margin-top:10px">If you have a chance<br>We must go to see the sea<br>Listen to the waves<br>Find a place to sit down</div>
+  </div>
+  <div class="corner c-bl neon small">Flying from the clouds<br>To an unknown sea area</div>
+  <div class="corner c-br neon small">Watching the sea<br>Itself is a<br>Romantic thing</div>
+  <div class="scroll-hint">往 海 里 去</div>
+</section>
+
+<!-- 第二屏：诗意文案 -->
+<section id="poem">
+  <div class="bg"></div>
+  <img class="doodle-gulls" src="./images/sea/doodle-gulls-t.png" alt="" aria-hidden="true">
+  <div class="wrap">
+    <div class="poem-line reveal">大海一望无际</div>
+    <div class="poem-line reveal" style="transition-delay:.2s">海风可以<em>吹走所有烦恼</em></div>
+    <div class="poem-line reveal" style="transition-delay:.4s;font-size:clamp(22px,3.4vw,40px);margin-top:4vh;letter-spacing:.16em;color:#d8e6f4">浪来了又退，像一页一页翻过的诗</div>
+    <div class="poem-en neon small reveal">The waves can sweep away your anxiety<br>It doesn't matter if there's no company<br>Take a picture, listen to the song<br>The tide will turn this page for you</div>
+  </div>
+</section>
+
+<!-- 第三屏：互动 -->
+<section id="play">
+  <div class="bg"></div>
+  <img class="doodle-boat" src="./images/sea/doodle-boat-t.png" alt="" aria-hidden="true">
+  <div class="wrap" id="playArea">
+    <div class="play-title reveal poem-line" style="font-size:clamp(30px,5vw,58px)">点一下海面，听它回答</div>
+    <div class="play-tip">CLICK THE SEA · RIPPLES &amp; HAND-DRAWN RAIN</div>
+  </div>
+</section>
+
+<!-- 第四屏：回到云端 -->
+<section id="back">
+  <div class="wrap">
+    <div class="back-cn">海听完了，云还在等你</div>
+    <a class="back-link" href="./index.html">← 翻回上一页 · 回到云端</a>
+    <div class="neon small">TURN BACK TO THE CLOUDS · PAGE ZERO</div>
+  </div>
+</section>
+
+<script>
+// 滚动渐显
+const io = new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('on'); });
+},{threshold:.25});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// 第三屏：点击涟漪 + 手绘雨
+const play = document.getElementById('play');
+const area = document.getElementById('playArea');
+function spawnRipple(x,y){
+  for(const cls of ['','r2']){
+    const r=document.createElement('div');
+    r.className='ripple '+cls;
+    r.style.left=x+'px'; r.style.top=y+'px';
+    play.appendChild(r);
+    setTimeout(()=>r.remove(),2000);
+  }
+}
+function rainBurst(){
+  const n=26;
+  for(let i=0;i<n;i++){
+    const d=document.createElement('div');
+    d.className='raindrop';
+    d.style.left=(Math.random()*100)+'%';
+    d.style.animationDuration=(0.9+Math.random()*0.9)+'s';
+    d.style.animationDelay=(Math.random()*0.6)+'s';
+    play.appendChild(d);
+    setTimeout(()=>d.remove(),2600);
+  }
+}
+area.addEventListener('click',e=>{
+  const rect=play.getBoundingClientRect();
+  spawnRipple(e.clientX-rect.left, e.clientY-rect.top);
+  rainBurst();
+});
+</script>
+</body>
+</html>

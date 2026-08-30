@@ -1,0 +1,197 @@
+/* ============================================================
+   云朵家族 · 梦幻绘本风  (cloud-dream.css)
+   重做版：参考梵高星空 / 治愈系手绘水彩插画的视觉语言
+   深蓝宇宙 + 翠绿星系漩涡 + 暖金星光 + 发光水彩角色
+   ============================================================ */
+
+:root{
+  /* 绘本夜空色系 */
+  --sky-0:#070d1f;          /* 最深宇宙 */
+  --sky-1:#0c1630;          /* 深蓝夜幕 */
+  --sky-2:#1a2a55;          /* 宝蓝 */
+  --sky-3:#274b8f;          /* 钴蓝 */
+  --galaxy-teal:#2fe0c0;    /* 星系翠绿 */
+  --galaxy-mint:#8ff5d8;
+  --star-gold:#ffd76a;      /* 暖金星 */
+  --star-warm:#ffb45e;
+  --cloud-white:#f6f3ff;
+  --blush:#ffc7d9;          /* 腮红粉 */
+  --ink-soft:#e9e4ff;
+  --ink-mute:#9aa3d0;
+  --hand:'HanziPen SC','Kaiti SC','STKaiti','KaiTi','Yuanti SC',cursive;
+  --round:'Yuanti SC','Nunito','PingFang SC',rounded,sans-serif;
+  --mono:'Space Mono',ui-monospace,monospace;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  min-height:100svh;
+  overflow-x:hidden;
+  background:var(--sky-0);
+  color:var(--ink-soft);
+  font-family:var(--round);
+  letter-spacing:.5px;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+img{display:block;max-width:100%}
+
+/* ---- 画布层：星空 / 星系 / 手绘颗粒 ---- */
+#sky-stars,#sky-galaxy{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+#sky-stars{z-index:0}
+#sky-galaxy{z-index:1;mix-blend-mode:screen;opacity:.85}
+.grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.10;
+  background-image:radial-gradient(rgba(246,243,255,.6) .5px,transparent .8px);
+  background-size:6px 6px;mix-blend-mode:overlay}
+.vignette{position:fixed;inset:0;z-index:3;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 42%,transparent 40%,rgba(4,8,20,.55) 100%)}
+
+/* ---- 整体布局 ---- */
+.stage{position:relative;z-index:4;min-height:100svh;display:flex;flex-direction:column}
+
+/* 顶栏 */
+.top{display:flex;align-items:center;justify-content:space-between;
+  padding:22px clamp(18px,4vw,44px);gap:16px}
+.pill{display:inline-flex;align-items:center;gap:8px;
+  padding:9px 16px;border-radius:999px;
+  background:rgba(20,34,72,.55);backdrop-filter:blur(10px);
+  border:1px solid rgba(140,170,255,.20);
+  font-size:13px;color:var(--ink-soft);transition:.25s}
+.pill:hover{background:rgba(60,90,180,.5);transform:translateY(-2px)}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:var(--star-gold);
+  box-shadow:0 0 10px var(--star-gold)}
+.brand{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--ink-mute)}
+.brand b{color:var(--star-gold);font-weight:400}
+
+/* 主区：桌面左右分栏 */
+.hero{flex:1;display:grid;grid-template-columns:minmax(300px,.9fr) minmax(360px,1.1fr);
+  align-items:center;gap:clamp(20px,4vw,64px);
+  max-width:1280px;margin:0 auto;width:100%;
+  padding:10px clamp(18px,4vw,44px) 40px}
+
+/* 左侧文案 */
+.intro{max-width:520px}
+.tag{display:inline-flex;align-items:center;gap:8px;margin-bottom:20px;
+  font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--ink-mute)}
+.tag::before{content:"";width:26px;height:1px;background:var(--star-gold)}
+h1.name{margin:0;font-family:var(--hand);font-weight:400;
+  font-size:clamp(58px,7vw,96px);line-height:1.04;color:var(--cloud-white);
+  text-shadow:0 0 40px rgba(140,245,216,.25)}
+h1.name .zh{display:block}
+h1.name .en{display:block;margin-top:14px;font-family:var(--mono);
+  font-size:clamp(11px,1.2vw,14px);letter-spacing:5px;color:var(--galaxy-mint)}
+.intro .desc{margin:26px 0 0;font-size:17px;line-height:2;color:#cfd6f5;max-width:44ch}
+.intro .quote{margin-top:22px;padding-left:16px;border-left:2px solid rgba(255,215,106,.5);
+  font-family:var(--hand);font-size:16px;color:var(--star-gold);line-height:1.9}
+
+/* 家族导航 */
+.fam{margin-top:34px}
+.fam .lbl{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink-mute);margin-bottom:12px}
+.fam .row{display:flex;flex-wrap:wrap;gap:8px}
+.fam a{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;
+  background:rgba(24,40,84,.45);border:1px solid rgba(140,170,255,.16);
+  font-size:13px;color:#c6cdee;transition:.22s}
+.fam a:hover{transform:translateY(-2px);border-color:rgba(255,215,106,.5)}
+.fam a.on{background:var(--star-gold);color:#1a1206;border-color:var(--star-gold);font-weight:600}
+.fam a .sw{width:18px;height:18px;border-radius:50%;overflow:hidden;flex:none;
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.3)}
+.fam a .sw img{width:100%;height:100%;object-fit:cover}
+
+/* 右侧视觉舞台 */
+.orb-wrap{position:relative;display:flex;align-items:center;justify-content:center;min-height:420px}
+.orb{position:relative;width:min(100%,520px);aspect-ratio:1;cursor:pointer;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.orb:hover{transform:scale(1.02)}
+.orb .halo{position:absolute;inset:-8%;border-radius:50%;
+  background:radial-gradient(circle,rgba(140,245,216,.20),transparent 62%);
+  animation:breathe 5s ease-in-out infinite}
+.orb .halo.h2{inset:-18%;background:radial-gradient(circle,rgba(255,215,106,.12),transparent 60%);
+  animation-delay:1.4s}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.06);opacity:1}}
+.orb .disc{position:absolute;inset:0;border-radius:50%;overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 0 1px rgba(160,190,255,.15),
+    inset 0 0 60px rgba(140,245,216,.12);
+  animation:float 7s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-14px) rotate(1.2deg)}}
+.orb .disc img{width:100%;height:100%;object-fit:cover;transform:scale(1.04)}
+.orb .ring{position:absolute;inset:6%;border-radius:50%;border:1px dashed rgba(255,215,106,.3);
+  animation:spin 60s linear infinite}
+.orb .ring.r2{inset:-2%;border-color:rgba(140,245,216,.18);animation-duration:90s;animation-direction:reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.orb .hint{position:absolute;left:50%;bottom:-20px;transform:translateX(-50%);
+  font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--ink-mute);
+  background:rgba(10,18,40,.7);padding:6px 14px;border-radius:999px;white-space:nowrap;
+  border:1px solid rgba(140,170,255,.2)}
+.orb .hint .pulse{display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--star-gold);margin-right:7px;box-shadow:0 0 8px var(--star-gold);
+  animation:blink 1.6s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* 环绕小星 */
+.spark{position:absolute;border-radius:50%;background:var(--star-gold);
+  box-shadow:0 0 12px var(--star-gold);animation:twinkle 3s ease-in-out infinite}
+@keyframes twinkle{0%,100%{transform:scale(.6);opacity:.4}50%{transform:scale(1.2);opacity:1}}
+
+/* 互动面板 */
+.panel{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;
+  padding:24px;background:rgba(5,9,22,.72);backdrop-filter:blur(14px);
+  opacity:0;pointer-events:none;transition:opacity .35s}
+.panel.show{opacity:1;pointer-events:auto}
+.panel .card{position:relative;width:min(560px,94vw);max-height:86svh;overflow:auto;
+  border-radius:28px;padding:34px 32px 30px;
+  background:linear-gradient(160deg,#182650,#0d1834 60%,#0a1228);
+  border:1px solid rgba(150,180,255,.22);
+  box-shadow:0 40px 120px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08);
+  transform:translateY(24px) scale(.96);transition:transform .45s cubic-bezier(.34,1.4,.64,1)}
+.panel.show .card{transform:none}
+.panel .close{position:absolute;top:16px;right:16px;width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  color:var(--ink-soft);font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center}
+.panel .close:hover{background:rgba(255,255,255,.18)}
+.panel .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--galaxy-mint);margin-bottom:8px}
+.panel h2{margin:0 0 6px;font-family:var(--hand);font-weight:400;font-size:34px;color:var(--cloud-white)}
+.panel .sub{font-size:13px;color:var(--ink-mute);margin-bottom:22px}
+.panel .play-area{position:relative;min-height:280px;border-radius:20px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:16px;padding:24px;
+  background:rgba(8,14,32,.5);border:1px dashed rgba(150,180,255,.25);
+  touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.panel .play-area canvas{display:block;border-radius:14px;max-width:100%;
+  cursor:crosshair;touch-action:none}
+.panel .big-btn{padding:15px 34px;border-radius:999px;font-size:17px;font-family:var(--hand);
+  background:linear-gradient(120deg,var(--star-gold),var(--star-warm));color:#231603;font-weight:600;
+  box-shadow:0 10px 30px rgba(255,180,94,.35);transition:.25s}
+.panel .big-btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 16px 40px rgba(255,180,94,.5)}
+.panel .big-btn:active{transform:scale(.97)}
+.panel .result{margin-top:6px;font-family:var(--hand);font-size:19px;color:var(--star-gold);
+  text-align:center;line-height:1.8;min-height:30px}
+.panel .tip{font-size:12px;color:var(--ink-mute);text-align:center}
+
+/* 互动小物件（掉落物/粒子容器） */
+.fx-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:20px}
+
+/* 页脚 */
+.foot{padding:20px;text-align:center;font-family:var(--mono);font-size:10px;
+  letter-spacing:2px;color:rgba(154,163,208,.5)}
+
+/* ---- 响应式：平板 & 手机 ---- */
+@media (max-width:980px){
+  .hero{grid-template-columns:1fr;gap:8px;text-align:center;padding-bottom:24px}
+  .intro{max-width:640px;margin:0 auto;order:2}
+  .orb-wrap{order:1;min-height:unset;padding:10px 0 6px}
+  .orb{width:min(78vw,420px)}
+  h1.name{margin-top:6px}
+  .intro .desc,.intro .quote{margin-left:auto;margin-right:auto}
+  .intro .quote{border-left:none;border-top:2px solid rgba(255,215,106,.5);padding:14px 0 0}
+  .fam .row{justify-content:center}
+  .tag{justify-content:center}
+}
+@media (max-width:520px){
+  .top{padding:16px 16px}
+  .brand{display:none}
+  .panel .card{padding:26px 20px 22px;border-radius:22px}
+  .panel h2{font-size:28px}
+  .orb .hint{font-size:9px}
+}

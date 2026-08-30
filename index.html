@@ -1,0 +1,2159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>云朵实验室 · 跟着鸟找到诗集</title>
+<meta name="description" content="alomo（三角叶杨）的云朵感创意作品集 —— 跟着一只鸟，穿过云海与树梢，找到云朵诗集柜" />
+<link href="./assets/fonts/fonts.css" rel="stylesheet">
+<style>
+:root{
+  --sky-deep:#1657b8; --sky-mid:#2f7fd0; --sky-soft:#7fb8e4;
+  --leaf:#d8e3a4; --leaf-deep:#b9cf8e; --leaf-pale:#e8efc6;
+  --ink:#0e3a7d; --paper:#f4f7ee;
+  --hand:"HanziPen SC","Hannotate SC","Kaiti SC","STKaiti","KaiTi",cursive;
+  --serif:"Kaiti SC","STKaiti","Songti SC",serif;
+  --mono:"Space Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--serif);color:var(--paper);background:#1a63c2;overflow-x:hidden;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;z-index:-1;
+  background:radial-gradient(120% 60% at 80% -10%, rgba(188,217,236,.55) 0%, transparent 55%),
+  linear-gradient(178deg,#0e4aa6 0%, #1a63c2 30%, #3d8ad6 58%, #79b6e2 82%, #a9cfe8 100%);}
+::selection{background:var(--leaf);color:var(--ink)}
+
+.grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:90;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.34'/%3E%3C/svg%3E");
+  animation:grain-shift 1.2s steps(4) infinite}
+@keyframes grain-shift{0%{transform:translate(0,0)}25%{transform:translate(-1.2%,.8%)}50%{transform:translate(.9%,-1.1%)}75%{transform:translate(-.6%,-.5%)}100%{transform:translate(0,0)}}
+
+/* ---------- 导航 ---------- */
+nav{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;align-items:center;justify-content:space-between;padding:22px clamp(20px,4vw,54px)}
+.nav-brand{font-family:var(--hand);font-size:26px;color:#fff;text-decoration:none;letter-spacing:2px;text-shadow:0 2px 14px rgba(10,50,110,.35)}
+.poplar-leaf{vertical-align:-3px;margin-left:7px}
+.nav-brand small{display:block;font-family:var(--mono);font-size:9px;letter-spacing:3px;opacity:.75;margin-top:2px}
+.nav-links{display:flex;gap:clamp(14px,2.4vw,34px)}
+.nav-links a{font-family:var(--serif);font-size:14px;color:#eaf3fb;text-decoration:none;letter-spacing:2px;padding:6px 2px;border-bottom:1px solid transparent;transition:.25s;cursor:pointer}
+.nav-links a::before{content:"○ ";font-size:9px;vertical-align:2px;opacity:.7}
+.nav-links a:hover{color:var(--leaf);border-bottom-color:var(--leaf)}
+@media(max-width:720px){.nav-links{display:none}}
+
+/* ---------- 3D 视差场景 ---------- */
+.scene{perspective:1400px;perspective-origin:50% 40%}
+.scene-inner{transform-style:preserve-3d;will-change:transform}
+.layer{transform-style:preserve-3d;will-change:transform}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px clamp(18px,5vw,70px) 80px}
+.shot .hero{min-height:900px}
+.shot .sec-head,.shot footer > *,.shot .work-card{opacity:1!important;transform:rotate(var(--tilt,0deg))!important}
+.only-locker .hero,.only-locker .flight,.only-locker .poem-band,.only-locker #works,.only-locker .clouds-sec,.only-locker section:not(.locker-sec),.only-locker .divider-bird,.only-locker footer{display:none!important}
+.only-locker .locker-sec{padding-top:40px}
+.shot .flight{height:900px}
+.shot .flight-stage{position:relative;height:900px}
+.shot .flight-caption{opacity:1!important}
+.shot .locker-wrap{opacity:1!important;transform:none!important}
+.shot .flight-bird{left:60%!important;top:30%!important}
+.shot .flight-bg.canopy{opacity:.55!important}
+.hero .scene-inner{position:relative;width:min(1060px,94vw);height:min(660px,78vh)}
+.shot .hero .scene-inner{height:660px}
+.plane{position:absolute;border-radius:6px;
+  background:linear-gradient(150deg,var(--leaf-pale) 0%,var(--leaf) 45%,var(--leaf-deep) 100%);
+  box-shadow:0 1px 0 rgba(255,255,255,.65) inset,0 30px 60px -18px rgba(8,38,90,.55),0 90px 140px -40px rgba(8,38,90,.35)}
+.plane-main{right:2%;top:6%;width:56%;height:82%;transform:rotate(-7deg) rotateY(-14deg) rotateX(6deg) translateZ(40px);overflow:hidden}
+.plane-main img{width:100%;height:100%;object-fit:contain;filter:saturate(1.05) contrast(1.05);mix-blend-mode:multiply;opacity:.92}
+.plane-back{right:14%;top:-2%;width:52%;height:76%;transform:rotate(-11deg) rotateY(-18deg) rotateX(8deg) translateZ(-90px);opacity:.55}
+.plane-sliver{right:-3%;bottom:2%;width:34%;height:44%;transform:rotate(-4deg) rotateY(-10deg) translateZ(120px);opacity:.9}
+.sliver-cloud{position:absolute;inset:0;margin:auto;width:62%;filter:drop-shadow(0 8px 18px rgba(90,110,40,.25))}
+.hero-title{position:absolute;left:0;top:11%;z-index:5;transform:rotate(-3deg) translateZ(180px)}
+.hero-title .brush{font-family:var(--hand);font-size:clamp(64px,10.5vw,148px);line-height:1.04;color:#fff;text-shadow:0 2px 0 rgba(210,228,246,.35),0 14px 44px rgba(8,38,90,.45)}
+.hero-title .en{font-family:var(--mono);font-size:clamp(11px,1.2vw,15px);letter-spacing:6px;color:var(--leaf-pale);margin-top:18px;text-transform:uppercase}
+.hero-title .quote{margin-top:26px;max-width:340px;font-size:15px;line-height:2;color:#dcebf8;border-left:2px solid rgba(216,227,164,.7);padding-left:16px}
+.hero-title .quote em{display:block;font-style:normal;font-family:var(--mono);font-size:10px;letter-spacing:1px;opacity:.65;margin-top:6px;line-height:1.7}
+.bird{position:absolute;pointer-events:none;filter:drop-shadow(0 10px 24px rgba(8,38,90,.35))}
+.bird img{display:block;width:100%;height:auto}
+.bird-1{width:clamp(150px,17vw,250px);left:38%;top:-4%;transform:translateZ(220px) rotate(6deg)}
+.bird-2{width:clamp(90px,10vw,150px);right:6%;bottom:-8%;transform:translateZ(150px) rotate(-10deg);opacity:.95}
+.bird-3{width:clamp(56px,6vw,92px);left:52%;bottom:6%;transform:translateZ(90px) rotate(-14deg);opacity:.85}
+.hero-foot{position:absolute;left:0;bottom:-9%;display:flex;gap:34px;align-items:baseline;flex-wrap:wrap;transform:translateZ(60px)}
+.hero-foot .mark{font-family:var(--serif);font-size:15px;color:var(--leaf-pale);letter-spacing:3px}
+.hero-foot .mark::before{content:"○ ";font-size:10px}
+.hero-foot .en2{font-family:var(--mono);font-size:9.5px;letter-spacing:1.5px;color:rgba(220,235,248,.6);max-width:300px;line-height:1.8}
+.scroll-hint{position:absolute;right:4%;bottom:6%;font-family:var(--mono);font-size:10px;letter-spacing:4px;color:rgba(230,242,252,.75);writing-mode:vertical-rl}
+.scroll-hint::after{content:"";display:block;width:1px;height:52px;margin:12px auto 0;background:linear-gradient(180deg,rgba(230,242,252,.9),transparent);animation:drip 2.2s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ---------- 飞行章节 ---------- */
+.flight{position:relative;height:320vh}
+.flight-stage{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.flight-bg{position:absolute;inset:0}
+.flight-bg.sea{background:radial-gradient(90% 70% at 30% 110%, rgba(216,227,164,.28) 0%, transparent 60%)}
+.flight-bg.canopy{background-size:cover;background-position:center;opacity:0;mix-blend-mode:multiply;filter:saturate(1.1)}
+.fly-cloud{position:absolute;pointer-events:none;opacity:.9}
+.fly-cloud img{width:100%;display:block;filter:drop-shadow(0 14px 26px rgba(8,38,90,.3))}
+.flight-bird{position:absolute;left:0;top:42%;width:clamp(96px,11vw,160px);z-index:5;filter:drop-shadow(0 12px 26px rgba(8,38,90,.4))}
+.flight-bird img{width:100%;display:block}
+.flight-caption{position:relative;z-index:4;max-width:560px;text-align:center;opacity:0;padding:0 24px}
+.flight-caption .fc-kicker{font-family:var(--mono);font-size:10px;letter-spacing:5px;color:var(--leaf);text-transform:uppercase;margin-bottom:18px}
+.flight-caption .fc-kicker::before{content:"○ "}
+.flight-caption h3{font-family:var(--hand);font-size:clamp(34px,4.6vw,58px);color:#fff;letter-spacing:4px;text-shadow:0 10px 32px rgba(8,38,90,.45);margin-bottom:20px}
+.flight-caption p{font-size:15.5px;line-height:2.15;color:#e6f1fb}
+.flight-caption p b{font-weight:normal;color:var(--leaf-pale)}
+.flight-caption .fc-en{margin-top:16px;font-family:var(--mono);font-size:9.5px;letter-spacing:2px;color:rgba(220,235,248,.6);line-height:1.8}
+.flight-progress{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:5}
+.flight-progress i{width:22px;height:2px;background:rgba(230,242,252,.35);border-radius:2px}
+.flight-progress i.on{background:var(--leaf)}
+
+/* 飞行增强素材层 */
+.flight-sea{position:absolute;left:0;right:0;bottom:0;height:62%;background-size:cover;background-position:center 40%;opacity:.85;mix-blend-mode:normal;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 38%);mask-image:linear-gradient(180deg,transparent,#000 38%)}
+.flight-flock{position:absolute;left:-20%;top:22%;width:clamp(180px,22vw,320px);opacity:.85;animation:flock-drift 26s linear infinite}
+.flight-flock img{width:100%;display:block}
+@keyframes flock-drift{0%{transform:translateX(0) translateY(0)}50%{transform:translateX(60vw) translateY(-4vh)}100%{transform:translateX(130vw) translateY(-7vh)}}
+.flight-branch{position:absolute;left:-6%;bottom:-8%;width:min(58vw,760px);opacity:.8;pointer-events:none}
+.flight-branch img{width:100%;display:block}
+.leaf{position:absolute;width:34px;opacity:0;animation:leaf-fall linear infinite}
+.leaf img{width:100%;display:block}
+@keyframes leaf-fall{
+  0%{transform:translateY(-8vh) translateX(0) rotate(0deg);opacity:0}
+  8%{opacity:.9}
+  88%{opacity:.9}
+  100%{transform:translateY(96vh) translateX(10vw) rotate(300deg);opacity:0}}
+
+/* 诗句带 */
+.poem-band{position:relative;text-align:center;padding:clamp(70px,10vh,120px) 24px}
+.poem-band .pb-zh{font-family:var(--hand);font-size:clamp(24px,3.6vw,42px);color:#fff;letter-spacing:4px;line-height:1.9;text-shadow:0 8px 28px rgba(8,38,90,.42);transform:rotate(-1.5deg);display:inline-block}
+.poem-band .pb-en{margin-top:16px;font-family:var(--mono);font-size:9.5px;letter-spacing:2px;color:rgba(220,235,248,.65);line-height:1.9}
+.poem-band .pb-mark{font-family:var(--serif);font-size:13px;color:var(--leaf-pale);letter-spacing:3px;margin-bottom:18px}
+.poem-band .pb-mark::before,.poem-band .pb-mark::after{content:"○ ";font-size:9px;margin:0 8px}
+
+/* ---------- 章节通用 ---------- */
+section{position:relative;padding:clamp(80px,11vh,140px) clamp(20px,6vw,90px)}
+.sec-head{margin-bottom:clamp(36px,5vh,60px)}
+.sec-head.center{text-align:center}
+.sec-head.center .sec-sub{margin-left:auto;margin-right:auto}
+.sec-kicker{font-family:var(--mono);font-size:10px;letter-spacing:5px;color:var(--leaf);text-transform:uppercase;margin-bottom:14px}
+.sec-kicker::before{content:"○ ";opacity:.7}
+.sec-title{font-family:var(--hand);font-size:clamp(38px,5.6vw,70px);color:#fff;letter-spacing:4px;text-shadow:0 10px 34px rgba(8,38,90,.4)}
+.sec-sub{margin-top:14px;max-width:520px;font-size:14.5px;line-height:2;color:#d6e7f6}
+.sec-sub em{font-style:normal;font-family:var(--mono);font-size:10px;opacity:.6;display:block;margin-top:6px;letter-spacing:1px}
+
+/* ---------- 云朵小队（可互动） ---------- */
+.clouds-stage{position:relative;max-width:1180px;margin:0 auto;height:clamp(480px,60vh,580px)}
+.cloud-float{position:absolute;text-align:center;cursor:pointer;user-select:none;-webkit-user-drag:none}
+.cloud-float img{width:100%;height:auto;display:block;filter:drop-shadow(0 18px 30px rgba(8,38,90,.45));transition:transform .35s cubic-bezier(.2,.8,.3,1.2)}
+.cloud-float:hover img{transform:translateY(-10px) scale(1.07) rotate(-2deg)}
+.cloud-float>span{display:inline-block;margin-top:6px;font-family:var(--hand);font-size:16px;letter-spacing:2px;color:#fff;background:rgba(14,58,125,.45);border:1px solid rgba(216,227,164,.5);border-radius:999px;padding:4px 14px;backdrop-filter:blur(4px)}
+.cloud-float small{display:block;font-family:var(--mono);font-size:8.5px;letter-spacing:2px;color:var(--leaf-pale);margin-top:5px;opacity:.85}
+.cloud-bubble{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) scale(.6);width:max-content;max-width:220px;
+  background:var(--leaf-pale);color:var(--ink);font-size:13px;line-height:1.7;letter-spacing:1px;padding:10px 16px;border-radius:16px 16px 16px 3px;
+  box-shadow:0 14px 30px rgba(8,38,90,.35);opacity:0;pointer-events:none;transition:.28s cubic-bezier(.2,.8,.3,1.4);z-index:6}
+.cloud-bubble::after{content:"";position:absolute;left:16px;bottom:-7px;width:14px;height:14px;background:var(--leaf-pale);transform:rotate(45deg);border-radius:2px}
+.cloud-bubble.show{opacity:1;transform:translateX(-50%) scale(1)}
+.clouds-tip{text-align:center;margin-top:26px;font-size:13px;color:#cfe3f4;letter-spacing:2px}
+.clouds-tip::before{content:"○ ";font-size:9px;color:var(--leaf)}
+
+/* ---------- 作品集 ---------- */
+.works-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:clamp(24px,3.5vw,44px);max-width:1180px;margin:0 auto;perspective:1400px}
+.work-card{position:relative;border-radius:6px;transform:rotate(var(--tilt,-3deg));transform-style:preserve-3d;
+  background:linear-gradient(155deg,var(--leaf-pale),var(--leaf) 55%,var(--leaf-deep));padding:12px 12px 46px;
+  box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 34px 70px -22px rgba(8,38,90,.6);
+  transition:transform .4s cubic-bezier(.2,.8,.3,1.1),box-shadow .4s}
+.work-card:hover{transform:rotate(0deg) translateY(-8px) scale(1.02);box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 50px 100px -24px rgba(8,38,90,.7);z-index:3}
+.work-card .duo{position:relative;overflow:hidden;border-radius:3px;background:linear-gradient(150deg,#1c5fb4,#8fc0e0)}
+.work-card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;filter:grayscale(1) contrast(1.06) brightness(1.22);mix-blend-mode:luminosity;transition:filter .5s}
+.work-card:hover img{filter:grayscale(.15) contrast(1.05)}
+.work-card figcaption{position:absolute;left:16px;bottom:12px;right:16px;display:flex;justify-content:space-between;align-items:baseline}
+.work-card figcaption b{font-family:var(--hand);font-weight:normal;font-size:19px;color:var(--ink);letter-spacing:2px}
+.work-card figcaption i{font-family:var(--mono);font-style:normal;font-size:8.5px;letter-spacing:2px;color:#3c5a2e}
+.work-card .duo{transform:translateZ(34px)}
+.work-card figcaption{transform:translateZ(46px)}
+.work-card::after{content:"";position:absolute;inset:0;border-radius:6px;transform:translateZ(-30px);background:rgba(8,38,90,.22);filter:blur(18px)}
+
+/* ---------- 诗集柜（3D） ---------- */
+.locker-sec{padding-bottom:60px}
+.locker-wrap{position:relative;max-width:1180px;margin:0 auto;height:min(78vh,720px);min-height:520px;border-radius:18px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(188,217,236,.14),rgba(14,58,125,.18));
+  border:1px solid rgba(216,227,164,.28);box-shadow:0 40px 90px -30px rgba(8,38,90,.5) inset,0 30px 70px -30px rgba(8,38,90,.45)}
+#lockerCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+.locker-hint{position:absolute;left:22px;bottom:18px;z-index:5;font-family:var(--mono);font-size:9.5px;letter-spacing:2px;color:rgba(230,242,252,.8);line-height:2;pointer-events:none}
+.locker-hint b{color:var(--leaf-pale);font-weight:normal}
+.locker-land{position:absolute;right:22px;bottom:18px;z-index:5;font-family:var(--hand);font-size:18px;color:#fff;letter-spacing:2px;text-shadow:0 4px 16px rgba(8,38,90,.5);pointer-events:auto}
+.locker-bubble{position:absolute;top:16px;left:50%;transform:translate(-50%,-8px);max-width:min(520px,86%);z-index:6;pointer-events:none;
+  background:rgba(244,247,238,.95);color:#0e3a7d;font-family:var(--hand);font-size:17px;letter-spacing:1px;line-height:1.7;
+  padding:10px 20px;border-radius:16px;border:2px solid rgba(14,58,125,.35);box-shadow:0 10px 30px rgba(8,38,90,.3);
+  opacity:0;transition:opacity .3s,transform .3s}
+.locker-bubble.show{opacity:1;transform:translate(-50%,0)}
+.locker-bubble::after{content:"";position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);border:8px solid transparent;border-top-color:rgba(244,247,238,.95);border-bottom:0}
+.locker-fallback{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:30px;font-size:15px;line-height:2.2;color:#e6f1fb}
+/* ---------- 飞鸟衔诗 ---------- */
+.flock-bird{position:fixed;z-index:95;pointer-events:none;will-change:transform,left,top}
+.flock-bird img{--bird-flip:1;display:block;width:100%;transform-origin:50% 50%;animation:flap .45s ease-in-out infinite alternate;filter:drop-shadow(0 10px 22px rgba(8,38,90,.35))}
+@keyframes flap{from{transform:scaleX(var(--bird-flip)) scaleY(1)}to{transform:scaleX(var(--bird-flip)) scaleY(.82)}}
+/* 放飞时刻：柜口光芒 + 飘羽 + 金色光尘 + 天幕聚焦 */
+.door-glow{position:fixed;z-index:93;pointer-events:none;border-radius:50%;
+  background:radial-gradient(circle, rgba(255,244,210,.9) 0%, rgba(255,232,170,.35) 45%, rgba(255,232,170,0) 72%);
+  will-change:transform,opacity}
+.flock-feather{position:fixed;z-index:96;pointer-events:none;will-change:transform,left,top;
+  background:linear-gradient(155deg,#ffffff 20%,#e9f0f7 80%);
+  border-radius:50% 50% 50% 50%/62% 62% 38% 38%;
+  box-shadow:0 2px 6px rgba(8,38,90,.18)}
+.gold-mote{position:fixed;z-index:117;pointer-events:none;border-radius:50%;
+  background:radial-gradient(circle,#fff3c4 0%,#f7cf78 42%,rgba(247,207,120,0) 70%);
+  will-change:transform,opacity}
+.sky-veil{position:fixed;inset:0;z-index:110;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse at 50% 44%, rgba(10,34,74,0) 26%, rgba(5,20,48,.7) 100%)}
+.sky-bloom{position:fixed;inset:0;z-index:119;pointer-events:none;opacity:0;
+  background:radial-gradient(circle at 50% 46%, rgba(255,252,240,.98) 0%, rgba(255,248,224,.55) 34%, rgba(255,248,224,0) 62%)}
+/* 衔书主鸟 + 诗集放大 */
+.book-flyin{position:fixed;z-index:118;pointer-events:none;width:210px;height:220px;will-change:transform,left,top}
+.book-flyin .bf-bird{--bird-flip:1;position:absolute;left:50%;top:0;display:block;width:190px;transform:translateX(-50%);transform-origin:50% 56%;animation:heroFlap .52s ease-in-out infinite alternate;filter:drop-shadow(0 18px 40px rgba(8,38,90,.45));z-index:2}
+@keyframes heroFlap{from{transform:translateX(-50%) scaleX(var(--bird-flip)) scaleY(1)}to{transform:translateX(-50%) scaleX(var(--bird-flip)) scaleY(.94) translateY(3px)}}
+.book-flyin .bf-halo{position:absolute;left:50%;top:50%;width:170%;height:0;padding-bottom:170%;
+  transform:translate(-50%,-50%);border-radius:50%;opacity:0;
+  background:radial-gradient(circle, rgba(255,243,205,.85) 0%, rgba(255,226,160,.32) 42%, rgba(255,226,160,0) 70%)}
+.book-flyin .bf-book{position:absolute;left:50%;top:62%;width:min(64vw,620px);opacity:0;border:8px solid #f4f7ee;border-radius:8px;box-shadow:0 50px 110px rgba(5,25,60,.65);transform-origin:50% 0%;z-index:1}
+/* ---------- 诗集海报覆盖层 ---------- */
+.poem-overlay{position:fixed;inset:0;z-index:120;display:none;overflow:auto;
+  background:radial-gradient(120% 60% at 80% -10%, rgba(188,217,236,.5) 0%, transparent 55%),linear-gradient(178deg,#0e4aa6 0%,#1a63c2 35%,#3d8ad6 65%,#79b6e2 100%)}
+.poem-overlay.open{display:block}
+.poem-close{position:fixed;top:20px;right:24px;z-index:5;width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(244,247,238,.5);background:rgba(14,58,125,.3);color:#f4f7ee;font-size:17px;cursor:pointer;transition:.25s}
+.poem-close:hover{background:#d8e3a4;color:#0e3a7d;border-color:#d8e3a4}
+.poem-stage{min-height:100vh;display:flex;align-items:center;justify-content:center;gap:clamp(24px,4vw,60px);flex-wrap:wrap;padding:70px clamp(18px,5vw,60px) 50px}
+.poem-hero{width:min(540px,88vw);border:8px solid #f4f7ee;border-radius:6px;box-shadow:0 30px 70px rgba(8,38,90,.5);transform:rotate(-3deg)}
+.poem-list{max-width:520px}
+.poem-list h3{font-family:var(--hand);font-size:clamp(34px,4.5vw,50px);color:#fff;letter-spacing:6px;text-shadow:0 4px 18px rgba(8,38,90,.45);margin:0}
+.poem-list .pm-en{font-family:var(--mono);font-size:10px;letter-spacing:4px;color:rgba(244,247,238,.75);margin:8px 0 22px}
+.pm-card{background:#f4f7ee;color:#0e3a7d;border-radius:6px;padding:14px 20px;margin-bottom:14px;box-shadow:0 14px 30px rgba(8,38,90,.35)}
+.pm-card:nth-child(odd){transform:rotate(-.8deg)}
+.pm-card:nth-child(even){transform:rotate(.7deg)}
+.pm-card p{font-family:var(--hand);font-size:19px;letter-spacing:2px;line-height:1.7;margin:0}
+.pm-card span{display:block;margin-top:4px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:#4a6b9d}
+
+/* ---------- 翻页书 ---------- */
+.book-overlay{position:fixed;inset:0;z-index:110;display:none;align-items:center;justify-content:center;padding:24px;
+  background:rgba(6,26,58,.62);backdrop-filter:blur(7px)}
+.book-overlay.open{display:flex}
+.book-close{position:absolute;top:20px;right:24px;width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(244,247,238,.5);background:rgba(14,58,125,.3);color:#f4f7ee;font-size:17px;cursor:pointer;transition:.25s;z-index:6}
+.book-close:hover{background:#d8e3a4;color:#0e3a7d;border-color:#d8e3a4}
+.book3d{position:relative;width:min(860px,94vw);aspect-ratio:2/1.28;perspective:2200px;transform-style:preserve-3d}
+.book3d .spine-shadow{position:absolute;left:50%;top:2%;bottom:2%;width:34px;transform:translateX(-50%);
+  background:radial-gradient(50% 50% at 50% 50%, rgba(10,30,60,.42), transparent 75%);filter:blur(6px);pointer-events:none;z-index:0}
+.bk-page{position:absolute;top:0;bottom:0;width:50%;transform-style:preserve-3d;transform-origin:left center;
+  transition:transform 1.05s cubic-bezier(.35,.1,.22,1);cursor:pointer}
+.bk-page{left:50%}
+.bk-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;
+  background:#f6f2e3;border:1px solid rgba(120,110,80,.35);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 14px 40px rgba(8,30,66,.28)}
+.bk-face.front{border-radius:0 10px 10px 0;background:linear-gradient(95deg,#e9e3cd 0%,#f6f2e3 7%,#f8f4e6 100%)}
+.bk-face.back{transform:rotateY(180deg);border-radius:10px 0 0 10px;background:linear-gradient(265deg,#e9e3cd 0%,#f6f2e3 7%,#f8f4e6 100%)}
+.bk-page.flipped{transform:rotateY(-180deg)}
+.bk-page.cover-page .bk-face.front{background:linear-gradient(140deg,#20509a,#123a78 70%);border-color:rgba(240,244,220,.25)}
+.bk-static{position:absolute;top:0;bottom:0;left:0;width:50%;border-radius:10px 0 0 10px;overflow:hidden;
+  background:linear-gradient(265deg,#e9e3cd 0%,#f6f2e3 7%,#f8f4e6 100%);border:1px solid rgba(120,110,80,.35);
+  box-shadow:0 14px 40px rgba(8,30,66,.28)}
+.bk-inner{position:absolute;inset:0;padding:clamp(18px,3.4vw,38px) clamp(16px,3vw,34px);display:flex;flex-direction:column;color:#274268}
+.bk-inner .pg-kicker{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:#7a8a5e;text-transform:uppercase;margin-bottom:12px}
+.bk-inner h4{font-family:var(--hand);font-size:clamp(20px,2.6vw,30px);letter-spacing:3px;color:#16406e;margin-bottom:10px}
+.bk-inner .pg-zh{font-family:var(--hand);font-size:clamp(15px,1.9vw,21px);line-height:2;letter-spacing:1.5px;color:#274268}
+.bk-inner .pg-en{margin-top:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:1.4px;line-height:1.9;color:#6b7f9c}
+.bk-inner .pg-num{position:absolute;bottom:12px;font-family:var(--mono);font-size:9px;color:#98a58a}
+.bk-face.front .pg-num{right:16px}
+.bk-face.back .pg-num,.bk-static .pg-num{left:16px}
+.bk-inner img.pg-art{width:72%;margin:6px auto;border-radius:4px;box-shadow:0 8px 22px rgba(20,50,90,.25)}
+.bk-inner.cover-inner{align-items:center;justify-content:center;text-align:center;color:#f2f6e4}
+.bk-inner.cover-inner h4{color:#f2f6e4;font-size:clamp(30px,4vw,44px);letter-spacing:8px}
+.bk-inner.cover-inner .cv-en{font-family:var(--mono);font-size:9px;letter-spacing:5px;color:#c9d9a8;margin-top:10px}
+.bk-inner.cover-inner .cv-bird{width:34%;margin-bottom:18px;filter:drop-shadow(0 6px 16px rgba(0,20,50,.4))}
+.book-hint{position:absolute;bottom:-44px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9.5px;letter-spacing:2.5px;color:rgba(230,242,252,.8);white-space:nowrap}
+@media(max-width:640px){.book3d{aspect-ratio:1/1.4}.bk-inner .pg-zh{font-size:13px}}
+
+/* ---------- 覆盖面板 ---------- */
+.overlay{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;
+  background:rgba(10,42,92,.45);backdrop-filter:blur(6px)}
+.overlay.open{display:flex}
+.overlay-card{position:relative;width:min(680px,94vw);max-height:84vh;overflow:auto;border-radius:8px;padding:clamp(26px,4vw,46px);
+  background:linear-gradient(160deg,var(--leaf-pale),var(--leaf) 60%,var(--leaf-deep));color:var(--ink);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 60px 120px -30px rgba(5,25,60,.7);transform:rotate(-1.2deg)}
+.overlay-card::before{content:"";position:absolute;top:-12px;left:50%;transform:translateX(-50%) rotate(1.5deg);width:100px;height:26px;background:rgba(216,227,164,.85);box-shadow:0 3px 8px rgba(8,38,90,.2)}
+.overlay-close{position:absolute;top:14px;right:16px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(14,58,125,.35);background:transparent;color:var(--ink);font-size:16px;cursor:pointer;transition:.2s}
+.overlay-close:hover{background:var(--ink);color:var(--leaf-pale)}
+.overlay-card h3{font-family:var(--hand);font-size:clamp(26px,3.4vw,38px);letter-spacing:3px;margin-bottom:6px}
+.overlay-card .ov-en{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:#3c5a2e;text-transform:uppercase;margin-bottom:22px}
+.overlay-card p{font-size:14.5px;line-height:2.1;margin-bottom:14px;color:#1c3f70}
+.typer-overlay{position:fixed;inset:0;z-index:115;display:none;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(14,28,22,.9);backdrop-filter:blur(10px)}
+.typer-overlay.open{display:flex}
+.typer-overlay canvas{width:min(94vw,1000px);height:min(78vh,760px);border-radius:14px}
+.typer-hint{margin-top:14px;font-family:var(--hand);font-size:17px;letter-spacing:2px;color:#e8dfc0;text-shadow:0 2px 6px rgba(0,0,0,.4)}
+.typer-hint b{color:#fff;background:rgba(243,233,207,.16);border:1px solid rgba(243,233,207,.4);border-bottom-width:2px;border-radius:6px;padding:1px 8px;margin:0 2px;font-family:var(--mono);font-size:13px}
+.typer-close{position:absolute;top:20px;right:24px;width:38px;height:38px;border-radius:50%;border:1px solid rgba(243,233,207,.5);
+  background:transparent;color:#e8dfc0;font-size:17px;cursor:pointer;transition:.2s}
+.typer-close:hover{background:#e8dfc0;color:#24402f}
+.scope-overlay{position:fixed;inset:0;z-index:115;display:none;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(10,22,38,.88);backdrop-filter:blur(8px)}
+.scope-overlay.open{display:flex}
+.scope-eye{position:relative;width:min(78vh,86vw);height:min(78vh,86vw);border-radius:50%;overflow:hidden;
+  border:10px solid #c9a05a;box-shadow:0 0 0 4px #a8843f,0 0 60px rgba(0,0,0,.6),inset 0 0 80px rgba(8,20,40,.55);
+  cursor:none;background:#7aa7dd}
+.scope-sky{position:absolute;width:200%;height:200%;left:-50%;top:-50%;
+  background:url('./images/stray-birds/cloud-sea.jpg') center/cover;filter:saturate(1.05)}
+.scope-bird{position:absolute;width:12%;left:44%;top:42%;pointer-events:none;
+  filter:drop-shadow(0 4px 10px rgba(20,40,80,.35))}
+.scope-reticle{position:absolute;inset:0;pointer-events:none}
+.scope-reticle::before,.scope-reticle::after{content:"";position:absolute;background:rgba(20,40,80,.35)}
+.scope-reticle::before{left:50%;top:38%;bottom:38%;width:1.5px;transform:translateX(-50%)}
+.scope-reticle::after{top:50%;left:38%;right:38%;height:1.5px;transform:translateY(-50%)}
+.scope-ring{position:absolute;left:50%;top:50%;width:56px;height:56px;border:1.5px solid rgba(20,40,80,.4);border-radius:50%;
+  transform:translate(-50%,-50%);pointer-events:none;transition:border-color .3s}
+.scope-ring.lock{border-color:#c9a05a;box-shadow:0 0 18px rgba(201,160,90,.6)}
+.scope-hint{margin-top:16px;font-family:var(--hand);font-size:17px;letter-spacing:2px;color:#dce8f8;text-shadow:0 2px 6px rgba(0,0,0,.4)}
+.scope-hint b{color:#fff;background:rgba(220,232,248,.14);border:1px solid rgba(220,232,248,.4);border-bottom-width:2px;border-radius:6px;padding:1px 8px;margin:0 2px;font-family:var(--mono);font-size:13px}
+.scope-letter{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-2deg);width:min(420px,80vw);
+  background:#f7f3e2;border-radius:6px;padding:30px 34px;box-shadow:0 18px 50px rgba(4,16,40,.5);
+  font-family:var(--hand);font-size:22px;line-height:2;color:#1c3f70;display:none;text-align:center}
+.scope-letter .pm-en{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:#4a6b9d;display:block;margin-bottom:12px}
+.ov-facts{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:8px}
+.ov-facts span{font-size:13px;color:#1c3f70}
+.ov-facts span::before{content:"○ ";font-size:9px;color:#5c7a3a}
+.ov-links{display:flex;flex-direction:column;margin-top:6px}
+.ov-links a{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:13px 2px;border-bottom:1px dashed rgba(14,58,125,.3);text-decoration:none;color:var(--ink);transition:padding .25s}
+.ov-links a:hover{padding-left:12px}
+.ov-links a b{font-family:var(--hand);font-weight:normal;font-size:20px;letter-spacing:2px}
+.ov-links a i{font-family:var(--mono);font-style:normal;font-size:8.5px;letter-spacing:2px;color:#3c5a2e}
+.ov-works{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:8px}
+.ov-works figure{border-radius:5px;overflow:hidden;background:rgba(255,255,255,.5);padding:8px 8px 4px;box-shadow:0 8px 18px rgba(8,38,90,.12)}
+.ov-works img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:3px;filter:grayscale(.6) brightness(1.1);mix-blend-mode:luminosity}
+.ov-works figcaption{font-family:var(--hand);font-size:15px;letter-spacing:1px;padding:6px 2px;color:var(--ink)}
+
+/* ---------- 页脚 ---------- */
+footer{position:relative;text-align:center;padding:100px 20px 60px}
+footer .foot-poem{font-family:var(--hand);font-size:clamp(22px,3vw,34px);color:#fff;letter-spacing:4px;margin-bottom:18px;text-shadow:0 8px 26px rgba(8,38,90,.4)}
+footer .foot-poem-en{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:rgba(240,248,255,.85);margin-bottom:44px;line-height:1.9;text-shadow:0 1px 8px rgba(10,50,110,.3)}
+footer .copy{font-family:var(--serif);font-size:12.5px;color:#eaf5d8;letter-spacing:2px;text-shadow:0 1px 8px rgba(10,50,110,.3)}
+footer .copy::before{content:"○ ";font-size:9px}
+.divider-bird{display:flex;justify-content:center;padding:10px 0 0;opacity:.9}
+.divider-bird img{width:clamp(70px,8vw,110px);filter:drop-shadow(0 8px 18px rgba(8,38,90,.3))}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<nav>
+  <a class="nav-brand" href="#top">云朵实验室<svg class="poplar-leaf" width="15" height="17" viewBox="0 0 16 18" aria-hidden="true"><path d="M8 1.2 L13.8 10.2 Q8 14.4 2.2 10.2 Z M8 14 L8 17" fill="rgba(216,227,164,.25)" stroke="#d8e3a4" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></svg><small>CLOUD&nbsp;LAB&nbsp;·&nbsp;ALOMO</small></a>
+  <div class="nav-links">
+    <a data-goto="#flight1">关于我</a>
+    <a data-goto="#works">作品集</a>
+    <a data-goto="#locker">诗集柜</a>
+    <a id="navTools">小工具</a>
+  </div>
+</nav>
+
+<!-- ============ HERO：鸟停在诗集上 ============ -->
+<header class="hero scene" id="top">
+  <div class="scene-inner" id="heroScene">
+    <div class="plane plane-back layer" data-depth="14"></div>
+    <div class="plane plane-main layer" data-depth="26"><img src="./images/stray-birds/sky-canopy.jpg" alt="云上的树影" /></div>
+    <div class="plane plane-sliver layer" data-depth="40"><img class="sliver-cloud" src="./images/stray-birds/cloud-brush.png" alt="" /></div>
+    <div class="hero-title layer" data-depth="55">
+      <h1 class="brush">云朵<br>实验室</h1>
+      <p class="en">Cloud Lab · Stray Thoughts <svg class="poplar-leaf" width="15" height="17" viewBox="0 0 16 18" aria-hidden="true"><path d="M8 1.2 L13.8 10.2 Q8 14.4 2.2 10.2 Z M8 14 L8 17" fill="rgba(216,227,164,.25)" stroke="#d8e3a4" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></svg></p>
+      <p class="quote">那些小小的灵感，<br>就像云端的絮语，<br>在我心里欢快地窃窃私语。
+        <em>These little thoughts are the rustle of clouds;<br>they have their whisper of joy in my mind.</em></p>
+    </div>
+    <div class="bird bird-1 layer" data-depth="70"><img class="flap" src="./images/stray-birds/bird-up.png" alt="" /></div>
+    <div class="bird bird-2 layer" data-depth="48"><img class="flap" src="./images/stray-birds/bird-glide.png" alt="" /></div>
+    <div class="bird bird-3 layer" data-depth="34"><img class="flap" src="./images/stray-birds/bird-glide.png" alt="" /></div>
+    <div class="hero-foot layer" data-depth="22">
+      <span class="mark">窗前的云</span>
+      <span class="en2">"夏天，偶尔有云路过我的窗前，<br>投下一小片阴凉，就飞远。"</span>
+    </div>
+    <div class="scroll-hint">跟着鸟 · 往下飞</div>
+  </div>
+</header>
+
+<!-- ============ 飞行第一章：穿过云海（自我介绍 1） ============ -->
+<div class="flight" id="flight1">
+  <div class="flight-stage">
+    <div class="flight-bg sea"></div>
+    <div class="flight-sea" style="background-image:url('./images/stray-birds/cloud-sea.jpg')"></div>
+    <div class="flight-flock"><img src="./images/stray-birds/birds-flock.png" alt=""></div>
+    <div class="fly-cloud" data-speed="1.6" style="left:8%;top:14%;width:150px"><img src="./images/stray-birds/cloud-brush.png" alt=""></div>
+    <div class="fly-cloud" data-speed="1.1" style="left:64%;top:8%;width:110px;opacity:.7"><img src="./images/stray-birds/cloud-brush.png" alt=""></div>
+    <div class="fly-cloud" data-speed="2.1" style="left:76%;top:64%;width:190px"><img src="./images/stray-birds/cloud-brush.png" alt=""></div>
+    <div class="fly-cloud" data-speed="0.8" style="left:20%;top:72%;width:90px;opacity:.6"><img src="./images/stray-birds/cloud-brush.png" alt=""></div>
+    <div class="flight-bird"><div class="fb-inner"><img class="flap" src="./images/stray-birds/bird-up.png" alt=""></div></div>
+    <div class="flight-caption">
+      <div class="fc-kicker">Chapter 01 · 穿过云海</div>
+      <h3>嗨，我是杨云康</h3>
+      <p>也叫 <b>alomo</b>（三角叶杨），23 岁，<b>产品运营 / AI 应用</b> 方向。<br>喜欢把云朵感界面、彩色系统和奇思妙想，<br>慢慢做成真正能用、能玩、能被记住的作品。</p>
+      <p class="fc-en">HI, I'M ALOMO — PRODUCT OPS & AI APPLIED,<br>BUILDING SOFT THINGS IN THE CLOUD.</p>
+    </div>
+    <div class="flight-progress"><i class="on"></i><i></i><i></i></div>
+  </div>
+</div>
+
+<!-- ============ 云朵小队（点一点它们） ============ -->
+<!-- 诗句带 1 -->
+<div class="poem-band">
+  <p class="pb-mark">飞鸟集 · 一</p>
+  <p class="pb-zh">夏天的飞鸟，来到我的窗前，<br>唱唱歌，就飞远了。</p>
+  <p class="pb-en">Stray birds of summer come to my window to sing and fly away.</p>
+</div>
+
+<!-- ============ 飞行第二章：越过树梢（自我介绍 2） ============ -->
+<div class="flight" id="flight2">
+  <div class="flight-stage">
+    <div class="flight-bg canopy" style="background-image:url('./images/stray-birds/sky-canopy.jpg')"></div>
+    <div class="flight-branch"><img src="./images/stray-birds/branch.png" alt=""></div>
+    <div class="leaf" style="left:12%;animation-duration:9s;animation-delay:0s"><img src="./images/stray-birds/leaves.png" alt=""></div>
+    <div class="leaf" style="left:34%;animation-duration:12s;animation-delay:-4s;width:26px"><img src="./images/stray-birds/leaves.png" alt=""></div>
+    <div class="leaf" style="left:58%;animation-duration:10s;animation-delay:-7s;width:40px"><img src="./images/stray-birds/leaves.png" alt=""></div>
+    <div class="leaf" style="left:79%;animation-duration:13s;animation-delay:-2s;width:24px"><img src="./images/stray-birds/leaves.png" alt=""></div>
+    <div class="fly-cloud" data-speed="1.4" style="left:70%;top:16%;width:130px"><img src="./images/stray-birds/cloud-brush.png" alt=""></div>
+    <div class="fly-cloud" data-speed="2" style="left:12%;top:60%;width:170px;opacity:.8"><img src="./images/stray-birds/cloud-brush.png" alt=""></div>
+    <div class="flight-bird"><div class="fb-inner"><img class="flap" src="./images/stray-birds/bird-glide.png" alt=""></div></div>
+    <div class="flight-caption">
+      <div class="fc-kicker">Chapter 02 · 越过树梢</div>
+      <h3>在路上攒下的事</h3>
+      <p><b>南京大学</b> 课程与教学论 · 硕士 / <b>合肥师范学院</b> 小学教育 · 学士<br>
+      小红书词书矩阵账号，累计拉新 <b>5000+</b> 精准用户<br>
+      GEO 稿件 <b>60+</b> 篇，有效被百度 AI 引用并成为唯一推荐<br>
+      用扣子搭过 <b>智能客服 Agent</b>，也做过 <b>智能词书工作坊</b></p>
+      <p class="fc-en">NJU MASTER · XHS GROWTH 5000+ · GEO WRITER · AGENT BUILDER</p>
+    </div>
+    <div class="flight-progress"><i></i><i class="on"></i><i></i></div>
+  </div>
+</div>
+
+<!-- ============ 作品集 ============ -->
+<section id="works" class="scene">
+  <div class="sec-head">
+    <div class="sec-kicker">Selected Works · 精选项目</div>
+    <h2 class="sec-title">云上作品集</h2>
+    <p class="sec-sub">像把作品晾在云端的照片绳上，蓝绿晒印，颗粒作证。<em>Works pinned on a cloud line, printed in blue and green.</em></p>
+  </div>
+  <div class="works-grid scene-inner">
+    <figure class="work-card layer" style="--tilt:-3.5deg" data-depth="18"><div class="duo"><img src="./images/work-1.jpg" alt="音乐播放器界面" /></div><figcaption><b>彩色应用设计</b><i>UI / NEON PLAYER</i></figcaption></figure>
+    <figure class="work-card layer" style="--tilt:2.5deg" data-depth="26"><div class="duo"><img src="./images/work-2.jpg" alt="创意网页" /></div><figcaption><b>创意网页</b><i>WEB / EXPERIMENT</i></figcaption></figure>
+    <figure class="work-card layer" style="--tilt:-2deg" data-depth="22"><div class="duo"><img src="./images/work-3.jpg" alt="云朵电商" /></div><figcaption><b>云朵电商感</b><i>COMMERCE / MOOD</i></figcaption></figure>
+    <figure class="work-card layer" style="--tilt:3deg" data-depth="20"><div class="duo"><img src="./images/portfolio/slide1_img1.png" alt="智能词书工作坊" /></div><figcaption><b>智能词书工作坊</b><i>AI / VOCAB LAB</i></figcaption></figure>
+    <figure class="work-card layer" style="--tilt:-3deg" data-depth="30"><div class="duo"><img src="./images/portfolio/slide3_img9.png" alt="智能客服 Agent" /></div><figcaption><b>智能客服 Agent</b><i>AGENT / COZE</i></figcaption></figure>
+    <figure class="work-card layer" style="--tilt:2deg" data-depth="24"><div class="duo"><img src="./images/portfolio/slide5_img18.png" alt="GEO 稿件写作" /></div><figcaption><b>GEO 稿件写作</b><i>GEO / WRITING</i></figcaption></figure>
+  </div>
+</section>
+
+<div class="divider-bird"><img class="flap" src="./images/stray-birds/bird-up.png" alt="" /></div>
+
+<!-- 诗句带 2 -->
+<div class="poem-band">
+  <p class="pb-mark">飞鸟集 · 二</p>
+  <p class="pb-zh">秋天，黄黄的叶子，无歌可唱，<br>一声叹息，飘落那里。</p>
+  <p class="pb-en">And yellow leaves of autumn, which have no songs,<br>flutter and fall there with a sigh.</p>
+</div>
+
+<!-- ============ 诗集柜（3D） ============ -->
+<section id="locker" class="locker-sec">
+  <div class="sec-head center">
+    <div class="sec-kicker">Final Chapter · 找到诗集</div>
+    <h2 class="sec-title">鸟落在了诗集柜上</h2>
+    <p class="sec-sub">飞过云海和树梢，最后找到这只蓝色的柜子——<br>所有的故事、技能和工具，都收在里面。</p>
+  </div>
+  <div class="locker-wrap" id="lockerWrap">
+    <canvas id="lockerCanvas"></canvas>
+    <div class="locker-hint"><b>拖动</b> 旋转 · <b>点柜门</b> 开柜放飞鸟 · <b>点物品</b> 拿出来看看 · <b>点打字机</b> 写上一行 · <b>点鸟笼</b> 去窝里孵蛋 · <b>点柜顶诗集</b> 翻开来读</div>
+    <div class="locker-land"><a href="./sea.html" style="color:inherit;text-decoration:none;border-bottom:1px dashed rgba(244,247,238,.6)">—— 旅途的终点，是另一页开始 →</a></div>
+    <div class="locker-bubble" id="lockerBubble"></div>
+    <div class="locker-fallback" id="lockerFallback">你的浏览器暂时打不开 3D 柜子。<br>不过没关系：关于我、作品集、小工具都在上面的章节里。</div>
+  </div>
+</section>
+
+<!-- ============ 覆盖面板 ============ -->
+<div class="overlay" id="overlay">
+  <div class="overlay-card">
+    <button class="overlay-close" id="overlayClose">✕</button>
+    <div id="overlayBody"></div>
+  </div>
+</div>
+
+<!-- ============ 翻页诗集书 ============ -->
+<div class="book-overlay" id="bookOverlay">
+  <button class="book-close" id="bookClose">✕</button>
+  <div class="book3d" id="book3d">
+    <div class="spine-shadow"></div>
+    <div class="book-hint">点右页向后翻 · 点左页往回翻</div>
+  </div>
+</div>
+
+<!-- ============ 飞鸟集 · 诗集海报 ============ -->
+<div class="typer-overlay" id="typerOverlay">
+  <canvas id="typerCanvas"></canvas>
+  <div class="typer-hint">用真实键盘打字吧 · <b>Enter</b> 换行 · <b>Backspace</b> 退格 · <b>Esc</b> 放回柜子</div>
+  <button class="typer-close" id="typerClose">✕</button>
+</div>
+
+<div class="scope-overlay" id="scopeOverlay">
+  <div class="scope-eye" id="scopeEye">
+    <div class="scope-sky" id="scopeSky"></div>
+    <img class="scope-bird" id="scopeBird" src="./images/stray-birds/bird-book-glide.png" alt="">
+    <div class="scope-reticle"></div>
+    <div class="scope-ring" id="scopeRing"></div>
+    <div class="scope-letter" id="scopeLetter">
+      <span class="pm-en">A LETTER FROM THE SKY</span>
+      「天空没有翅膀的痕迹，但我已飞过。」
+    </div>
+  </div>
+  <div class="scope-hint">移动鼠标转动望远镜 · 把圆环对准衔诗集的鸟 · <b>Esc</b> 放下望远镜</div>
+</div>
+
+<div class="poem-overlay" id="poemOverlay">
+  <button class="poem-close" id="poemClose">✕</button>
+  <div class="poem-stage">
+    <img class="poem-hero" src="./images/stray-birds/poem-hero3.jpg" alt="飞鸟集 · 书页化作飞鸟">
+    <div class="poem-list">
+      <h3>飞鸟集</h3>
+      <div class="pm-en">STRAY BIRDS · RABINDRANATH TAGORE</div>
+      <div class="pm-card"><p>「夏天的飞鸟，来到我窗前，唱唱歌，就飞离。」</p><span>Stray birds of summer come to my window to sing and fly away.</span></div>
+      <div class="pm-card"><p>「世界以痛吻我，要我报之以歌。」</p><span>The world has kissed my soul with its pain, asking for its return in songs.</span></div>
+      <div class="pm-card"><p>「生如夏花之绚烂，死如秋叶之静美。」</p><span>Let life be beautiful like summer flowers and death like autumn leaves.</span></div>
+      <div class="pm-card"><p>「天空没有翅膀的痕迹，但我已飞过。」</p><span>I leave no trace of wings in the air, but I am glad I have had my flight.</span></div>
+      <div class="pm-card"><p>「如果你为错过太阳而哭泣，你也要错过群星了。」</p><span>If you shed tears when you miss the sun, you also miss the stars.</span></div>
+      <div class="pm-card"><p>「使卵石臻于完美的，并非锤的打击，而是水的且歌且舞。」</p><span>Not hammer-strokes, but dance of the water sings the pebbles into perfection.</span></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p class="foot-poem">云朵收到了神秘的信号……</p>
+  <p class="foot-poem-en">"Stray clouds of summer come to my window<br>and drift on, leaving a patch of shade."</p>
+  <p class="copy">© 2026 alomo · 三角叶杨 · 把云朵感界面、彩色系统和奇思妙想慢慢做成作品</p>
+</footer>
+
+<script src="./assets/js/gsap.min.js"></script>
+<script src="./assets/js/ScrollTrigger.min.js"></script>
+<script src="./assets/js/three.min.js"></script>
+<script src="./locker-typewriter-3d.js"></script>
+<script src="./locker-birdcage-3d.js"></script>
+<script src="./locker-nest-3d.js"></script>
+<script src="./locker-telescope-3d.js"></script>
+<script src="./locker-gramophone-3d.js"></script>
+<script src="./locker-easel-3d.js"></script>
+<script src="./locker-inkwell-3d.js"></script>
+<script src="./locker-photos-3d.js"></script>
+<script src="./locker-cloche-3d.js"></script>
+<script src="./locker-musicbox-3d.js"></script>
+<script src="./locker-teacup-3d.js"></script>
+<script src="./locker-featherjar-3d.js"></script>
+<script src="./locker-windchime-3d.js"></script>
+<script src="./locker-bookstack-3d.js"></script>
+<script src="./locker-plane-3d.js"></script>
+<script src="./locker-suitcase-3d.js"></script>
+<script src="./locker-crate-3d.js"></script>
+<script>
+(function(){
+  gsap.registerPlugin(ScrollTrigger);
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var noanim = /noanim/.test(location.search);
+  if(/shot/.test(location.search)) document.body.classList.add('shot');
+  if(/only=locker/.test(location.search)) document.body.classList.add('only-locker');
+
+  /* ---------- 鸟扇翅膀（两帧动画） ---------- */
+  if(!reduced){
+    var flapUp = './images/stray-birds/bird-up.png', flapGlide = './images/stray-birds/bird-glide.png';
+    setInterval(function(){
+      document.querySelectorAll('img.flap').forEach(function(img,i){
+        if((Date.now()/400 + i) % 2 < 1) return;
+        img.src = (img.src.indexOf('bird-up')>-1) ? flapGlide : flapUp;
+      });
+    }, 420);
+  }
+
+  /* ---------- 云朵小队 ---------- */
+  var clouds = [
+    {name:'云小画', en:'PAINTER',   img:'cloud-painter.png',      x:4,  y:6,  s:150, z:60,  d:0,   line:'把今天的天空，画成薄荷绿。'},
+    {name:'云知知', en:'LIBRARIAN', img:'cloud-librarian.png',    x:36, y:0,  s:140, z:30,  d:.4,  line:'我把散落的灵感都编了号。'},
+    {name:'云滴滴', en:'WEATHER',   img:'cloud-weather.png',      x:68, y:5,  s:150, z:80,  d:.8,  line:'南京今天多云，适合出发。'},
+    {name:'云梦梦', en:'SLEEPER',   img:'cloud-sleeper.png',      x:8,  y:42, s:145, z:20,  d:1.2, line:'困了就靠着我睡一会儿。'},
+    {name:'云音音', en:'SINGER',    img:'cloud-singer.png',       x:40, y:36, s:160, z:100, d:.2,  line:'啦啦——下一句你来唱！'},
+    {name:'云小厨', en:'BAKER',     img:'cloud-baker.png',        x:72, y:44, s:145, z:40,  d:.6,  line:'新烤的云朵面包，尝一口？'},
+    {name:'云闪闪', en:'HERO',      img:'cloud-hero.png',         x:5,  y:72, s:150, z:70,  d:1,   line:'有困难？我第一个到！'},
+    {name:'云探探', en:'DETECTIVE', img:'cloud-detective.png',    x:38, y:68, s:140, z:35,  d:1.4, line:'我发现了一枚鸟的脚印。'},
+    {name:'云摄摄', en:'PHOTO',     img:'cloud-photographer.png', x:70, y:74, s:150, z:55,  d:.9,  line:'别动，这张逆光很好看。'}
+  ];
+
+  if(!reduced){
+    /* ---------- 鼠标视差 3D ---------- */
+    document.querySelectorAll('.scene').forEach(function(scene){
+      var inner = scene.querySelector('.scene-inner');
+      if(!inner) return;
+      scene.addEventListener('mousemove', function(e){
+        var r = scene.getBoundingClientRect();
+        var rx = (e.clientX - r.left) / r.width - .5;
+        var ry = (e.clientY - r.top) / r.height - .5;
+        gsap.to(inner, {rotationY: rx*10, rotationX: -ry*7, transformPerspective:1400, duration:.9, ease:'power2.out'});
+        inner.querySelectorAll('.layer').forEach(function(l){
+          var dep = parseFloat(l.getAttribute('data-depth')||0);
+          gsap.to(l, {x: rx*dep, y: ry*dep*.7, duration:1.1, ease:'power2.out'});
+        });
+      });
+      scene.addEventListener('mouseleave', function(){
+        gsap.to(inner, {rotationY:0, rotationX:0, duration:1.2, ease:'power3.out'});
+        inner.querySelectorAll('.layer').forEach(function(l){ gsap.to(l, {x:0, y:0, duration:1.2, ease:'power3.out'}); });
+      });
+    });
+
+    /* ---------- 作品卡：跟随鼠标的真 3D 倾斜 ---------- */
+    document.querySelectorAll('.work-card').forEach(function(card){
+      card.style.transition = 'box-shadow .4s';
+      var baseTilt = parseFloat(getComputedStyle(card).getPropertyValue('--tilt')) || 0;
+      card.addEventListener('mousemove', function(e){
+        var r = card.getBoundingClientRect();
+        var rx = (e.clientX - r.left) / r.width - .5;
+        var ry = (e.clientY - r.top) / r.height - .5;
+        gsap.to(card, {rotationY: rx*16, rotationX: -ry*12, rotation:0, y:-8, scale:1.03,
+          transformPerspective:900, duration:.5, ease:'power2.out'});
+      });
+      card.addEventListener('mouseleave', function(){
+        gsap.to(card, {rotationY:0, rotationX:0, rotation:baseTilt, y:0, scale:1, duration:.9, ease:'power3.out'});
+      });
+    });
+
+    /* ---------- 飞鸟漂浮 ---------- */
+    gsap.utils.toArray('.bird').forEach(function(b,i){
+      gsap.to(b, {y:'-=' + (12+i*6), rotation:(i%2? -2.5: 2.5), duration:3+i, yoyo:true, repeat:-1, ease:'sine.inOut'});
+    });
+
+    /* ---------- 飞行章节（滚动驱动） ---------- */
+    if(!noanim) document.querySelectorAll('.flight').forEach(function(fl){
+      var bird = fl.querySelector('.flight-bird');
+      var cap = fl.querySelector('.flight-caption');
+      var fclouds = fl.querySelectorAll('.fly-cloud');
+      var canopy = fl.querySelector('.flight-bg.canopy');
+      var tl = gsap.timeline({scrollTrigger:{trigger:fl, start:'top top', end:'bottom bottom', scrub:.6}});
+      tl.fromTo(bird, {left:'-8%', top:'62%', rotation:6}, {left:'86%', top:'26%', rotation:-6, ease:'none', duration:1}, 0);
+      tl.to(bird, {top:'48%', ease:'sine.inOut', duration:.33}, .33);
+      tl.to(bird, {top:'30%', ease:'sine.inOut', duration:.34}, .66);
+      fclouds.forEach(function(fc){
+        var sp = parseFloat(fc.getAttribute('data-speed')||1);
+        tl.fromTo(fc, {xPercent:60*sp}, {xPercent:-160*sp, ease:'none', duration:1}, 0);
+      });
+      tl.fromTo(cap, {opacity:0, y:60}, {opacity:1, y:0, duration:.22, ease:'power2.out'}, .3);
+      tl.to(cap, {opacity:0, y:-50, duration:.18, ease:'power2.in'}, .78);
+      if(canopy) tl.fromTo(canopy, {opacity:0, scale:1.15}, {opacity:.55, scale:1, ease:'none', duration:1}, 0);
+    });
+
+    /* ---------- 飞行鸟：鼠标牵引（你带着它飞） ---------- */
+    document.querySelectorAll('.flight-stage').forEach(function(st){
+      var inner = st.querySelector('.fb-inner');
+      if(!inner) return;
+      var qx = gsap.quickTo(inner, 'x', {duration:.9, ease:'power2.out'});
+      var qy = gsap.quickTo(inner, 'y', {duration:.9, ease:'power2.out'});
+      st.addEventListener('mousemove', function(e){
+        var r = st.getBoundingClientRect();
+        qy(((e.clientY - r.top) / r.height - .5) * 130);
+        qx(((e.clientX - r.left) / r.width - .5) * 70);
+      });
+      st.addEventListener('mouseleave', function(){ qx(0); qy(0); });
+    });
+
+    /* ---------- HERO 鸟：点击绕飞一圈 ---------- */
+    var heroBird = document.querySelector('.bird-1');
+    if(heroBird){
+      heroBird.style.pointerEvents = 'auto';
+      heroBird.style.cursor = 'pointer';
+      var flying = false;
+      heroBird.addEventListener('click', function(){
+        if(flying) return; flying = true;
+        var tl = gsap.timeline({onComplete:function(){ flying = false; }});
+        tl.to(heroBird, {x:'+=26vw', y:'-=16vh', rotation:10, duration:1.1, ease:'power2.inOut'})
+          .to(heroBird, {x:'+=10vw', y:'+=6vh', rotation:-6, duration:.9, ease:'sine.inOut'})
+          .to(heroBird, {x:'-=18vw', y:'+=12vh', rotation:4, duration:1.1, ease:'sine.inOut'})
+          .to(heroBird, {x:0, y:0, rotation:0, duration:1.2, ease:'power2.inOut'});
+      });
+    }
+
+    if(!noanim){
+      /* ---------- 滚动进场 ---------- */
+      gsap.utils.toArray('.sec-head').forEach(function(el){
+        gsap.from(el, {y:60, opacity:0, duration:1.1, ease:'power3.out', scrollTrigger:{trigger:el, start:'top 85%'}});
+      });
+      gsap.utils.toArray('.work-card').forEach(function(el,i){
+        gsap.from(el, {y:90, opacity:0, rotation:(i%2? 6:-6), duration:1.1, delay:(i%3)*.12, ease:'power3.out', scrollTrigger:{trigger:el, start:'top 88%'}});
+      });
+      gsap.from('.locker-wrap', {y:80, opacity:0, duration:1.2, ease:'power3.out', scrollTrigger:{trigger:'#locker', start:'top 70%'}});
+      gsap.from('footer > *', {y:40, opacity:0, stagger:.15, duration:1, ease:'power2.out', scrollTrigger:{trigger:'footer', start:'top 88%'}});
+      gsap.to('#heroScene', {yPercent:-8, ease:'none', scrollTrigger:{trigger:'.hero', start:'top top', end:'bottom top', scrub:true}});
+    }
+  }
+
+  /* ---------- 导航 & 覆盖面板 ---------- */
+  var overlay = document.getElementById('overlay');
+  var overlayBody = document.getElementById('overlayBody');
+  var OV = {
+    about: '<h3>关于我</h3><div class="ov-en">About · alomo</div>'+
+      '<p>23 岁，产品运营 / AI 应用方向。喜欢把云朵感界面、彩色系统和奇思妙想慢慢做成作品——更活泼的产品界面、适合动效的模块结构，以及不牺牲可用性的细节处理。</p>'+
+      '<p>把云朵世界、柔和插画和个人表达结合在一起，做成更有记忆点的网页体验。</p>'+
+      '<div class="ov-facts"><span><b>南京大学</b> 课程与教学论 · 硕士</span><span><b>合肥师范学院</b> 小学教育 · 学士</span><span>小红书词书矩阵 拉新 <b>5000+</b></span><span>GEO 稿件 <b>60+</b> 篇</span></div>',
+    skills: '<h3>个人技能</h3><div class="ov-en">Skills · Find-A-Word</div>'+
+      '<p>AI 工具实战：GPT / 豆包 / Gemini / Cursor 全链路融入工作流；扣子 Agent 搭建；GEO 写作方法论。</p>'+
+      '<p>内容增长：小红书词书矩阵冷启动，热门影视剧识别产出爆文；公众号推文与新闻稿撰写。</p>'+
+      '<p>创意实现：Figma 毛玻璃 UI、HTML/GSAP 动效原型、数据清洗与自动化小工具。</p>',
+    works: '<h3>作品展示</h3><div class="ov-en">Selected Work</div><div class="ov-works">'+
+      '<figure><img src="./images/work-1.jpg"><figcaption>彩色应用设计</figcaption></figure>'+
+      '<figure><img src="./images/work-2.jpg"><figcaption>创意网页</figcaption></figure>'+
+      '<figure><img src="./images/work-3.jpg"><figcaption>云朵电商感</figcaption></figure>'+
+      '<figure><img src="./images/portfolio/slide1_img1.png"><figcaption>智能词书工作坊</figcaption></figure>'+
+      '<figure><img src="./images/portfolio/slide3_img9.png"><figcaption>智能客服 Agent</figcaption></figure>'+
+      '<figure><img src="./images/portfolio/slide5_img18.png"><figcaption>GEO 稿件写作</figcaption></figure></div>',
+    tools: '<h3>云端小工具</h3><div class="ov-en">Little Tools</div><div class="ov-links">'+
+      '<a href="./daily.html"><b>我的日常</b><i>DAILY</i></a>'+
+      '<a href="./vocab.html"><b>智能生词提取工坊</b><i>VOCAB LAB</i></a>'+
+      '<a href="./fortune.html"><b>小康算命铺</b><i>FORTUNE</i></a>'+
+      '<a href="./pomodoro.html"><b>云端番茄钟</b><i>POMODORO</i></a>'+
+      '<a href="./palette.html"><b>云彩调色盘</b><i>PALETTE</i></a>'+
+      '<a href="./countdown.html"><b>倒计时</b><i>COUNTDOWN</i></a>'+
+      '<a href="./qrcode.html"><b>云端二维码</b><i>QR CODE</i></a></div>'
+  };
+  function openOverlay(key){
+    overlayBody.innerHTML = OV[key] || '';
+    overlay.classList.add('open');
+    gsap.fromTo('.overlay-card', {y:50, opacity:0, rotation:-4}, {y:0, opacity:1, rotation:-1.2, duration:.5, ease:'back.out(1.4)'});
+  }
+  window.openOverlay = openOverlay;
+  overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.classList.remove('open'); });
+  document.getElementById('overlayClose').addEventListener('click', function(){ overlay.classList.remove('open'); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') overlay.classList.remove('open'); });
+  document.querySelectorAll('[data-goto]').forEach(function(a){
+    a.addEventListener('click', function(){
+      var t = document.querySelector(a.getAttribute('data-goto'));
+      if(t) t.scrollIntoView({behavior:'smooth'});
+    });
+  });
+  document.getElementById('navTools').addEventListener('click', function(){ openOverlay('tools'); });
+  if(location.hash === '#tools') openOverlay('tools');
+
+  /* ================= 翻页诗集书 ================= */
+  var BOOK_PAGES = [
+    {kicker:'CHAPTER 01 · 飞鸟集', title:'夏天的飞鸟', zh:'夏天的飞鸟，来到我窗前，<br>唱唱歌，就飞离。<br><br>秋天的黄叶，无歌可唱，<br>一声叹息，飘落那里。', en:'Stray birds of summer come to my window to sing and fly away. And yellow leaves of autumn flutter and fall there with a sigh.'},
+    {kicker:'CHAPTER 02 · 飞鸟集', title:'世界以痛吻我', zh:'世界以痛吻我，<br>要我报之以歌。<br><br>使卵石臻于完美的，并非锤的打击，<br>而是水的且歌且舞。', en:'The world has kissed my soul with its pain, asking for its return in songs.'},
+    {kicker:'CHAPTER 03 · 飞鸟集', title:'天空没有痕迹', zh:'天空没有翅膀的痕迹，<br>但我已飞过。<br><br>如果你为错过太阳而哭泣，<br>你也要错过群星了。', en:'I leave no trace of wings in the air, but I am glad I have had my flight.'},
+    {kicker:'ABOUT · 关于我', title:'写这本书的人', zh:'23 岁，产品运营 / AI 应用方向。<br>把云朵感界面、彩色系统和奇思妙想<br>慢慢做成作品。<br><br>南京大学 课程与教学论 硕士', en:'alomo · cloud lab · making playful interfaces with usable details'},
+    {kicker:'WORKS · 作品', title:'云上作品集', zh:'智能词书工作坊 · 小红书拉新 5000+<br>智能客服 Agent · 扣子搭建<br>GEO 稿件 60+ 篇<br>云朵感网页与动效实验', en:'vocab lab · agent · geo writing · playful web experiments'},
+    {kicker:'EPILOGUE · 后记', title:'另一页开始', zh:'鸟落在柜顶，诗集合上又翻开。<br>旅途的终点，<br>是另一页开始。', en:'The end of the journey is where another page begins.'}
+  ];
+  var bookOverlay = document.getElementById('bookOverlay');
+  var book3d = document.getElementById('book3d');
+  var bookBuilt = false, bookLeaves = [];
+  function buildBook(){
+    if(bookBuilt) return; bookBuilt = true;
+    // 静态左底页（封底内页）
+    var st = document.createElement('div');
+    st.className = 'bk-static';
+    st.innerHTML = '<div class="bk-inner"><div class="pg-kicker">CLOUD LAB PRESS</div><p class="pg-zh" style="margin-top:auto;margin-bottom:auto;text-align:center;opacity:.55">—— 云端印制 ——</p></div>';
+    book3d.insertBefore(st, book3d.firstChild);
+    // 叶片：封面 + 内容页两两成叶
+    var leaves = [];
+    leaves.push({front:'<div class="bk-inner cover-inner"><img class="cv-bird" src="./images/stray-birds/bird-book-glide.png" alt=""><h4>飞鸟集</h4><div class="cv-en">STRAY BIRDS · CLOUD EDITION</div></div>', back: pageHTML(BOOK_PAGES[0], 1)});
+    for(var i = 1; i < BOOK_PAGES.length; i += 2){
+      var frontP = pageHTML(BOOK_PAGES[i], i + 1);
+      var backP = BOOK_PAGES[i+1] ? pageHTML(BOOK_PAGES[i+1], i + 2) : '<div class="bk-inner"></div>';
+      leaves.push({front:frontP, back:backP});
+    }
+    leaves.forEach(function(lf, idx){
+      var el = document.createElement('div');
+      el.className = 'bk-page' + (idx === 0 ? ' cover-page' : '');
+      el.style.zIndex = 40 - idx;
+      el.innerHTML = '<div class="bk-face front">' + lf.front + '</div><div class="bk-face back">' + lf.back + '</div>';
+      el.addEventListener('click', function(){
+        if(el.classList.contains('flipped')){
+          // 往回翻：只有当它上面（更晚翻的）都已复原才允许
+          for(var j = idx + 1; j < bookLeaves.length; j++) if(bookLeaves[j].classList.contains('flipped')) return;
+          el.classList.remove('flipped');
+          el.style.zIndex = 40 - idx;
+        } else {
+          for(var j2 = 0; j2 < idx; j2++) if(!bookLeaves[j2].classList.contains('flipped')) return;
+          el.classList.add('flipped');
+          el.style.zIndex = 40 + idx;
+        }
+      });
+      book3d.insertBefore(el, book3d.querySelector('.book-hint'));
+      bookLeaves.push(el);
+    });
+  }
+  function pageHTML(p, num){
+    return '<div class="bk-inner"><div class="pg-kicker">' + p.kicker + '</div><h4>' + p.title + '</h4>' +
+      '<p class="pg-zh">' + p.zh + '</p><p class="pg-en">' + p.en + '</p><span class="pg-num">' + num + '</span></div>';
+  }
+  function openBook(){
+    buildBook();
+    bookLeaves.forEach(function(el, i){ el.classList.remove('flipped'); el.style.zIndex = 40 - i; });
+    bookOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if(!document.body.classList.contains('shot')){
+      gsap.fromTo(book3d, {y:60, opacity:0, rotationX:14}, {y:0, opacity:1, rotationX:6, duration:.8, ease:'power3.out'});
+      // 自动翻开封面
+      setTimeout(function(){ if(bookLeaves[0] && bookOverlay.classList.contains('open')){ bookLeaves[0].classList.add('flipped'); bookLeaves[0].style.zIndex = 40; } }, 750);
+    } else {
+      bookLeaves[0].classList.add('flipped'); bookLeaves[0].style.zIndex = 40;
+    }
+  }
+  window.openBook = openBook;
+  function closeBook(){
+    bookOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('bookClose').addEventListener('click', closeBook);
+  bookOverlay.addEventListener('click', function(e){ if(e.target === bookOverlay) closeBook(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeBook(); });
+
+  /* ================= 3D 诗集柜 ================= */
+  try{ initLocker(); }catch(err){
+    document.getElementById('lockerFallback').style.display = 'flex';
+    document.getElementById('lockerCanvas').style.display = 'none';
+  }
+
+  function initLocker(){
+    var canvas = document.getElementById('lockerCanvas');
+    var wrap = document.getElementById('lockerWrap');
+    var renderer = new THREE.WebGLRenderer({canvas:canvas, alpha:true, antialias:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+    camera.position.set(0, 0.42, 14.2);
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x8fb8dd, 1.05));
+    var dir = new THREE.DirectionalLight(0xffffff, 0.55);
+    dir.position.set(5, 8, 7);
+    scene.add(dir);
+
+    var root = new THREE.Group();
+    scene.add(root);
+
+    var BLUE = 0x4a7cb8, BLUE_D = 0x35619c, BLUE_IN = 0x5d8cc2, SHELF = 0xc9dcec;
+    var matBody = new THREE.MeshLambertMaterial({color:BLUE});
+    var matDark = new THREE.MeshLambertMaterial({color:BLUE_D});
+    var matIn = new THREE.MeshLambertMaterial({color:BLUE_IN});
+    var matShelf = new THREE.MeshLambertMaterial({color:SHELF});
+    var matLeaf = new THREE.MeshLambertMaterial({color:0xd8e3a4});
+
+    var texLoader = new THREE.TextureLoader();
+    // 加载失败自动重试（单线程静态服务器并发大时会掐掉部分连接）
+    function loadTexRetry(url, tries){
+      tries = tries || 0;
+      var mat = arguments[2];
+      var t = texLoader.load(url + (tries ? ('?r=' + tries) : ''), function(ok){
+        if(mat){ mat.map = ok; mat.needsUpdate = true; }
+      }, undefined, function(){
+        if(tries < 3) setTimeout(function(){ loadTexRetry(url, tries + 1, mat); }, 400 * (tries + 1));
+      });
+      return t;
+    }
+    function texMat(url){
+      var m = new THREE.MeshBasicMaterial({transparent:true});
+      m.map = loadTexRetry(url, 0, m);
+      return m;
+    }
+    function makeLabel(text, sub, opts){
+      opts = opts || {};
+      var w = 512, h = sub ? 256 : 170;
+      var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      var g = cv.getContext('2d');
+      g.fillStyle = opts.bg || '#f2f6e4';
+      g.fillRect(0,0,w,h);
+      g.strokeStyle = 'rgba(14,58,125,.5)'; g.lineWidth = 6; g.strokeRect(8,8,w-16,h-16);
+      g.fillStyle = '#0e3a7d';
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.font = 'bold ' + (opts.size||72) + 'px "HanziPen SC","Kaiti SC",cursive';
+      g.fillText(text, w/2, sub ? h/2-34 : h/2);
+      if(sub){
+        g.font = '28px "Space Mono",monospace';
+        g.fillStyle = '#4a6b9d';
+        g.fillText(sub, w/2, h/2+52);
+      }
+      var t = new THREE.CanvasTexture(cv);
+      return new THREE.MeshBasicMaterial({map:t, transparent:true});
+    }
+
+    /* ---- 柜体：三列 ---- */
+    var W = 2.6, H = 8, D = 2, GAP = 0.12;
+    var clickables = [];
+    var familyCards = [];
+    var doors = [];
+    [-1,0,1].forEach(function(col){
+      var gcol = new THREE.Group();
+      gcol.position.x = col * (W + GAP);
+      root.add(gcol);
+      // 背板/顶/底/侧
+      var back = new THREE.Mesh(new THREE.BoxGeometry(W, H, 0.12), matIn);
+      back.position.set(0, 0, -D/2 + 0.06); gcol.add(back);
+      var top = new THREE.Mesh(new THREE.BoxGeometry(W, 0.14, D), matBody);
+      top.position.set(0, H/2 - 0.07, 0); gcol.add(top);
+      var bot = new THREE.Mesh(new THREE.BoxGeometry(W, 0.14, D), matBody);
+      bot.position.set(0, -H/2 + 0.07, 0); gcol.add(bot);
+      [-1,1].forEach(function(s){
+        var side = new THREE.Mesh(new THREE.BoxGeometry(0.14, H, D), matBody);
+        side.position.set(s*(W/2 - 0.07), 0, 0); gcol.add(side);
+      });
+    });
+
+    /* ---- 左右柜：云朵的小房间 ---- */
+    var colL = root.children[0], colR = root.children[2], mid0 = root.children[1];
+    var PROP = './images/locker-props/';
+    var snowBursts = [], tuneNotes = [];
+    var tuneOn = false, tuneTimer = null, actx = null;
+
+    var snowTex = (function(){
+      var cv = document.createElement('canvas'); cv.width = cv.height = 64;
+      var g = cv.getContext('2d');
+      var gr = g.createRadialGradient(32,32,2,32,32,30);
+      gr.addColorStop(0,'rgba(255,255,255,1)'); gr.addColorStop(1,'rgba(255,255,255,0)');
+      g.fillStyle = gr; g.fillRect(0,0,64,64);
+      return new THREE.CanvasTexture(cv);
+    })();
+    var noteTex = (function(){
+      var cv = document.createElement('canvas'); cv.width = cv.height = 96;
+      var g = cv.getContext('2d');
+      g.font = '72px serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillStyle = '#f4f7ee'; g.strokeStyle = 'rgba(14,58,125,.6)'; g.lineWidth = 4;
+      g.strokeText('\u266A', 48, 50); g.fillText('\u266A', 48, 50);
+      return new THREE.CanvasTexture(cv);
+    })();
+
+    function say(text, ms){
+      var b = document.getElementById('lockerBubble');
+      b.textContent = text;
+      b.classList.add('show');
+      clearTimeout(b._t);
+      b._t = setTimeout(function(){ b.classList.remove('show'); }, ms || 2800);
+    }
+    /* ---- 鸟笼：开门 -> 飞到柜顶鸟窝孵蛋；再点 -> 飞回笼里 ---- */
+    var cageBirdState = { bird: null, cage: null, nest: null, busy: false, onNest: false, wiggleTimer: null };
+    function flyBirdAlong(bird, pathPts, secs, onDone){
+      var path = new THREE.CatmullRomCurve3(pathPts);
+      var prog = {t: 0};
+      var flap = {v: 0};
+      var flapTween = gsap.to(flap, {v: 1, duration: secs, ease: 'none',
+        onUpdate: function(){
+          var w = Math.sin(flap.v * secs * 9) * 0.55;
+          if(cageBirdState.bird){
+            cageBirdState.bird.wings[0].rotation.z = w;
+            cageBirdState.bird.wings[1].rotation.z = -w;
+          }
+        }});
+      gsap.to(prog, {t: 1, duration: secs, ease: 'power1.inOut',
+        onUpdate: function(){
+          var p = path.getPoint(Math.min(prog.t, 0.999));
+          var tan = path.getTangent(Math.min(prog.t, 0.999));
+          bird.position.copy(p);
+          // 每帧整组重置：attach() 可能把等价旋转分解成 (π, y, π)，只改 y/z 会让鸟倒着飞
+          bird.rotation.set(0, Math.atan2(tan.x, tan.z), 0);
+        },
+        onComplete: function(){
+          flapTween.kill();
+          gsap.to(cageBirdState.bird.wings[0].rotation, {z: 0, duration: 0.3});
+          gsap.to(cageBirdState.bird.wings[1].rotation, {z: 0, duration: 0.3});
+          gsap.to(bird.rotation, {z: 0, duration: 0.3});
+          if(onDone) onDone();
+        }});
+    }
+    function startEggWiggle(){
+      stopEggWiggle();
+      cageBirdState.wiggleTimer = setInterval(function(){
+        var eggs = (cageBirdState.nest && cageBirdState.nest.userData.nestApi.eggs) || [];
+        eggs.forEach(function(e, i){
+          setTimeout(function(){
+            gsap.fromTo(e.rotation, {z: -0.18}, {z: 0.18, duration: 0.12, yoyo: true, repeat: 3,
+              onComplete: function(){ e.rotation.z = 0; }});
+          }, i * 260);
+        });
+      }, 4200);
+    }
+    function stopEggWiggle(){
+      if(cageBirdState.wiggleTimer){ clearInterval(cageBirdState.wiggleTimer); cageBirdState.wiggleTimer = null; }
+    }
+    function flyCageBird(cageModel){
+      if(cageBirdState.busy) return;
+      var cageApi = cageModel.userData.cage;
+      var nestModel = null;
+      root.traverse(function(o){ if(o.userData && o.userData.nestApi) nestModel = o; });
+      if(!cageApi || !nestModel) return;
+      cageBirdState.busy = true;
+      cageBirdState.cage = cageModel;
+      cageBirdState.nest = nestModel;
+      cageBirdState.bird = cageApi;
+      var bird = cageApi.bird;
+
+      if(!cageBirdState.onNest){
+        /* ---- 出笼 -> 飞到鸟窝孵蛋 ---- */
+        say('\u7b3c\u95e8\u5f00\u4e86\u2014\u2014\u5b83\u53bb\u67dc\u9876\u770b\u770b\u90a3\u4e2a\u7a9d\u3002', 3200);
+        cageApi.setDoor(true);
+        var startW = new THREE.Vector3();
+        bird.getWorldPosition(startW);
+        root.worldToLocal(startW);
+        root.attach(bird);
+        var nestW = new THREE.Vector3();
+        nestModel.getWorldPosition(nestW);
+        root.worldToLocal(nestW);
+        var seat = new THREE.Vector3(nestW.x, nestW.y + 0.26, nestW.z + 0.05);
+        flyBirdAlong(bird, [
+          startW,
+          new THREE.Vector3(startW.x + 1.2, startW.y + 0.6, 1.3),
+          new THREE.Vector3(startW.x + 0.5, 3.1, 1.7),
+          new THREE.Vector3(0, 4.4, 1.5),
+          new THREE.Vector3(nestW.x - 0.7, 4.3, 1.0),
+          seat
+        ], 5.5, function(){
+          // 落窝：孵蛋姿态
+          gsap.to(bird.rotation, {y: 0.5, duration: 0.5});
+          gsap.to(bird.scale, {x: 0.8, y: 0.72, z: 0.8, duration: 0.6, ease: 'power2.out'});
+          cageBirdState.onNest = true;
+          cageBirdState.busy = false;
+          cageApi.setDoor(false);
+          say('\u5de2\u91cc\u7684\u86cb\u8f7b\u8f7b\u52a8\u4e86\u52a8\uff0c\u50cf\u8981\u5b75\u51fa\u4e00\u9996\u8bd7\u3002', 3600);
+          startEggWiggle();
+        });
+      } else {
+        /* ---- 从鸟窝飞回笼里 ---- */
+        say('\u5b83\u6536\u5fc3\u56de\u7b3c\u5566\u3002', 2600);
+        stopEggWiggle();
+        cageApi.setDoor(true);
+        var startW2 = bird.position.clone();
+        var cageW = new THREE.Vector3();
+        cageModel.getWorldPosition(cageW);
+        root.worldToLocal(cageW);
+        var perch = new THREE.Vector3(cageW.x, cageW.y + cageApi.perchY * 0.92, cageW.z + 0.05 * 0.92);
+        flyBirdAlong(bird, [
+          startW2,
+          new THREE.Vector3(startW2.x - 1.0, startW2.y + 0.3, 1.3),
+          new THREE.Vector3(cageW.x + 1.6, cageW.y + 1.6, 1.4),
+          new THREE.Vector3(cageW.x + 0.9, cageW.y + 0.8, 0.7),
+          perch
+        ], 5, function(){
+          cageModel.attach(bird);
+          bird.position.set(0, cageApi.perchY, 0.05);
+          // attach() 的旋转分解可能得到 (π, y, π) 等价姿态，直接清零避免鸟倒立
+          bird.rotation.set(0, 0, 0);
+          gsap.to(bird.scale, {x: 0.88, y: 0.88, z: 0.88, duration: 0.4});
+          cageApi.setDoor(false);
+          cageBirdState.onNest = false;
+          cageBirdState.busy = false;
+          say('\u60f3\u7559\u5c31\u7559\uff0c\u60f3\u8d70\u5c31\u8d70\u3002', 2600);
+        });
+      }
+    }
+
+    function addShelf(col, ys){
+      ys.forEach(function(y){
+        var sh = new THREE.Mesh(new THREE.BoxGeometry(W-0.2, 0.12, D-0.2), matShelf);
+        sh.position.set(0, y, 0); col.add(sh);
+      });
+    }
+    var flatProps = [];
+    function addProp(col, img, w, h, x, y, z, action){
+      var m = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
+        new THREE.MeshBasicMaterial({map: texLoader.load(PROP + img), transparent:true}));
+      m.position.set(x, y, z);
+      m.userData = {type:'prop', action:action, baseX:x};
+      col.add(m); clickables.push(m); flatProps.push(m);
+      return m;
+    }
+    function itemProp(col, img, w, h, x, y, z, key){
+      var m = addProp(col, img, w, h, x, y, z, null);
+      m.userData = {type:'item', key:key};
+      return m;
+    }
+    function propTag(col, text, w, x, y, z, bg){
+      var t = new THREE.Mesh(new THREE.PlaneGeometry(w, w*0.332), makeLabel(text, null, {size:64, bg:bg}));
+      t.position.set(x, y, z); col.add(t);
+      return t;
+    }
+    addShelf(colL, [1.5, -0.9]);
+    addShelf(colR, [1.5, -0.9]);
+
+    // 3D 物件通用挂载：工厂存在则用 3D 模型，否则回退平面贴图
+    function addProp3d(col, factory, scale, x, y, z, data){
+      var f = window[factory];
+      if(!f) return null;
+      var m;
+      try{ m = f(); }catch(e){ return null; }
+      m.scale.set(scale, scale, scale);
+      // 记录局部包围盒（focusProp 聚焦时用：3D 模型原点在底部而非中心）
+      var bb = new THREE.Box3().setFromObject(m);
+      m.userData.focusCY = ((bb.min.y + bb.max.y) / 2) / scale;
+      m.userData.focusH = (bb.max.y - bb.min.y) / scale;
+      m.position.set(x, y, z);
+      m.userData.type = data.type || 'prop';
+      if(data.action) m.userData.action = data.action;
+      if(data.key) m.userData.key = data.key;
+      m.userData.baseX = x;
+      col.add(m); clickables.push(m);
+      return m;
+    }
+
+    // 左柜 · 诗与云的画廊（全 3D：画架/墨水瓶/晾照片/雪景罩/八音盒/茶杯/羽毛罐）
+    addProp3d(colL, 'createLockerEasel', 1.0, -0.55, 1.56, 0.1, {action:'painting'}) ||
+      addProp(colL, 'easel2-cut.png', 1.0, 1.49, -0.55, 2.4, 0.1, 'painting');
+    addProp3d(colL, 'createLockerInkwell', 0.72, 0.68, 1.56, 0.35, {action:'ink'}) ||
+      addProp(colL, 'inkwell2-cut.png', 0.5, 1.03, 0.68, 2.14, 0.4, 'ink');
+    addProp3d(colL, 'createLockerPhotos', 0.82, 0, -0.84, -0.25, {action:'photos'}) ||
+      addProp(colL, 'photos2-cut.png', 2.2, 1.05, 0, 0.9, 0.3, 'photos');
+    addProp3d(colL, 'createLockerCloche', 1.15, -0.5, -3.86, 0.2, {action:'snow'}) ||
+      addProp(colL, 'cloche2-cut.png', 0.95, 1.4, -0.5, -3.16, 0.2, 'snow');
+    addProp3d(colL, 'createLockerMusicbox', 0.9, 0.62, -3.86, 0.3, {action:'music'}) ||
+      addProp(colL, 'musicbox2-cut.png', 0.85, 1.21, 0.62, -3.26, 0.3, 'music');
+    addProp3d(colL, 'createLockerTeacup', 0.62, -0.72, -0.84, 0.35, {action:'tea'}) ||
+      addProp(colL, 'teacup2-cut.png', 0.62, 0.77, -0.72, -0.46, 0.35, 'tea');
+    addProp3d(colL, 'createLockerFeatherjar', 0.78, 0.55, -0.84, 0.35, {action:'feather'}) ||
+      addProp(colL, 'featherjar2-cut.png', 0.55, 1.05, 0.55, -0.32, 0.35, 'feather');
+    // 3D 鸟窝（一个窝三枚蛋），替代原平面贴图；加载失败时回退
+    var nest3d = window.createLockerNest ? createLockerNest() : null;
+    if(nest3d){
+      nest3d.scale.set(1.4, 1.4, 1.4);
+      // 柜顶面 y = H/2 = 4.0（顶板上表面），窝要坐实在柜顶上
+      nest3d.position.set(0.35, 4.0, 1.0);
+      nest3d.userData.type = 'prop';
+      nest3d.userData.action = 'nest';
+      nest3d.userData.baseX = 0.35;
+      nest3d.userData.nestApi = nest3d.userData.nest;
+      colL.add(nest3d);
+      clickables.push(nest3d);
+    } else {
+      addProp(colL, 'nest2-cut.png', 0.9, 0.9, 0.35, 4.51, 0.2, 'nest');
+    }
+    // 右柜 · 鸟与诗的游乐角
+    // 3D 留声机，替代原平面贴图；点击唱片转起来放音乐
+    var gramophone3d = window.createLockerGramophone ? createLockerGramophone() : null;
+    if(gramophone3d){
+      gramophone3d.scale.set(1.2, 1.2, 1.2);
+      gramophone3d.position.set(-0.42, 1.56, 0.1);
+      gramophone3d.userData.type = 'prop';
+      gramophone3d.userData.action = 'tune';
+      gramophone3d.userData.baseX = -0.42;
+      colR.add(gramophone3d);
+      clickables.push(gramophone3d);
+    } else {
+      addProp(colR, 'gramophone2-cut.png', 1.25, 1.68, -0.42, 2.42, 0.25, 'tune');
+    }
+    addProp3d(colR, 'createLockerWindchime', 1.1, 0.72, 3.95, 0.35, {action:'chime'}) ||
+      addProp(colR, 'windchime2-cut.png', 0.55, 1.34, 0.72, 3.25, 0.35, 'chime');
+    // 3D 鸟笼（img2threejs 程序化模型），替代原平面贴图；加载失败时回退
+    var birdcage3d = window.createLockerBirdcage ? createLockerBirdcage() : null;
+    if(birdcage3d){
+      birdcage3d.scale.set(0.92, 0.92, 0.92);
+      birdcage3d.position.set(-0.1, -0.84, 0.1);
+      birdcage3d.userData.type = 'cage3d';
+      birdcage3d.userData.flying = false;
+      colR.add(birdcage3d);
+      clickables.push(birdcage3d);
+    } else {
+      addProp(colR, 'birdcage2-cut.png', 1.0, 1.63, 0, -0.02, 0.3, 'cage');
+    }
+    addProp3d(colR, 'createLockerBookstack', 1.0, -0.58, -3.86, 0.25, {action:'stack'}) ||
+      addProp(colR, 'bookstack2-cut.png', 1.05, 0.98, -0.58, -3.37, 0.25, 'stack');
+    // 3D 望远镜（黄铜复古），替代原平面贴图；点击看远方
+    var telescope3d = window.createLockerTelescope ? createLockerTelescope() : null;
+    if(telescope3d){
+      telescope3d.scale.set(1.05, 1.05, 1.05);
+      telescope3d.position.set(0.6, -3.86, 0.15);
+      telescope3d.userData.type = 'scope3d';
+      colR.add(telescope3d);
+      clickables.push(telescope3d);
+    } else {
+      addProp(colR, 'telescope2-cut.png', 0.85, 1.57, 0.6, -3.08, 0.35, 'scope');
+    }
+    addProp3d(mid0, 'createLockerPlane', 0.85, -0.62, 3.15, 0.3, {action:'plane'}) ||
+      addProp(mid0, 'plane2-cut.png', 0.85, 0.73, -0.62, 3.5, 0.3, 'plane');
+
+    var stackQuotes = [
+      '\u300c\u751f\u5982\u590f\u82b1\u4e4b\u7eda\u70c2\uff0c\u6b7b\u5982\u79cb\u53f6\u4e4b\u9759\u7f8e\u3002\u300d',
+      '\u300c\u4e16\u754c\u4ee5\u75db\u543b\u6211\uff0c\u8981\u6211\u62a5\u4e4b\u4ee5\u6b4c\u3002\u300d',
+      '\u300c\u5929\u7a7a\u6ca1\u6709\u7fc5\u8180\u7684\u75d5\u8ff9\uff0c\u4f46\u6211\u5df2\u98de\u8fc7\u3002\u300d',
+      '\u300c\u5f53\u4f60\u4e3a\u9519\u8fc7\u592a\u9633\u800c\u54ed\u6ce3\uff0c\u4f60\u4e5f\u8981\u9519\u8fc7\u7fa4\u661f\u4e86\u3002\u300d',
+      '\u300c\u6211\u4eec\u628a\u4e16\u754c\u770b\u9519\u4e86\uff0c\u53cd\u8bf4\u5b83\u6b3a\u9a97\u6211\u4eec\u3002\u300d'
+    ];
+
+    function snowBurst(cx, cy, cz, parent){
+      for(var i = 0; i < 26; i++){
+        var sp = new THREE.Sprite(new THREE.SpriteMaterial({map: snowTex, transparent:true, opacity:.95}));
+        var r = 0.08 + Math.random()*0.09;
+        sp.scale.set(r, r, 1);
+        sp.position.set(cx + (Math.random()-.5)*0.8, cy + Math.random()*0.5, cz + (Math.random()-.5)*0.3);
+        sp.userData = {vy:-(0.5+Math.random()*0.6), vx:(Math.random()-.5)*0.3, life:2.0+Math.random()};
+        parent.add(sp); snowBursts.push(sp);
+      }
+    }
+    function spawnNote(){
+      var sp = new THREE.Sprite(new THREE.SpriteMaterial({map: noteTex, transparent:true, opacity:.95}));
+      sp.scale.set(0.4, 0.4, 1);
+      sp.position.set((Math.random()-.5)*1.4, 2.6, 0.7);
+      sp.userData = {vy: 0.55+Math.random()*0.3, life: 1.8};
+      colR.add(sp); tuneNotes.push(sp);
+    }
+    function toggleTune(){
+      tuneOn = !tuneOn;
+      if(tuneOn){
+        say('\u7559\u58f0\u673a\u6c99\u6c99\u8f6c\u8d77\u6765\u2014\u2014\u4e91\u6735\u7535\u53f0\u5f00\u64ad\u5566 \u266a');
+        try{
+          if(!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+          if(actx.state === 'suspended') actx.resume();
+          var scale = [523.25, 587.33, 659.25, 783.99, 880];
+          var pat = [0,2,4,3,2,1,0,4], step = 0;
+          tuneTimer = setInterval(function(){
+            var f = scale[pat[step % 8]];
+            var o = actx.createOscillator(), g = actx.createGain();
+            o.type = 'sine'; o.frequency.value = f;
+            g.gain.setValueAtTime(0.0001, actx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.07, actx.currentTime + 0.03);
+            g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + 0.42);
+            o.connect(g); g.connect(actx.destination);
+            o.start(); o.stop(actx.currentTime + 0.45);
+            spawnNote(); step++;
+          }, 400);
+        }catch(e){}
+      } else {
+        say('\u4e91\u6735\u7535\u53f0\uff0c\u4e0b\u6b21\u518d\u542c\u3002');
+        clearInterval(tuneTimer); tuneTimer = null;
+      }
+    }
+    function propAction(action, mesh){
+      // 3D \u7269\u4ef6\u81ea\u5e26\u4e13\u5c5e\u4ea4\u4e92\u52a8\u753b\uff1b\u5e73\u9762\u8d34\u56fe\u56de\u9000\u7528\u901a\u7528\u6447\u6643
+      var fx = mesh && mesh.userData && mesh.userData.fx;
+      if(fx && fx.tap){ try{ fx.tap(); }catch(e){} }
+      if(action === 'painting'){
+        say('\u5750\u5728\u7a97\u8fb9\u770b\u4e91\u7684\u4eba\uff0c\u4e5f\u5728\u7b49\u4e00\u53ea\u9e1f\u3002');
+      } else if(action === 'ink'){
+        if(!fx) gsap.fromTo(mesh.rotation, {z:-0.09}, {z:0.09, duration:.12, yoyo:true, repeat:5, ease:'sine.inOut', onComplete:function(){ mesh.rotation.z = 0; }});
+        say('\u7fbd\u6bdb\u7b14\u8638\u4e86\u4e00\u70b9\u4e91\u7684\u58a8\u6c34\u2014\u2014\u4eca\u5929\u5148\u5199\u4e0b\u4e00\u884c\u3002');
+      } else if(action === 'photos'){
+        setTimeout(function(){ openOverlay('works'); }, fx ? 650 : 0);
+      } else if(action === 'snow'){
+        if(!fx){
+          snowBurst(mesh.position.x, mesh.position.y + 0.9, mesh.position.z + 0.45, mesh.parent);
+          gsap.fromTo(mesh.scale, {x:1.06, y:1.06}, {x:1, y:1, duration:.55, ease:'elastic.out(1,.4)'});
+        }
+        say('\u6447\u4e00\u6447\uff0c\u6c34\u6676\u7403\u91cc\u4e0b\u8d77\u4e91\u6735\u96ea \u2744');
+      } else if(action === 'tune'){
+        if(!fx) gsap.fromTo(mesh.rotation, {z:-0.04}, {z:0.04, duration:.16, yoyo:true, repeat:5, ease:'sine.inOut', onComplete:function(){ mesh.rotation.z = 0; }});
+        toggleTune();
+        if(typeof gramophone3d !== 'undefined' && gramophone3d && gramophone3d.userData.gram){
+          gramophone3d.userData.gram.setPlaying(tuneOn);
+        }
+      } else if(action === 'stack'){
+        if(!fx) gsap.fromTo(mesh.rotation, {z:-0.05}, {z:0.05, duration:.1, yoyo:true, repeat:5, ease:'sine.inOut', onComplete:function(){ mesh.rotation.z = 0; }});
+        setTimeout(function(){
+          say('\u505c\u5728\u4e66\u5806\u4e0a\u7684\u9e1f\u5148\u66ff\u6211\u8bfb\u4e86\u4e00\u53e5\uff1a' + stackQuotes[Math.floor(Math.random()*stackQuotes.length)], 3800);
+        }, 700);
+      } else if(action === 'cage'){
+        gsap.fromTo(mesh.rotation, {y:0.12}, {y:0.4, duration:.15, yoyo:true, repeat:3, onComplete:function(){ mesh.rotation.y = 0; }});
+        say('\u7b3c\u95e8\u4e00\u76f4\u5f00\u7740\u2014\u2014\u4e91\u60f3\u7559\u5c31\u7559\uff0c\u60f3\u8d70\u5c31\u8d70\u3002');
+      } else if(action === 'nest'){
+        gsap.fromTo(mesh.rotation, {z:-0.06}, {z:0.06, duration:.14, yoyo:true, repeat:5, ease:'sine.inOut', onComplete:function(){ mesh.rotation.z = 0; }});
+        say('\u5de2\u91cc\u7684\u86cb\u8f7b\u8f7b\u52a8\u4e86\u52a8\uff0c\u50cf\u8981\u5b75\u51fa\u4e00\u9996\u8bd7\u3002');
+      } else if(action === 'feather'){
+        say('\u7f50\u5b50\u91cc\u6536\u7740\u6389\u843d\u7684\u7fbd\u6bdb\uff0c\u6bcf\u4e00\u6839\u90fd\u98de\u8fc7\u4e00\u6bb5\u5929\u7a7a\u3002');
+      } else if(action === 'tea'){
+        if(!fx) gsap.fromTo(mesh.position, {y:mesh.position.y}, {y:mesh.position.y + 0.08, duration:.18, yoyo:true, repeat:3, ease:'sine.inOut'});
+        say('\u4e91\u6735\u7ea2\u8336\u7eed\u4e86\u4e00\u676f\uff0c\u70ed\u6c14\u90fd\u662f\u4e91\u7684\u5f62\u72b6 \u2601');
+      } else if(action === 'music'){
+        if(!fx) gsap.fromTo(mesh.rotation, {z:-0.06}, {z:0.06, duration:.14, yoyo:true, repeat:5, ease:'sine.inOut', onComplete:function(){ mesh.rotation.z = 0; }});
+        say('\u516b\u97f3\u76d2\u8f6c\u4e86\u534a\u5708\u2014\u2014\u662f\u300a\u98de\u9e1f\u96c6\u300b\u7b2c\u4e09\u9996 \u266a');
+      } else if(action === 'scope'){
+        say('\u671b\u8fdc\u955c\u91cc\uff1a\u4e00\u53ea\u9e1f\u6b63\u8854\u7740\u4fe1\u98de\u6765 \u2709');
+      } else if(action === 'chime'){
+        if(!fx) gsap.fromTo(mesh.rotation, {z:-0.1}, {z:0.1, duration:.16, yoyo:true, repeat:5, ease:'sine.inOut', onComplete:function(){ mesh.rotation.z = 0; }});
+        say('\u98ce\u94c3\u54cd\u4e86\u2014\u2014\u98ce\u8def\u8fc7\u65f6\u5ff5\u4e86\u4e00\u53e5\u8bd7');
+      } else if(action === 'plane'){
+        if(!fx) gsap.to(mesh.position, {x:'+=0.5', y:'+=0.35', duration:.7, ease:'power2.out', yoyo:true, repeat:1});
+        say('\u7eb8\u98de\u673a\u7684\u76ee\u7684\u5730\uff1a\u6709\u4e91\u7684\u8fdc\u65b9');
+      } else if(action === 'letters'){
+        say('\u4fe1\u672d\u91cc\u662f\u53bb\u5e74\u7684\u4e91\uff0c\u548c\u4e00\u5c01\u6ca1\u5bc4\u51fa\u7684\u8bd7');
+      }
+    }
+
+    /* ---- 中列内部 ---- */
+    var mid = root.children[1];
+    // 隔板
+    [1.5, -0.9].forEach(function(y){
+      var sh = new THREE.Mesh(new THREE.BoxGeometry(W-0.2, 0.12, D-0.2), matShelf);
+      sh.position.set(0, y, 0); mid.add(sh);
+    });
+    // 顶层：一排书（沉稳蓝绿米色调）——先随机生成再整体归一化，保证不超柜宽
+    var bookColors = [0x2c4a78,0x8a9a6b,0xe8e0c8,0x3d5c8c,0xc7bfa5,0x54718f,0x9aa88a,0x24406e,0xd9d2b8,0x6b82a3];
+    var bookSpecs = bookColors.map(function(c){
+      return {c: c, w: 0.16 + Math.random()*0.1, h: 1.15 + Math.random()*0.35};
+    });
+    var GAP_B = 0.045, PAD_B = 0.35;
+    var rawW = bookSpecs.reduce(function(s, b){ return s + b.w; }, 0) + GAP_B * (bookSpecs.length - 1);
+    // 两侧预留给柜壁，所有书保持竖直，避免相邻书边缘重叠闪烁。
+    var bookLimit = W/2 - 0.26;
+    var fitK = Math.min(1, (bookLimit * 2 - PAD_B * 2) / rawW);
+    var shelfBooks = [];
+    var bx = -W/2 + PAD_B;
+    bookSpecs.forEach(function(bs, i){
+      var bw = bs.w * fitK, bh = bs.h;
+      var b = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, 1.15), new THREE.MeshLambertMaterial({color: bs.c}));
+      b.name = 'shelf-book-' + i;
+      b.position.set(bx + bw/2, 1.5 + 0.06 + bh/2, 0);
+      b.userData = {type:'shelfBook', idx: i, baseY: 1.5 + 0.06 + bh/2, baseRZ: 0};
+      bx += bw + GAP_B * fitK;
+      mid.add(b);
+      clickables.push(b);
+      shelfBooks.push(b);
+    });
+    // 最右一本也保持正立，不与邻书共享倾斜外接框。
+    shelfBooks[shelfBooks.length - 1].rotation.z = 0;
+    /* 书的交互：抽出一本，念一句《飞鸟集》，其余书轻轻挤拢 */
+    var bookQuotes = [
+      '「让生命如夏花之绚烂。」',
+      '「鸟翼系上黄金，就飞不远了。」',
+      '「你微笑着，没同我说话；而我觉得，为了这个，我已等待很久。」',
+      '「群星不怕显得像萤火虫那样。」',
+      '「云把水倒进河的水杯里，自己却藏在远山之中。」',
+      '「绿叶恋爱时便成了花，花崇拜时便成了果实。」',
+      '「我今晨坐在窗前，世界如一个路人似的，停留了一会，向我点点头又走过去了。」',
+      '「瀑布歌唱道：我得到自由时便有了歌声。」',
+      '「天空没有翅膀的痕迹，但我已飞过。」',
+      '「使生如夏花之绚烂，死如秋叶之静美。」'
+    ];
+    var bookBusy = false;
+    function tapShelfBook(b){
+      if(bookBusy) return;
+      bookBusy = true;
+      var d = b.userData;
+      // 1) 抽出：向前滑出一截并前倾
+      var tl = gsap.timeline({onComplete: function(){ bookBusy = false; }});
+      tl.to(b.position, {z: 0.75, duration: 0.45, ease: 'power2.out'}, 0);
+      tl.to(b.rotation, {x: -0.42, z: d.baseRZ * 0.3, duration: 0.45, ease: 'power2.out'}, 0);
+      tl.to(b.position, {y: d.baseY + 0.15, duration: 0.45, ease: 'power2.out'}, 0);
+      // 邻书向空隙轻轻倾靠
+      shelfBooks.forEach(function(o){
+        if(o === b) return;
+        var dx = o.position.x - b.position.x;
+        if(Math.abs(dx) < 0.5){
+          tl.to(o.rotation, {z: o.userData.baseRZ + (dx > 0 ? 0.05 : -0.05), duration: 0.4}, 0.1);
+        }
+      });
+      // 2) 停一拍念一句
+      tl.call(function(){
+        say(bookQuotes[d.idx % bookQuotes.length], 3600);
+      }, null, 0.55);
+      // 3) 放回
+      tl.to(b.position, {z: 0, y: d.baseY, duration: 0.5, ease: 'power2.inOut'}, 2.6);
+      tl.to(b.rotation, {x: 0, z: d.baseRZ, duration: 0.5, ease: 'power2.inOut'}, 2.6);
+      shelfBooks.forEach(function(o){
+        if(o === b) return;
+        tl.to(o.rotation, {z: o.userData.baseRZ, duration: 0.4}, 2.7);
+      });
+    }
+    var cloudSprites = [];
+    // 中层：打字机（小工具）放在隔板上
+    // 3D 打字机（img2threejs 程序化黏土模型），替代原平面贴图；加载失败时回退贴图
+    var typewriter3d = window.createLockerTypewriter ? createLockerTypewriter() : null;
+    if(typewriter3d){
+      typewriter3d.scale.set(1.02, 1.02, 1.02);
+      typewriter3d.position.set(0, -0.84, 0.18);
+      typewriter3d.userData = {type:'typer'};
+      mid.add(typewriter3d);
+      clickables.push(typewriter3d);
+    } else {
+      itemProp(mid, 'typewriter2-cut.png', 1.3, 1.39, 0, -0.15, 0.2, 'tools');
+    }
+    propTag(mid, '小工具', 0.72, 0, 0.78, 0.25);
+    // 下层：关于我 手提箱 + 作品展示 画箱（并排不重叠）
+    var suitcase3d = addProp3d(mid, 'createLockerSuitcase', 0.92, -0.6, -3.86, 0.2, {type:'item', key:'about'});
+    if(!suitcase3d) itemProp(mid, 'suitcase2-cut.png', 1.2, 0.97, -0.6, -3.37, 0.2, 'about');
+    propTag(mid, '关于我', 0.72, -0.6, -2.55, 0.25);
+    var crate3d = addProp3d(mid, 'createLockerCrate', 0.95, 0.66, -3.86, 0.35, {type:'item', key:'works'});
+    if(!crate3d) itemProp(mid, 'crate2-cut.png', 1.1, 1.16, 0.66, -3.28, 0.35, 'works');
+    propTag(mid, '作品展示', 0.88, 0.66, -2.55, 0.4);
+
+    /* ---- 柜门（左/右关着，中列半开） ---- */
+    function makeDoor(col, openAngle){
+      var pivot = new THREE.Group();
+      var doorW = W - 0.06, doorH = H - 0.24;
+      pivot.position.set(col*(W+GAP) - doorW/2, 0, D/2 + 0.03);
+      var door = new THREE.Mesh(new THREE.BoxGeometry(doorW, doorH, 0.1), matBody);
+      door.position.x = doorW/2;
+      pivot.add(door);
+      // 通风口
+      [1.9, 2.25, 2.6].forEach(function(y){
+        var vent = new THREE.Mesh(new THREE.BoxGeometry(doorW*0.5, 0.09, 0.05), matDark);
+        vent.position.set(doorW/2, y, 0.07); pivot.add(vent);
+        var vent2 = vent.clone(); vent2.position.y = -y; pivot.add(vent2);
+      });
+      // 把手
+      var hd = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.5, 0.14), matDark);
+      hd.position.set(doorW - 0.25, 0, 0.09); pivot.add(hd);
+      pivot.rotation.y = openAngle;
+      pivot.userData = {type:'door', open: Math.abs(openAngle) > 0.3, openAngle: openAngle || -2.2, baseRot: openAngle};
+      root.add(pivot);
+      doors.push(pivot);
+      clickables.push(pivot);
+      return pivot;
+    }
+    var doorL = makeDoor(-1, 0);
+    var doorM = makeDoor(0, -1.9);
+    var doorR = makeDoor(1, 0);
+    if(document.body.classList.contains('shot')){
+      doors.forEach(function(d){ d.visible = false; });
+      doors.forEach(function(d){ d.userData.open = true; });
+    }
+
+    /* ---- 柜子背面：手绘云与飞鸟壁画（转到背面不再是三块光板） ---- */
+    (function(){
+      var cw = 1024, ch = 1024;
+      var cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
+      var g = cv.getContext('2d');
+      // 底色：比柜身略深的蓝，柔和渐变
+      var bg = g.createLinearGradient(0, 0, 0, ch);
+      bg.addColorStop(0, '#3f6dab'); bg.addColorStop(1, '#35619c');
+      g.fillStyle = bg; g.fillRect(0, 0, cw, ch);
+      // 大朵手绘云（白描边+半透明填充）
+      function paintCloud(cx, cy, s, alpha){
+        g.save(); g.globalAlpha = alpha;
+        g.fillStyle = '#e9f2fb'; g.strokeStyle = 'rgba(255,255,255,.9)'; g.lineWidth = s * 0.06;
+        g.beginPath();
+        g.arc(cx - s, cy, s * 0.62, Math.PI * 0.4, Math.PI * 1.6);
+        g.arc(cx - s * 0.3, cy - s * 0.5, s * 0.7, Math.PI * 0.9, Math.PI * 1.9);
+        g.arc(cx + s * 0.55, cy - s * 0.32, s * 0.62, Math.PI * 1.1, Math.PI * 0.1);
+        g.arc(cx + s, cy + s * 0.05, s * 0.5, Math.PI * 1.4, Math.PI * 0.55);
+        g.closePath(); g.fill(); g.stroke();
+        g.restore();
+      }
+      paintCloud(300, 300, 120, 0.9);
+      paintCloud(730, 480, 90, 0.75);
+      paintCloud(480, 750, 105, 0.85);
+      paintCloud(830, 190, 60, 0.6);
+      paintCloud(180, 620, 65, 0.6);
+      // 简笔飞鸟
+      function paintBird(bx, by, s, a){
+        g.save(); g.translate(bx, by); g.rotate(a || 0);
+        g.strokeStyle = '#f3f7ee'; g.lineWidth = s * 0.16; g.lineCap = 'round';
+        g.beginPath(); g.moveTo(-s, 0); g.quadraticCurveTo(-s * 0.4, -s * 0.75, 0, 0);
+        g.quadraticCurveTo(s * 0.4, -s * 0.75, s, 0); g.stroke();
+        g.restore();
+      }
+      paintBird(520, 260, 34, -0.08);
+      paintBird(660, 660, 26, 0.1);
+      paintBird(260, 480, 22, 0.05);
+      paintBird(860, 380, 20, -0.12);
+      // 一行手写诗
+      g.fillStyle = 'rgba(240,246,252,.85)';
+      g.font = '52px "HanziPen SC","Kaiti SC",cursive';
+      g.textAlign = 'center';
+      g.fillText('天空没有翅膀的痕迹', cw/2, 920);
+      g.font = '34px "HanziPen SC","Kaiti SC",cursive';
+      g.fillText('但我已飞过', cw/2, 975);
+      var muralTex = new THREE.CanvasTexture(cv);
+      var totalW = 3 * W + 2 * GAP;
+      var mural = new THREE.Mesh(
+        new THREE.PlaneGeometry(totalW - 0.1, H - 0.3),
+        new THREE.MeshBasicMaterial({map: muralTex})
+      );
+      mural.rotation.y = Math.PI;               // 面朝背后
+      mural.position.set(0, 0, -D/2 - 0.005);   // 贴着三列背板外侧
+      root.add(mural);
+      /* ---- 背面云朵家族相册墙：九张照片卡，转身后仍有内容可探索 ---- */
+      var familyPhotos = [
+        ['cloud-painter.png', '云小画', 'PAINTER', 'painter'],
+        ['cloud-librarian.png', '云知知', 'LIBRARIAN', 'librarian'],
+        ['cloud-weather.png', '云滴滴', 'WEATHER', 'weather'],
+        ['cloud-sleeper.png', '云梦梦', 'SLEEPER', 'sleeper'],
+        ['cloud-singer.png', '云音音', 'SINGER', 'singer'],
+        ['cloud-baker.png', '云小厨', 'BAKER', 'baker'],
+        ['cloud-hero.png', '云闪闪', 'HERO', 'hero'],
+        ['cloud-detective.png', '云探探', 'DETECTIVE', 'detective'],
+        ['cloud-photographer.png', '云摄摄', 'PHOTO', 'photographer']
+      ];
+      var photoXs = [-2.75, 0, 2.75], photoYs = [2.28, -0.02, -2.32];
+      var photoRot = [-0.035, 0.025, -0.02, 0.028, -0.018, 0.035, -0.025, 0.02, -0.03];
+      familyPhotos.forEach(function(fp, i){
+        var card = new THREE.Group();
+        card.name = 'cloud-family-photo-' + i;
+        card.position.set(photoXs[i % 3], photoYs[Math.floor(i / 3)], -D/2 - 0.08);
+        card.rotation.y = Math.PI;
+        card.rotation.z = photoRot[i];
+        var frame = new THREE.Mesh(new THREE.BoxGeometry(1.46, 1.48, 0.05), new THREE.MeshLambertMaterial({color:0xf0e4c7}));
+        frame.renderOrder = 2;
+        card.add(frame);
+        var backing = new THREE.Mesh(new THREE.BoxGeometry(1.18, 1.06, 0.035), new THREE.MeshLambertMaterial({color:0x9fc8e5}));
+        backing.position.z = 0.045; backing.renderOrder = 3; card.add(backing);
+        var portrait = new THREE.Mesh(new THREE.PlaneGeometry(1.12, 1.04), texMat('./images/stray-birds/clouds/' + fp[0]));
+        portrait.position.z = 0.075; portrait.renderOrder = 4;
+        portrait.userData = {type:'familyPage', slug:fp[3], name:fp[1]};
+        card.add(portrait); clickables.push(portrait);
+        // 卡片整体设为双面透明命中面，转到背面后点照片边缘也能稳定进入个人页。
+        var familyHit = new THREE.Mesh(new THREE.PlaneGeometry(1.36, 1.38), new THREE.MeshBasicMaterial({transparent:true, opacity:0, side:THREE.DoubleSide, depthWrite:false}));
+        familyHit.position.z = 0.105;
+        familyHit.userData = {type:'familyPage', slug:fp[3], name:fp[1]};
+        card.add(familyHit); clickables.push(familyHit);
+        familyCards.push({group:card, slug:fp[3]});
+        var nameplate = new THREE.Mesh(new THREE.PlaneGeometry(1.06, 0.20), makeLabel(fp[1], fp[2], {bg:'#f4edcf', size:36}));
+        nameplate.position.set(0, -0.61, 0.078); nameplate.renderOrder = 5; card.add(nameplate);
+        var pinMat = new THREE.MeshLambertMaterial({color:0xc9a05a});
+        [[-0.61,0.62],[0.61,0.62]].forEach(function(p){
+          var pin = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), pinMat);
+          pin.position.set(p[0], p[1], 0.08); pin.renderOrder = 6; card.add(pin);
+        });
+        root.add(card);
+      });
+      var familyTitle = new THREE.Group();
+      familyTitle.position.set(0, 3.57, -D/2 - 0.09); familyTitle.rotation.y = Math.PI;
+      var titleMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.35, 0.46), makeLabel('云朵家族', 'CLOUD FAMILY', {bg:'#d8e3a4', size:56}));
+      titleMesh.renderOrder = 5; familyTitle.add(titleMesh); root.add(familyTitle);
+      // 背板外侧四周一圈深色描边条，遮住列与列之间的接缝
+      var frameMat = new THREE.MeshLambertMaterial({color: BLUE_D});
+      [[0, H/2 - 0.05, totalW, 0.24], [0, -H/2 + 0.05, totalW, 0.24]].forEach(function(f){
+        var bar = new THREE.Mesh(new THREE.BoxGeometry(f[2], f[3], 0.06), frameMat);
+        bar.position.set(f[0], f[1], -D/2 - 0.03);
+        root.add(bar);
+      });
+      [-1, 1].forEach(function(s){
+        var bar = new THREE.Mesh(new THREE.BoxGeometry(0.24, H - 0.1, 0.06), frameMat);
+        bar.position.set(s * (totalW/2 - 0.08), 0, -D/2 - 0.03);
+        root.add(bar);
+      });
+    })();
+
+    /* ---- 云朵家族相册只保留在柜子背面，正面不再铺角色贴纸 ---- */
+
+    /* ---- 门上贴纸 ---- */
+    function addSticker(door, url, w, x, y, rot){
+      var st = new THREE.Mesh(new THREE.PlaneGeometry(w, w), texMat(url));
+      st.position.set(x, y, 0.08);
+      st.rotation.z = rot || 0;
+      door.add(st);
+    }
+    addSticker(doorL, './images/stray-birds/cloud-brush.png', 0.85, W/2 - 0.5, 1.4, 0.15);
+    addSticker(doorL, './images/stray-birds/bird-up.png', 0.7, W/2 + 0.4, 0.2, -0.1);
+    addSticker(doorR, './images/stray-birds/bird-glide.png', 0.8, W/2, 1.1, 0.08);
+    // 第三个柜门照片贴：使用用户提供的角色图，可点击
+    var photo = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 1.15), new THREE.MeshBasicMaterial({color:0xffffff}));
+    photo.position.set(W/2 - 0.1, -1.1, 0.075); photo.rotation.z = -0.06;
+    doorR.add(photo);
+    var portraitTex = texLoader.load('./images/locker-props/power-bills-character.jpg');
+    var photoImg = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.8),
+      new THREE.MeshBasicMaterial({map: portraitTex}));
+    photoImg.position.set(W/2 - 0.1, -1.0, 0.08); photoImg.rotation.z = -0.06;
+    photoImg.userData = {type:'miniCloud', s: 0.8, name: '云朵本云',
+      line: '这是我——喜欢待在柜门上，看你路过。'};
+    doorR.add(photoImg);
+    clickables.push(photoImg);
+    // 左门「云朵诗集」画：点击翻开诗集
+    var stickerLabel = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.75), makeLabel('云朵诗集', 'CLOUD POEMS', {bg:'#d8e3a4'}));
+    stickerLabel.position.set(W/2, 2.9, 0.08); stickerLabel.rotation.z = 0.05;
+    stickerLabel.userData = {type:'book'};
+    doorL.add(stickerLabel);
+    clickables.push(stickerLabel);
+
+    /* ---- 柜顶：诗集 + 停着的鸟 ---- */
+    var book = new THREE.Group();
+    var cover = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.32, 2.2), matLeaf);
+    book.add(cover);
+    var pages = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.22, 2.1), new THREE.MeshLambertMaterial({color:0xf7f3e2}));
+    pages.position.x = 0.06; book.add(pages);
+    var bookLabel = new THREE.Mesh(new THREE.PlaneGeometry(1.55, 2.1),
+      new THREE.MeshBasicMaterial({map: texLoader.load('./images/stray-birds/book-cover.jpg')}));
+    bookLabel.rotation.x = -Math.PI/2; bookLabel.position.y = 0.20;
+    book.add(bookLabel);
+    book.position.set(0, H/2 + 0.17, 0.1);
+    book.rotation.y = 0.35;
+    root.add(book);
+    book.userData = {type:'book'};
+    clickables.push(book);
+
+    var perchBird = new THREE.Sprite(new THREE.SpriteMaterial({map: texLoader.load('./images/stray-birds/bird-glide.png'), transparent:true}));
+    perchBird.scale.set(1.15, 1.15, 1);
+    perchBird.position.set(0, H/2 + 0.7, 0);
+    root.add(perchBird);
+
+    /* ---- 柜顶英文名与植物纹样：横放在右侧柜顶，作为正面可见的签名 ---- */
+    (function(){
+      var cv = document.createElement('canvas'); cv.width = 640; cv.height = 300;
+      var g = cv.getContext('2d');
+      g.fillStyle = '#e8e0c8'; g.fillRect(0, 0, cv.width, cv.height);
+      g.strokeStyle = '#35619c'; g.lineWidth = 8; g.strokeRect(12, 12, cv.width - 24, cv.height - 24);
+      g.strokeStyle = '#8a9a6b'; g.lineWidth = 5; g.lineCap = 'round';
+      g.beginPath(); g.moveTo(78, 226); g.quadraticCurveTo(95, 147, 144, 72); g.stroke();
+      g.beginPath(); g.moveTo(562, 226); g.quadraticCurveTo(545, 147, 496, 72); g.stroke();
+      [[103,166, -0.7], [118,130, -0.45], [137,94, -0.3], [537,166, 0.7], [522,130, 0.45], [503,94, 0.3]].forEach(function(p){
+        g.save(); g.translate(p[0], p[1]); g.rotate(p[2]);
+        g.fillStyle = '#b5c98e'; g.beginPath(); g.ellipse(0, 0, 16, 8, 0, 0, Math.PI * 2); g.fill();
+        g.restore();
+      });
+      g.fillStyle = '#0e3a7d'; g.font = 'bold 62px "Space Mono",monospace';
+      g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('ALOMO', cv.width / 2, 119);
+      g.fillStyle = '#4a6b9d'; g.font = '25px "Space Mono",monospace';
+      g.fillText('CLOUD / BOTANICAL NOTES', cv.width / 2, 178);
+      var nameTex = new THREE.CanvasTexture(cv);
+      var namePlate = new THREE.Mesh(new THREE.PlaneGeometry(1.32, 0.62), new THREE.MeshBasicMaterial({map:nameTex}));
+      // 中柜顶已被诗集占用，改为立在右侧第三柜顶，正面朝向观众。
+      namePlate.position.set(W + GAP, H/2 + 0.41, 0.22);
+      namePlate.rotation.z = -0.035;
+      root.add(namePlate);
+    })();
+
+    /* ---- 拿出来看看：点击道具聚焦到镜头前 ---- */
+    var focused = null;
+    var focusShade = new THREE.Mesh(new THREE.PlaneGeometry(70, 40),
+      new THREE.MeshBasicMaterial({color:0x08265a, transparent:true, opacity:0, depthWrite:false}));
+    focusShade.position.set(0, 0.4, 3.4);
+    focusShade.visible = false;
+    focusShade.renderOrder = 4;
+    root.add(focusShade);
+    function setDepthTest(m, v){
+      // 平面贴图：关深度测试防 z-fighting；3D 模型：保留深度测试（否则内部件穿插），
+      // 但把 renderOrder 传播到所有子 mesh，否则会被聚焦遮罩（renderOrder 4）压暗。
+      var is3d = m.userData && m.userData.focusH !== undefined;
+      var ro = v ? 0 : 5;
+      if(m.traverse){
+        m.traverse(function(o){ if(o.material){ if(!is3d) o.material.depthTest = v; o.renderOrder = ro; } });
+      } else if(m.material){ m.material.depthTest = v; m.renderOrder = ro; }
+    }
+    function focusProp(mesh, onDone){
+      var px = (mesh.parent === root) ? 0 : mesh.parent.position.x;
+      mesh.userData.home = {x: mesh.position.x, y: mesh.position.y, z: mesh.position.z, s: mesh.scale.x};
+      focused = mesh;
+      mesh.renderOrder = 5;
+      setDepthTest(mesh, false);
+      focusShade.visible = true;
+      gsap.to(focusShade.material, {opacity:.55, duration:.55});
+      // 3D 模型：原点在底部且有基础缩放，聚焦时按包围盒把中心对到镜头前
+      var ts = 2.3, ty = 0.35;
+      if(mesh.userData.focusH !== undefined){
+        ts = Math.min(mesh.userData.home.s * 2.3, 2.4 / mesh.userData.focusH);
+        ty = 0.35 - mesh.userData.focusCY * ts;
+      }
+      gsap.to(mesh.position, {x:-px, y:ty, z:5.4, duration:.85, ease:'power3.inOut'});
+      gsap.to(mesh.scale, {x:ts, y:ts, z:ts, duration:.85, ease:'power3.inOut',
+        onComplete:function(){ if(onDone) onDone(); }});
+    }
+    function unfocusProp(){
+      var m = focused; if(!m) return;
+      focused = null;
+      var h = m.userData.home;
+      gsap.to(focusShade.material, {opacity:0, duration:.5, onComplete:function(){ focusShade.visible = false; }});
+      gsap.to(m.position, {x:h.x, y:h.y, z:h.z, duration:.8, ease:'power3.inOut'});
+      gsap.to(m.scale, {x:h.s, y:h.s, z:h.s, duration:.8, ease:'power3.inOut',
+        onComplete:function(){ m.renderOrder = 0; setDepthTest(m, true); }});
+    }
+
+
+
+    /* ---- 场景纵深：前后景云 + 地面柔影 ---- */
+    var puffTex = (function(){
+      var cv = document.createElement('canvas'); cv.width = 256; cv.height = 160;
+      var g = cv.getContext('2d');
+      function blob(x, y, rr){
+        var gr = g.createRadialGradient(x, y, rr*0.15, x, y, rr);
+        gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+        g.fillStyle = gr; g.beginPath(); g.arc(x, y, rr, 0, 7); g.fill();
+      }
+      blob(80, 98, 52); blob(128, 74, 60); blob(178, 96, 50); blob(128, 106, 58);
+      return new THREE.CanvasTexture(cv);
+    })();
+    [[-7.6, 2.6, -3.5, 3.6, .5], [7.4, 3.6, -4.2, 4.2, .45], [-6.6, -2.4, 2.6, 2.6, .65],
+     [6.8, -1.6, 3.2, 3.0, .6], [-5.4, 5.0, 1.2, 2.2, .55], [5.8, 5.6, -2.2, 2.8, .45]].forEach(function(c, i){
+      var sp = new THREE.Sprite(new THREE.SpriteMaterial({map: puffTex, transparent:true, opacity:c[4], depthWrite:false}));
+      sp.position.set(c[0], c[1], c[2]);
+      sp.scale.set(c[3], c[3]*0.62, 1);
+      sp.userData = {baseY: c[1], phase: i * 1.3};
+      root.add(sp); cloudSprites.push(sp);
+    });
+    var shadowTex = (function(){
+      var cv = document.createElement('canvas'); cv.width = 256; cv.height = 128;
+      var g = cv.getContext('2d');
+      var gr = g.createRadialGradient(128, 64, 8, 128, 64, 120);
+      gr.addColorStop(0, 'rgba(8,30,70,.55)'); gr.addColorStop(1, 'rgba(8,30,70,0)');
+      g.fillStyle = gr;
+      g.save(); g.translate(128, 64); g.scale(1, 0.5); g.translate(-128, -64);
+      g.fillRect(0, 0, 256, 128); g.restore();
+      return new THREE.CanvasTexture(cv);
+    })();
+    var gShadow = new THREE.Mesh(new THREE.PlaneGeometry(13, 5),
+      new THREE.MeshBasicMaterial({map: shadowTex, transparent:true, opacity:.75, depthWrite:false}));
+    gShadow.rotation.x = -Math.PI/2;
+    gShadow.position.y = -H/2 - 0.45;
+    root.add(gShadow);
+
+    /* ---- 交互 ---- */
+    var ray = new THREE.Raycaster();
+    var mouse = new THREE.Vector2();
+    var dragging = false, moved = 0, lastX = 0, targetRotY = 0, targetRotX = 0;
+
+    canvas.addEventListener('pointerdown', function(e){ dragging = true; moved = 0; lastX = e.clientX; canvas.style.cursor='grabbing'; });
+    window.addEventListener('pointermove', function(e){
+      if(dragging){
+        var dx = e.clientX - lastX; lastX = e.clientX; moved += Math.abs(dx);
+        targetRotY += dx * 0.008;
+      } else {
+        var r = wrap.getBoundingClientRect();
+        targetRotX = ((e.clientY - r.top) / r.height - .5) * -0.12;
+      }
+    });
+    window.addEventListener('pointerup', function(e){
+      canvas.style.cursor='grab';
+      if(dragging && moved < 6) handleClick(e);
+      dragging = false;
+    });
+
+    function handleClick(e){
+      if(focused){ unfocusProp(); return; }
+      var r = canvas.getBoundingClientRect();
+      // 背面卡片做一次屏幕空间命中兜底：3D 透视下透明面在部分浏览器会出现命中偏移。
+      if(Math.cos(root.rotation.y) < -0.2 && familyCards.length){
+        root.updateMatrixWorld(true);
+        for(var fi = 0; fi < familyCards.length; fi++){
+          var fp3 = new THREE.Vector3();
+          familyCards[fi].group.getWorldPosition(fp3);
+          fp3.project(camera);
+          var fx = r.left + (fp3.x + 1) * 0.5 * r.width;
+          var fy = r.top + (-fp3.y + 1) * 0.5 * r.height;
+          var fr = Math.max(30, Math.min(76, r.width * 0.055));
+          if(Math.hypot(e.clientX - fx, e.clientY - fy) < fr){
+            window.location.href = './cloud-' + encodeURIComponent(familyCards[fi].slug) + '.html';
+            return;
+          }
+        }
+      }
+      mouse.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+      mouse.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+      ray.setFromCamera(mouse, camera);
+      var hits = ray.intersectObjects(clickables, true).filter(function(h){
+        var o = h.object;
+        while(o){ if(o.visible === false) return false; o = o.parent; }
+        return true;
+      });
+      if(!hits.length) return;
+      var obj = hits[0].object, data = null;
+      while(obj && !data){ if(obj.userData && obj.userData.type) data = obj.userData; else obj = obj.parent; }
+      if(!data) return;
+      if(data.type === 'door'){
+        var pivot = obj;
+        if(!data.open && !flockTriggered){ releaseFlock(); return; }
+        data.open = !data.open;
+        gsap.to(pivot.rotation, {y: data.open ? data.openAngle : 0, duration:1.1, ease:'power3.inOut'});
+      } else if(data.type === 'item'){
+        var itemObj = obj, itemFx = itemObj.userData && itemObj.userData.fx;
+        if(itemFx && itemFx.tap){
+          try{ itemFx.tap(); }catch(e){}
+          setTimeout(function(){ openOverlay(data.key); }, 900);
+        } else {
+          openOverlay(data.key);
+        }
+      } else if(data.type === 'prop'){
+        if(data.action === 'photos'){
+          propAction(data.action, obj);
+        } else {
+          var target = obj, act = data.action;
+          focusProp(target, function(){ propAction(act, target); });
+        }
+      } else if(data.type === 'scope3d'){
+        openScope();
+      } else if(data.type === 'cage3d'){
+        flyCageBird(obj);
+      } else if(data.type === 'shelfBook'){
+        tapShelfBook(obj);
+      } else if(data.type === 'typer'){
+        openTyper();
+      } else if(data.type === 'book'){
+        openBook();
+      } else if(data.type === 'familyPage'){
+        var familySlug = data.slug || 'painter';
+        window.location.href = './cloud-' + encodeURIComponent(familySlug) + '.html';
+      } else if(data.type === 'miniCloud'){
+        var sp = obj;
+        var sc = sp.userData.s || 0.42;
+        gsap.fromTo(sp.scale, {x:sc, y:sc}, {x:sc*1.28, y:sc*1.28, duration:.2, yoyo:true, repeat:1, ease:'power2.out'});
+        if(sp.userData.line) say(sp.userData.name + '\uff1a' + sp.userData.line);
+      }
+    }
+
+    /* ---- 尺寸 & 渲染循环 ---- */
+    function resize(){
+      var w = wrap.clientWidth, h = wrap.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    var visible = true;
+    new IntersectionObserver(function(en){ visible = en[0].isIntersecting; }, {threshold:0.02}).observe(wrap);
+
+    var t0 = performance.now(), lastT = t0;
+    (function loop(now){
+      requestAnimationFrame(loop);
+      if(!visible){ lastT = now; return; }
+      var dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
+      var t = (now - t0) / 1000;
+      if(!dragging) targetRotY += (Math.sin(t*0.35) * 0.14 - targetRotY) * 0.006;
+      root.rotation.y += (targetRotY - root.rotation.y) * 0.08;
+      root.rotation.x += (targetRotX - root.rotation.x) * 0.06;
+      // 平面道具受限反向补偿，减弱侧看纸片感（保留 70% 跟随）
+      var comp = THREE.MathUtils.clamp(root.rotation.y, -0.6, 0.6) * 0.7;
+      flatProps.forEach(function(p){ if(p !== focused) p.rotation.y = -comp; });
+      root.position.y = Math.sin(t * 0.8) * 0.06;
+      cloudSprites.forEach(function(sp){ sp.position.y = sp.userData.baseY + Math.sin(t*1.6 + sp.userData.phase) * 0.035; });
+      perchBird.position.y = H/2 + 0.7 + Math.sin(t * 1.4) * 0.08;
+      perchBird.material.rotation = Math.sin(t * 0.9) * 0.06;
+      for(var si = snowBursts.length - 1; si >= 0; si--){
+        var sn = snowBursts[si];
+        sn.position.y += sn.userData.vy * dt;
+        sn.position.x += sn.userData.vx * dt + Math.sin(t*3 + si) * 0.002;
+        sn.userData.life -= dt;
+        sn.material.opacity = Math.min(0.95, sn.userData.life);
+        if(sn.userData.life <= 0){ sn.parent.remove(sn); sn.material.dispose(); snowBursts.splice(si, 1); }
+      }
+      for(var ni = tuneNotes.length - 1; ni >= 0; ni--){
+        var nt = tuneNotes[ni];
+        nt.position.y += nt.userData.vy * dt;
+        nt.position.x += Math.sin(t*2 + ni) * 0.15 * dt;
+        nt.userData.life -= dt;
+        nt.material.opacity = Math.min(0.95, nt.userData.life);
+        if(nt.userData.life <= 0){ nt.parent.remove(nt); nt.material.dispose(); tuneNotes.splice(ni, 1); }
+      }
+      renderer.render(scene, camera);
+    })(t0);
+
+    /* ---- 望远镜：真的能看到远处 ---- */
+    var scopeOv = document.getElementById('scopeOverlay');
+    var scopeState = null;
+    function openScope(){
+      scopeOv.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      if(scopeState) scopeState.cancelled = true;
+      var sky = document.getElementById('scopeSky');
+      var bird = document.getElementById('scopeBird');
+      var ring = document.getElementById('scopeRing');
+      var letter = document.getElementById('scopeLetter');
+      letter.style.display = 'none';
+      bird.style.display = 'block';
+      var st = {cancelled: false, panX: 0, panY: 0, lockT: 0, caught: false, birdX: 0.44, birdY: 0.42, t0: performance.now()};
+      scopeState = st;
+      // 鸟缓慢游走
+      var birdTween = gsap.to(st, {
+        birdX: '+=0.1', duration: 3.2, yoyo: true, repeat: -1, ease: 'sine.inOut'
+      });
+      var bobTween = gsap.to(st, {
+        birdY: '+=0.06', duration: 2.1, yoyo: true, repeat: -1, ease: 'sine.inOut'
+      });
+      function onMove(e){
+        if(st.caught) return;
+        var r = scopeOv.getBoundingClientRect();
+        st.panX = ((e.clientX - r.left) / r.width - 0.5) * 2;
+        st.panY = ((e.clientY - r.top) / r.height - 0.5) * 2;
+      }
+      scopeOv.addEventListener('pointermove', onMove);
+      st.cleanup = function(){
+        scopeOv.removeEventListener('pointermove', onMove);
+        birdTween.kill(); bobTween.kill();
+      };
+      (function loop(){
+        if(st.cancelled || !scopeOv.classList.contains('open')){ st.cleanup(); return; }
+        requestAnimationFrame(loop);
+        // 天空随鼠标反向平移（转镜筒的感觉）
+        sky.style.transform = 'translate(' + (st.panX * 9) + '%,' + (st.panY * 9) + '%)';
+        if(st.caught) return;
+        // 鸟的位置 = 游走 + 天空平移（鸟在远处，跟着天空动）
+        var bx = st.birdX - st.panX * 0.18, by = st.birdY - st.panY * 0.18;
+        bird.style.left = (bx * 100) + '%';
+        bird.style.top = (by * 100) + '%';
+        // 对准检测：鸟中心距画面中心
+        var dx = bx - 0.5 + 0.06, dy = by - 0.5 + 0.06;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if(dist < 0.09){
+          st.lockT += 16.7;
+          ring.classList.add('lock');
+          if(st.lockT > 1100){
+            st.caught = true;
+            ring.classList.remove('lock');
+            gsap.to(bird, {left: '27%', top: '15%', width: '22%', duration: 1.1, ease: 'power2.out'});
+            setTimeout(function(){
+              letter.style.display = 'block';
+              gsap.fromTo(letter, {scale: 0.6, opacity: 0, rotation: -8}, {scale: 1, opacity: 1, rotation: -2, duration: 0.6, ease: 'back.out(1.6)'});
+            }, 900);
+          }
+        } else {
+          st.lockT = 0;
+          ring.classList.remove('lock');
+        }
+      })();
+    }
+    function closeScope(){
+      scopeOv.classList.remove('open');
+      document.body.style.overflow = '';
+      if(scopeState){ scopeState.cancelled = true; }
+    }
+    scopeOv.addEventListener('click', function(e){ if(e.target === scopeOv) closeScope(); });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && scopeOv.classList.contains('open')) closeScope();
+    });
+
+    /* ---- 复古打字机：真的可以打字 ---- */
+    var typerOv = document.getElementById('typerOverlay');
+    var typerState = null;
+    function initTyper(){
+      var cv = document.getElementById('typerCanvas');
+      var renderer = new THREE.WebGLRenderer({canvas: cv, antialias: true, alpha: true});
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(34, 1, 0.1, 50);
+      camera.position.set(0, 1.75, 2.15);
+      camera.lookAt(0, 0.55, 0);
+      scene.add(new THREE.HemisphereLight(0xf2ecd8, 0x2a3a30, 1.0));
+      var key = new THREE.DirectionalLight(0xfff2dc, 0.7);
+      key.position.set(-2, 3, 3);
+      scene.add(key);
+      var rim = new THREE.DirectionalLight(0xd8e4f0, 0.35);
+      rim.position.set(2, 2, -2);
+      scene.add(rim);
+      var model = createLockerTypewriter();
+      scene.add(model);
+      var api = model.userData.typer;
+      // 打字音效：短促机械咔哒
+      var actx = null;
+      function click(){
+        try{
+          if(!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+          if(actx.state === 'suspended') actx.resume();
+          var o = actx.createOscillator(), g = actx.createGain();
+          o.type = 'square'; o.frequency.value = 2200 + Math.random() * 600;
+          g.gain.setValueAtTime(0.06, actx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + 0.035);
+          o.connect(g); g.connect(actx.destination);
+          o.start(); o.stop(actx.currentTime + 0.04);
+        }catch(e){}
+      }
+      function ding(){
+        try{
+          if(!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+          var o = actx.createOscillator(), g = actx.createGain();
+          o.type = 'sine'; o.frequency.value = 1568;
+          g.gain.setValueAtTime(0.08, actx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + 0.5);
+          o.connect(g); g.connect(actx.destination);
+          o.start(); o.stop(actx.currentTime + 0.5);
+        }catch(e){}
+      }
+      function resize(){
+        var w = cv.clientWidth || 800, h = cv.clientHeight || 600;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+      window.addEventListener('resize', resize);
+      resize();
+      var running = false;
+      (function loop(){
+        requestAnimationFrame(loop);
+        if(!running) return;
+        renderer.render(scene, camera);
+      })();
+      return {
+        api: api, click: click, ding: ding,
+        start: function(){
+          running = true;
+          resize();
+          gsap.fromTo(model.rotation, {y: -0.35}, {y: 0, duration: 0.9, ease: 'power3.out'});
+          gsap.fromTo(model.position, {y: -0.25}, {y: 0, duration: 0.9, ease: 'power3.out'});
+        },
+        stop: function(){ running = false; }
+      };
+    }
+    function openTyper(){
+      typerOv.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      if(!typerState) typerState = initTyper();
+      typerState.start();
+      setTimeout(function(){
+        typerState.api.type('DEAR BIRD,\n');
+      }, 650);
+    }
+    function closeTyper(){
+      typerOv.classList.remove('open');
+      document.body.style.overflow = '';
+      if(typerState) typerState.stop();
+    }
+    document.getElementById('typerClose').addEventListener('click', closeTyper);
+    typerOv.addEventListener('click', function(e){ if(e.target === typerOv) closeTyper(); });
+    document.addEventListener('keydown', function(e){
+      if(!typerOv.classList.contains('open') || !typerState) return;
+      var api = typerState.api;
+      if(e.key === 'Escape'){ closeTyper(); return; }
+      e.preventDefault();
+      if(e.key === 'Enter'){ typerState.ding(); api.newline(); return; }
+      if(e.key === 'Backspace'){ api.backspace(); return; }
+      if(e.key.length === 1){
+        var ch = e.key.toUpperCase();
+        typerState.click();
+        if(api.keyMap[ch]) api.press(ch);
+        api.print(ch);
+      }
+    });
+
+    /* ---- 诗集覆盖层 ---- */
+    function openPoemOverlay(){
+      var ov = document.getElementById('poemOverlay');
+      ov.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      if(document.body.classList.contains('shot')) return; // 截图模式直接呈现终态
+      gsap.fromTo('.poem-hero', {y:60, opacity:0, rotation:-8}, {y:0, opacity:1, rotation:-3, duration:.9, ease:'power3.out'});
+      gsap.fromTo('.poem-list h3, .poem-list .pm-en', {y:30, opacity:0}, {y:0, opacity:1, duration:.7, stagger:.1, ease:'power3.out', delay:.15});
+      gsap.fromTo('.pm-card', {y:46, opacity:0}, {y:0, opacity:1, duration:.7, stagger:.09, ease:'back.out(1.5)', delay:.3,
+        onComplete:function(){ gsap.set('.pm-card', {clearProps:'transform'}); }});
+    }
+    document.getElementById('poemClose').addEventListener('click', function(){
+      document.getElementById('poemOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    });
+    /* ---- \u5f00\u67dc\u653e\u98de\u9e1f\uff1a\u8854\u7740\u8bd7\u96c6\u7684\u9e1f\u7fa4 + \u4e3b\u9e1f\u9001\u4e66 ---- */
+    var flockFlying = false, flockTriggered = false;
+    function openAllDoors(){
+      doors.forEach(function(d, i){
+        if(!d.userData.open){
+          d.userData.open = true;
+          gsap.to(d.rotation, {y: d.userData.openAngle, duration:1.0, delay: i*0.14, ease:'power3.inOut'});
+        }
+      });
+    }
+    function heroBookFinale(r){
+      /* 先让观众看清“喙衔书”，再让书从书脊展开；两个动作分开，叙事关系不会混乱。 */
+      var veil = document.createElement('div');
+      veil.className = 'sky-veil';
+      document.body.appendChild(veil);
+      var bloom = document.createElement('div');
+      bloom.className = 'sky-bloom';
+      document.body.appendChild(bloom);
+      var el = document.createElement('div');
+      el.className = 'book-flyin';
+      el.innerHTML = '<span class="bf-halo"></span><img class="bf-bird" src="./images/stray-birds/bird-book-beak-v2.png"><img class="bf-book" src="./images/stray-birds/poem-hero3.jpg">';
+      document.body.appendChild(el);
+      var bird = el.querySelector('.bf-bird');
+      var bookImg = el.querySelector('.bf-book');
+      var halo = el.querySelector('.bf-halo');
+      var sx = r.left + r.width * 0.5, sy = r.top + r.height * 0.42;
+      var cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+      var flip = cx >= sx ? 1 : -1;
+      bird.style.setProperty('--bird-flip', flip);
+      el.style.left = sx + 'px';
+      el.style.top = sy + 'px';
+      gsap.set(el, {xPercent:-50, yPercent:-50, scale:.25, opacity:0});
+      gsap.set(halo, {scale:.35, opacity:0});
+      gsap.set(bookImg, {xPercent:-50, y:18, scale:.05, rotationX:76, opacity:0, transformOrigin:'50% 0%'});
+
+      var motes = [];
+      for(var mi = 0; mi < 22; mi++){
+        var mote = document.createElement('i');
+        mote.className = 'gold-mote';
+        var ms = 4 + Math.random() * 9;
+        mote.style.width = ms + 'px'; mote.style.height = ms + 'px';
+        mote.style.left = cx + 'px'; mote.style.top = (cy + 20) + 'px';
+        document.body.appendChild(mote); motes.push(mote);
+        var ma = (mi / 22) * Math.PI * 2 + Math.random() * .35;
+        var mr = 100 + Math.random() * 250;
+        gsap.set(mote, {x:-ms/2, y:-ms/2, scale:0, opacity:0});
+        gsap.to(mote, {x:Math.cos(ma) * mr, y:Math.sin(ma) * mr, scale:1, opacity:.9,
+          duration:1.1 + Math.random() * .9, delay:.35 + Math.random() * .8, ease:'power2.out'});
+        gsap.to(mote, {opacity:0, duration:.55, delay:1.8 + Math.random() * .6});
+      }
+      var tl = gsap.timeline({onComplete:function(){
+        openPoemOverlay();
+        gsap.to([el, veil, bloom], {opacity:0, duration:.55, onComplete:function(){
+          el.remove(); veil.remove(); bloom.remove();
+          motes.forEach(function(m){ m.remove(); });
+          flockFlying = false;
+        }});
+      }});
+      tl.to(veil, {opacity:.58, duration:.45, ease:'sine.out'})
+        .to(bloom, {opacity:.58, duration:.5, ease:'power2.out'}, '<')
+        .to(el, {opacity:1, scale:.52, duration:.38, ease:'back.out(1.7)'})
+        .to(el, {left:sx + (cx - sx) * .38, top:sy - window.innerHeight * .08, scale:.74, duration:.72, ease:'power2.out'})
+        .to(el, {left:cx, top:cy - 58, scale:1, duration:.95, ease:'power3.inOut'})
+        .to(halo, {opacity:.9, scale:1.15, duration:.55, ease:'power2.out'}, '-=.35')
+        .to(bookImg, {opacity:1, scale:1, rotationX:0, y:0, duration:1.2, ease:'power3.out'}, '+=.2')
+        .to(halo, {scale:1.48, opacity:.25, duration:1, ease:'sine.out'}, '-=.72')
+        .to(el, {scale:1.08, duration:.45, ease:'sine.out'}, '-=.55')
+        .to(veil, {opacity:0, duration:.7, ease:'sine.in'})
+        .to(bloom, {opacity:0, duration:.7, ease:'sine.in'}, '<')
+        .to({}, {duration:.4});
+    }
+    function releaseFlock(){
+      if(flockFlying) return;
+      flockFlying = true; flockTriggered = true;
+      openAllDoors();
+      var r = wrap.getBoundingClientRect();
+      var srcs = ['./images/stray-birds/bird-book-beak-v2.png', './images/stray-birds/bird-book-glide.png'];
+      var n = 16, done = 0;
+      var colX = [0.28, 0.5, 0.72];
+      say('\u67dc\u95e8\u5f00\u4e86\u2014\u2014\u98de\u9e1f\u8854\u7740\u8bd7\u96c6\u51fa\u53d1\uff01', 3200);
+      var glows = [];
+      colX.forEach(function(fr, gi){
+        var glow = document.createElement('div');
+        glow.className = 'door-glow';
+        var gs = Math.min(300, Math.max(180, r.width * .16));
+        glow.style.width = gs + 'px'; glow.style.height = gs + 'px';
+        glow.style.left = (r.left + r.width * fr - gs/2) + 'px';
+        glow.style.top = (r.top + r.height * .49 - gs/2) + 'px';
+        document.body.appendChild(glow); glows.push(glow);
+        gsap.fromTo(glow, {scale:.2, opacity:0}, {scale:1.15, opacity:.72, duration:.85, delay:gi*.12, ease:'power2.out'});
+      });
+      for(var i = 0; i < n; i++){
+        (function(i){
+          var el = document.createElement('div');
+          el.className = 'flock-bird';
+          el.style.width = (44 + Math.random() * 50) + 'px';
+          el.innerHTML = '<img src="' + srcs[i % 2] + '">';
+          var cx = r.left + r.width * colX[i % 3] + (Math.random() - .5) * 70;
+          var cy = r.top + r.height * (0.4 + Math.random() * 0.3);
+          el.style.left = cx + 'px'; el.style.top = cy + 'px';
+          document.body.appendChild(el);
+          var column = i % 3;
+          var dir = column === 0 ? -1 : (column === 2 ? 1 : (i % 2 ? 1 : -1));
+          // 素材鸟头朝右；用 CSS 变量保留翻转，不会被翅膀动画覆盖。
+          var flip = dir < 0 ? -1 : 1;
+          var img = el.querySelector('img');
+          img.style.setProperty('--bird-flip', flip);
+          var endX = cx + dir * (window.innerWidth * (0.42 + Math.random() * 0.3));
+          var endY = cy - window.innerHeight * (0.4 + Math.random() * 0.45);
+          var midX = cx + dir * (60 + Math.random() * 140);
+          var midY = cy - (50 + Math.random() * 120);
+          var dur = 2.1 + Math.random() * 1.1;
+          gsap.set(el, {scale:0.3, opacity:0, rotation:dir * -8});
+          var tl = gsap.timeline({delay:.55 + i * 0.09, onComplete:function(){
+            el.remove();
+            if(++done === n){
+              glows.forEach(function(g){ gsap.to(g, {opacity:0, scale:1.5, duration:.6, onComplete:function(){ g.remove(); }}); });
+              heroBookFinale(r);
+            }
+          }});
+          tl.to(el, {scale:1, opacity:1, duration:.35, ease:'back.out(2)'}, 0)
+            .to(el, {left:midX, top:midY, duration:dur * 0.4, ease:'power2.out'}, 0)
+            .to(el, {left:endX, top:endY, rotation:dir * 10, duration:dur * 0.6, ease:'power1.in'}, dur * 0.4);
+        })(i);
+      }
+    }
+    var qp = new URLSearchParams(location.search);
+    if(qp.has('goto')){
+      var gt = document.getElementById(qp.get('goto'));
+      if(gt) gt.scrollIntoView({behavior:'instant', block:'start'});
+    }
+    if(qp.has('poem')) openPoemOverlay();
+    if(qp.has('book')){
+      openBook();
+      var bn = parseInt(qp.get('book') || '0');
+      for(var bi = 1; bi <= bn && bi < bookLeaves.length; bi++){ bookLeaves[bi].classList.add('flipped'); bookLeaves[bi].style.zIndex = 40 + bi; }
+    }
+    if(qp.has('flock')){
+      releaseFlock();
+      if(qp.get('flock') === 'freeze') gsap.delayedCall(parseInt(qp.get('t') || '1500') / 1000, function(){ gsap.globalTimeline.pause(); });
+    }
+  }
+})();
+</script>
+</body>
+</html>

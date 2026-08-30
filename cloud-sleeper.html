@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070d1f">
+<title>云朵家族 · 云梦梦</title>
+<link rel="stylesheet" href="./assets/fonts/fonts.css">
+<link rel="stylesheet" href="./cloud-dream.css">
+</head>
+<body>
+
+<canvas id="sky-stars"></canvas>
+<canvas id="sky-galaxy"></canvas>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<div class="stage">
+
+  <header class="top">
+    <a class="pill" href="./cloud-family.html"><span>←</span> 回到云朵家族</a>
+    <div class="brand">CLOUD FAMILY · <b>云梦梦</b></div>
+    <a class="pill" href="./index.html"><span class="dot"></span> 主页</a>
+  </header>
+
+  <main class="hero">
+    <section class="intro">
+      <div class="tag">MEMBER 09 · DREAMER</div>
+      <h1 class="name"><span class="zh">云梦梦</span><span class="en">MENGMENG · THE DREAM KEEPER</span></h1>
+      <p class="desc">云梦梦是家族里最爱睡觉的小云朵。它抱着一弯小月亮，负责把甜甜的梦送进每一个人的窗户。它轻轻哼着摇篮曲，让整个夜空都变得柔软。</p>
+      <p class="quote">「嘘——把烦恼关掉，我送你一个发着光的梦。」</p>
+      <nav class="fam">
+        <div class="lbl">CLOUD FAMILY / 去见其他成员</div>
+        <div class="row">
+          <a href="./cloud-weather.html"><span class="sw"><img src="./assets/cloud-heroes/web/weather.webp" alt=""></span>云滴滴</a>
+          <a href="./cloud-painter.html"><span class="sw"><img src="./assets/cloud-heroes/web/painter.webp" alt=""></span>云小画</a>
+          <a href="./cloud-singer.html"><span class="sw"><img src="./assets/cloud-heroes/web/singer.webp" alt=""></span>云音音</a>
+          <a href="./cloud-baker.html"><span class="sw"><img src="./assets/cloud-heroes/web/baker.webp" alt=""></span>云小厨</a>
+          <a href="./cloud-detective.html"><span class="sw"><img src="./assets/cloud-heroes/web/detective.webp" alt=""></span>云探探</a>
+          <a href="./cloud-librarian.html"><span class="sw"><img src="./assets/cloud-heroes/web/librarian.webp" alt=""></span>云知知</a>
+          <a href="./cloud-hero.html"><span class="sw"><img src="./assets/cloud-heroes/web/hero.webp" alt=""></span>云闪闪</a>
+          <a href="./cloud-photographer.html"><span class="sw"><img src="./assets/cloud-heroes/web/photographer.webp" alt=""></span>云摄摄</a>
+          <a href="./cloud-sleeper.html" class="on"><span class="sw"><img src="./assets/cloud-heroes/web/sleeper.webp" alt=""></span>云梦梦</a>
+        </div>
+      </nav>
+    </section>
+
+    <section class="orb-wrap">
+      <div class="orb" id="orb" role="button" tabindex="0" aria-label="和云梦梦互动">
+        <div class="halo"></div><div class="halo h2"></div>
+        <div class="ring"></div><div class="ring r2"></div>
+        <div class="disc"><img src="./assets/cloud-heroes/web/sleeper.webp" alt="云梦梦"></div>
+        <div class="hint"><span class="pulse"></span>点一下，和云梦梦一起玩</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">CLOUD FAMILY · HAND-PAINTED DREAM · ☁</footer>
+</div>
+
+<div class="panel" id="panel" aria-hidden="true">
+  <div class="card">
+    <button class="close" aria-label="关闭">✕</button>
+    <div class="eyebrow">PLAY WITH 云梦梦</div>
+    <h2>和云梦梦一起玩弹珠</h2>
+    <div class="sub">按住蓄力，松开发出小月亮撞星星</div>
+    <div class="play-area" id="game"></div>
+  </div>
+</div>
+
+<script src="./cloud-dream.js"></script>
+<script src="./cloud-fx.js"></script>
+<script src="./cloud-games.js"></script>
+<script>
+  (function(){ 
+    const host = document.getElementById('game');
+    let started = false;
+    const orb = document.getElementById('orb');
+    orb.addEventListener('click', () => {
+      if (!started && window.CloudGames && window.CloudGames['sleeper']) {
+        window.CloudGames['sleeper'](host); started = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>

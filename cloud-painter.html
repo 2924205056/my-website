@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070d1f">
+<title>云朵家族 · 云小画</title>
+<link rel="stylesheet" href="./assets/fonts/fonts.css">
+<link rel="stylesheet" href="./cloud-dream.css">
+</head>
+<body>
+
+<canvas id="sky-stars"></canvas>
+<canvas id="sky-galaxy"></canvas>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<div class="stage">
+
+  <header class="top">
+    <a class="pill" href="./cloud-family.html"><span>←</span> 回到云朵家族</a>
+    <div class="brand">CLOUD FAMILY · <b>云小画</b></div>
+    <a class="pill" href="./index.html"><span class="dot"></span> 主页</a>
+  </header>
+
+  <main class="hero">
+    <section class="intro">
+      <div class="tag">MEMBER 02 · PAINTER</div>
+      <h1 class="name"><span class="zh">云小画</span><span class="en">XIAOHUA · THE SKY PAINTER</span></h1>
+      <p class="desc">云小画是家族里的小画家。它把晚霞当调色盘，把彩虹当画笔，把整个天空都当成自己的画布。每一次日落，都是它刚刚完成的新作品。</p>
+      <p class="quote">「我把天空涂成温柔的颜色，好让你的梦也变软。」</p>
+      <nav class="fam">
+        <div class="lbl">CLOUD FAMILY / 去见其他成员</div>
+        <div class="row">
+          <a href="./cloud-weather.html"><span class="sw"><img src="./assets/cloud-heroes/web/weather.webp" alt=""></span>云滴滴</a>
+          <a href="./cloud-painter.html" class="on"><span class="sw"><img src="./assets/cloud-heroes/web/painter.webp" alt=""></span>云小画</a>
+          <a href="./cloud-singer.html"><span class="sw"><img src="./assets/cloud-heroes/web/singer.webp" alt=""></span>云音音</a>
+          <a href="./cloud-baker.html"><span class="sw"><img src="./assets/cloud-heroes/web/baker.webp" alt=""></span>云小厨</a>
+          <a href="./cloud-detective.html"><span class="sw"><img src="./assets/cloud-heroes/web/detective.webp" alt=""></span>云探探</a>
+          <a href="./cloud-librarian.html"><span class="sw"><img src="./assets/cloud-heroes/web/librarian.webp" alt=""></span>云知知</a>
+          <a href="./cloud-hero.html"><span class="sw"><img src="./assets/cloud-heroes/web/hero.webp" alt=""></span>云闪闪</a>
+          <a href="./cloud-photographer.html"><span class="sw"><img src="./assets/cloud-heroes/web/photographer.webp" alt=""></span>云摄摄</a>
+          <a href="./cloud-sleeper.html"><span class="sw"><img src="./assets/cloud-heroes/web/sleeper.webp" alt=""></span>云梦梦</a>
+        </div>
+      </nav>
+    </section>
+
+    <section class="orb-wrap">
+      <div class="orb" id="orb" role="button" tabindex="0" aria-label="和云小画互动">
+        <div class="halo"></div><div class="halo h2"></div>
+        <div class="ring"></div><div class="ring r2"></div>
+        <div class="disc"><img src="./assets/cloud-heroes/web/painter.webp" alt="云小画"></div>
+        <div class="hint"><span class="pulse"></span>点一下，和云小画一起玩</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">CLOUD FAMILY · HAND-PAINTED DREAM · ☁</footer>
+</div>
+
+<div class="panel" id="panel" aria-hidden="true">
+  <div class="card">
+    <button class="close" aria-label="关闭">✕</button>
+    <div class="eyebrow">PLAY WITH 云小画</div>
+    <h2>和云小画一起飞行</h2>
+    <div class="sub">点一下让画笔往上飞，从云缝中间穿过去</div>
+    <div class="play-area" id="game"></div>
+  </div>
+</div>
+
+<script src="./cloud-dream.js"></script>
+<script src="./cloud-fx.js"></script>
+<script src="./cloud-games.js"></script>
+<script>
+  (function(){ 
+    const host = document.getElementById('game');
+    let started = false;
+    const orb = document.getElementById('orb');
+    orb.addEventListener('click', () => {
+      if (!started && window.CloudGames && window.CloudGames['painter']) {
+        window.CloudGames['painter'](host); started = true;
+      }
+    });
+  })();
+</script>
+</body>
+</html>
